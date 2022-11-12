@@ -28,7 +28,7 @@
     {if $settings.Appearance.enable_quick_view == 'Y'}
         {$quick_nav_ids = $products|fn_fields_from_multi_level:"product_id":"product_id"}
     {/if}
-    {if !$item_class}<div class="ty-grid-list" style="--columns: {$columns};">{/if}
+    {if !$item_class}<div class="ty-grid-list" {if $products|count < $settings.Appearance.columns_in_products_list}style="--grip-gap: {$products|count}"{/if}>{/if}
         {strip}
             {foreach from=$splitted_products item="sproducts" name="sprod"}
                 {foreach from=$sproducts item="product" name="sproducts"}
@@ -39,7 +39,7 @@
                             {$product.image_pairs = ''}
                             {$wishlist_but_meta = 'ty-btn-icon ty-btn__add-to-wish'}
                             {$but_text = ' '}
-                            {include file="common/product_data.tpl" product=$product}
+                            {include file="common/product_data.tpl" product=$product show_product_amount=true show_amount_label=false}
                             
                             <div class="ty-grid-list__item {$item_class} ty-flex-column 
                                 {if $settings.Appearance.enable_quick_view == 'Y' || $show_features} ty-grid-list__item--overlay{/if}">
@@ -67,6 +67,13 @@
                                         {if $smarty.capture.$rating}
                                             <div class="grid-list__rating">
                                                 {$smarty.capture.$rating nofilter}
+                                            </div>
+                                        {/if}
+
+                                        {assign var="product_amount" value="product_amount_`$obj_id`"}
+                                        {if $smarty.capture.$product_amount|trim}
+                                            <div class="ty-grid-list__product_amount">
+                                                {$smarty.capture.$product_amount nofilter}
                                             </div>
                                         {/if}
 

@@ -1,7 +1,6 @@
 <?php
 
 use Tygh\Tygh;
-use Tygh\Enum\SiteArea;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -23,25 +22,4 @@ function fn_blocks_aurora_get_vendor_info() {
     }
 
     return $company_data;
-}
-
-function fn_aurora_init_user_session_data(&$sess_data, $user_id) {
-    $message = __(
-        'vendor_panel_configurator.configure_vendor_panel_notice',
-        [
-            '[config_url]' => fn_url(
-                'addons.update?addon=vendor_panel_configurator&selected_section=settings',
-                SiteArea::ADMIN_PANEL
-            ),
-        ]
-    );
-
-    if (!empty($sess_data['notifications'])) {
-        foreach ($sess_data['notifications'] as $key => $data) {
-            if ($data['message'] == $message) {
-                unset($sess_data['notifications'][$key]);
-            }
-        }
-    }
-
 }

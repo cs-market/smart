@@ -136,8 +136,10 @@
                         {include file="buttons/button.tpl" but_href="products.view?product_id=`$product.product_id`" but_text=__("view_details") but_role="submit"}
                     {/if}
 
-                    {assign var="qty" value="qty_`$obj_id`"}
-                    {$smarty.capture.$qty nofilter}
+                    <div class="ty-product-block__qty">
+                        {assign var="qty" value="qty_`$obj_id`"}
+                        {$smarty.capture.$qty nofilter}
+                    </div>
 
                     {assign var="add_to_cart" value="buttons_product"}
                     {$smarty.capture.$add_to_cart nofilter}

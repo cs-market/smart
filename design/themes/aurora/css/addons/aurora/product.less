@@ -49,18 +49,34 @@ Product page
             .box-shadow(rgba(90, 112, 114, 0.2) 0px 4px 18px);   
         }
     }
-
+    &__img-wrapper {
+        @media @mobile {
+            max-width: 180px;
+            div& {
+                margin: 0 auto;
+            }
+        }
+    }
+    &-title {
+        font-size: 20px;
+    }
     .prices-container {
         float: left;
     }
     &__center {
         margin-top: 25px;
+        @media @mobile {
+            margin-top: 0;
+        }
     }
     &__prices {
         .ty-price-old {
             font-size: 20px;
         }
         margin-bottom: 20px;
+        @media @mobile {
+            margin-bottom: 6px;
+        }
     }
     &__wishlist {
         float: right;
@@ -72,21 +88,27 @@ Product page
         font-weight: @price_font_weight;
         font-style: @price_font_style;
         text-decoration: @price_font_decoration;
+        @media @mobile {
+            font-size: 24px;
+        }
     }
     &__button {
         display: flex;
-        align-items: center;
+        align-items: end;
+        justify-content: space-between;
+        gap: var(--gap);
         .ty-btn__add-to-cart {
             flex: 1;
             margin: 0;
+        }
+        @media @mobile {
+            --gap: 5px;
+            margin-top: 6px;
         }
     }
     &__note {
         position: initial;
         width: initial;
-    }
-    .ty-qty {
-        margin-right: 25px;
     }
     .ty-control-group {
         margin: 0;
@@ -95,6 +117,9 @@ Product page
 
 .ty-qty {
     margin: 0;
+    &-backorder {
+        color: #f4a900;
+    }
 }
 .ty-value-changer, .touch .ty-value-changer {
     border: 1px solid #ebebeb;
@@ -133,5 +158,10 @@ Product page
     &__increase {
         background-color: lighten(@base, 20%);
         color: #fff;
+    }
+}
+.ty-rating {
+    &__label:before {
+        color: @decorative;
     }
 }
