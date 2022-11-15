@@ -16,7 +16,7 @@ $schema['pre_processing']['rejoin_user_profiles'] =    array(
     'import_only' => true,
 );
 
-$schema['import_process_data']['unset_product_id'] = array(
+$schema['import_process_data']['check_profile_id'] = array(
     'function' => 'fn_exim_smart_distribution_check_profile_id',
     'args' => array('$primary_object_id', '$object', '$pattern'),
     'import_only' => true,
@@ -32,22 +32,9 @@ $schema['references']['user_data'] = array(
     'join_type' => 'LEFT'
 );
 
-$schema['export_fields']['Reward points'] = [
-    'process_get' => array('unserialize', '#this'),
-    'export_only' => true,
-    'db_field' => 'data',
-    'table' => 'user_data',
-];
-
 $schema['export_fields']['Profile name'] = [
     'db_field' => 'profile_name',
     'table' => 'user_profiles',
-];
-
-$schema['export_fields']['Add usergroup IDs'] = [
-    'process_put' => array('fn_smart_distribution_exim_set_usergroups', '#key', '#this', false),
-    'import_only' => true,
-    'linked' => false,
 ];
 
 $schema['import_process_data']['get_salts'] = array(
@@ -55,14 +42,6 @@ $schema['import_process_data']['get_salts'] = array(
     'args' => array('$primary_object_id', '$object', '$pattern', '$import_data'),
     'import_only' => true,
 );
-
-if (isset($schema['export_fields']['User group IDs']['process_put'])) {
-    $schema['export_fields']['User group IDs']['process_put'][0] = 'fn_smart_distribution_exim_set_usergroups';
-}
-
-// backward compatibility
-$schema['export_fields']['Usergroup IDs'] = $schema['export_fields']['User group IDs'];
-
 
 $schema['import_process_data']['set_default_pass_for_baltika'] = array(
     'function' => 'fn_exim_smart_distribution_set_default_pass_for_baltika',

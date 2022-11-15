@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>maintenance</id>
+    <name>Maintenance addon</name>
+    <description>Добавляет общие механики работы магазина</description>
+    <status>active</status>
+    <version>1.0.1</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+</addon>

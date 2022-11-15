@@ -1,8 +1,5 @@
 <?php
 
-use Tygh\Registry;
-use Tygh\Languages\Languages;
-
 function fn_exim_mve_put_usergroup($usergroup, $lang_code) {
     $default_usergroups = fn_get_default_usergroups($lang_code);
     foreach ($default_usergroups as $usergroup_id => $ug) {

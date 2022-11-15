@@ -568,7 +568,7 @@ function fn_smart_distribution_set_product_categories_exist($category_id) {
 }
 
 function fn_smart_distribution_pre_add_to_cart(&$product_data, &$cart, $auth, $update) {
-    // specual modification for dmitry plotvinov
+    // special modification for dmitry plotvinov
     if ((!empty(Tygh::$app['session']['auth']['company_id'])) && defined('API')) {
         $_product_data = array();
         foreach ($product_data as $key => $product) {
@@ -581,9 +581,6 @@ function fn_smart_distribution_pre_add_to_cart(&$product_data, &$cart, $auth, $u
         }
         $product_data = $_product_data;
     }
-
-    // disable popup notification
-    $cart['skip_notification'] = true;
 }
 
 // wishlist in mobile application should have qty_step && cart should have qty_step for +- buttons
@@ -1328,11 +1325,6 @@ function fn_reward_points_promotion_give_percent_points($bonus, &$cart, &$auth, 
     return true;
 }
 
-function fn_trim_bom_helper(&$value)
-{
-    $value = is_string($value) ? str_replace("\xEF\xBB\xBF", "", $value) : $value;
-}
-
 function fn_smart_distribution_exim_import_price($price, $decimals_separator = false) {
     if (is_string($price)) {
         $price = str_replace([' ', ','], ['', '.'], $price);
@@ -1388,6 +1380,8 @@ function fn_smart_distribution_get_filters_pre($params, &$cache_params) {
     $cache_params[] = 'for_api';
 }
 
+
+// refactor to fn_maintenance_exim_get_usergroup_ids
 function fn_exim_smart_distribution_get_usergroup_ids($data, $without_status = true) {
     $pair_delimiter = ':';
     $set_delimiter = ',';

@@ -203,23 +203,6 @@ function fn_exim_get_salts($primary_object_id, &$object) {
     }
 }
 
-function fn_smart_distribution_exim_set_usergroups($user_id, $data, $cleanup = true) {
-    if ($cleanup) db_query("DELETE FROM ?:usergroup_links WHERE user_id = ?i", $user_id);
-    if (!empty($data)) {
-        $usergroups = fn_exim_smart_distribution_get_usergroup_ids($data, false);
-        foreach ($usergroups as $ug_id => $status) {
-            $_data = array(
-                'user_id' => $user_id,
-                'usergroup_id' => $ug_id,
-                'status' => $status
-            );
-            db_query('REPLACE INTO ?:usergroup_links ?e', $_data);
-        }
-    }
-
-    return true;
-}
-
 function fn_exim_smart_distribution_set_default_pass_for_baltika($id, &$object) {
     if (empty($id['user_id']) && !empty($object['company_id']) && $object['company_id'] == 45 && empty($object['password'])) {
         $object['password'] = 1111;
