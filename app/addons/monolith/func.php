@@ -131,6 +131,7 @@ function fn_monolith_generate_xml($order_id) {
                         )
                     ];
                 }
+                break;
             }
         }
 
