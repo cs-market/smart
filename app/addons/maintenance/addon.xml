@@ -12,4 +12,7 @@
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
     <has_icon>Y</has_icon>
+    <language_variables>
+        <item lang="ru" id="promotion_cond_catalog_once_per_customer">Один раз для покупателя</item>
+    </language_variables>
 </addon>

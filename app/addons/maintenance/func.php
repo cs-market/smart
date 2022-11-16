@@ -72,30 +72,25 @@ function fn_maintenance_promotion_get_dynamic($promotion_id, $promotion, $condit
 }
 
 function fn_maintenance_promotion_check_existence($promotion_ids, &$cart, $auth) {
-    static $statuses = null;
+    static $order_statuses = null;
     if (!is_array($promotion_ids)) {
         $promotion_ids = explode(',', $promotion_ids);
     }
 
-    if (is_null($statuses)) {
+    if (is_null($order_statuses)) {
         $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true);
-        foreach ($order_statuses as $status) {
-            if ($status['params']['inventory'] == 'D') { // decreasing (positive) status
-                $statuses[] = $status['status'];
-            }
-        }
+        $order_statuses = array_filter($order_statuses, function($v) {
+            return $v['params']['payment_received'] == 'Y';
+        });
     }
 
-    if (!$statuses) {
+    if (!$order_statuses) {
         return false;
     }
 
     fn_set_hook('maintenance_promotion_check_existence', $promotion_ids, $cart, $auth);
 
-    $exists = db_get_field(
-        "SELECT order_id FROM ?:orders WHERE user_id = ?i AND (" . fn_find_array_in_set($promotion_ids, 'promotion_ids', false) . ") AND ?:orders.status IN (?a) LIMIT 1",
-        $auth['user_id'], $statuses
-    );
+    $exists = db_get_field("SELECT order_id FROM ?:orders WHERE user_id = ?i AND (" . fn_find_array_in_set($promotion_ids, 'promotion_ids', false) . ") AND ?:orders.status IN (?a) LIMIT 1", $auth['user_id'], array_keys($order_statuses));
 
     return $exists;
 }
