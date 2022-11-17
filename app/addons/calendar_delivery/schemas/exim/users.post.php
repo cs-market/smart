@@ -33,6 +33,9 @@ $schema['import_process_data']['import_delivery_days'] = array(
     'import_only' => true,
 );
 
+$schema['export_fields']['Delivery days'] = [
+    'db_field' => 'delivery_date',
+];
 
 $schema['export_fields']['iney delivery days'] = [
     'db_field' => 'delivery_date',
