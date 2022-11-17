@@ -288,15 +288,6 @@
                             <li><a href="{"companies.manage?switch_company_id=0"|fn_url}">{__("manage_stores")}...</a></li>
                         {/if}
                     {/if}
-
-                    {* feedback *}
-                    {if !$runtime.company_id}
-                        <li class="divider"></li>
-                        <li>
-                            {include file="common/popupbox.tpl" id="group`$id_prefix`feedback" edit_onclick=$onclick text=__("feedback_values") act="link" picker_meta="cm-clear-content" link_text=__("send_feedback", ["[product]" => $smarty.const.PRODUCT_NAME]) content=$smarty.capture.update_block href="feedback.prepare" no_icon_link=true but_name="dispatch[feedback.send]" opener_ajax_class="cm-ajax"}
-                        </li>
-                    {/if}
-                    {* end feedback *}
                 </ul>
                 </div>
             </div>
