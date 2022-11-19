@@ -131,7 +131,7 @@ function fn_calendar_get_nearest_delivery_day($shipping_params = [], $get_ts = f
         $nearest_delivery += 1;
     }
 
-    if (!empty($shipping_params['exception_days']) && in_array(getdate()['wday'], fn_delivery_date_from_line($shipping_params['exception_days'])) && strtotime(date("G:i")) <= strtotime($shipping_params['exception_time_till'])) {
+    if (!YesNo::toBool($shipping_params['ignore_exception_days']) && !empty($shipping_params['exception_days']) && in_array(getdate()['wday'], fn_delivery_date_from_line($shipping_params['exception_days'])) && strtotime(date("G:i")) <= strtotime($shipping_params['exception_time_till'])) {
         $nearest_delivery = 0;
     }
 
@@ -281,6 +281,7 @@ function fn_calendar_delivery_get_user_info($user_id, $get_profile, $profile_id,
 
 function fn_calendar_delivery_get_user_short_info_pre($user_id, &$fields, $condition, $join, $group_by) {
     $fields[] = 'delivery_date';
+    if (Registry::get('addons.storages.status') == 'A') $fields[] = 'ignore_exception_days';
 }
 
 function fn_calendar_delivery_user_init(&$auth, &$user_info) {
@@ -354,7 +355,7 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                     }
 
                     // TODO грохнуть это к 2023 году так как повсеместно передодим на nearest_delivery_day weekdays_availability
-                    $shipping['service_params'] = fn_array_merge($shipping['service_params'], $shipping_company_settings, $storage_settings, $usergroup_working_time_till);
+                    $shipping['service_params'] = fn_array_merge($shipping['service_params'], $shipping_company_settings, $storage_settings, $usergroup_working_time_till, ['ignore_exception_days' => $user_info['ignore_exception_days']]);
 
                     fn_set_hook('calendar_delivery_service_params', $group, $shipping, $shipping_company_settings, $usergroup_working_time_till);
 

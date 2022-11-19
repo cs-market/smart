@@ -27,6 +27,7 @@ foreach ($days as $key => $day) {
         'linked' => false, // this field is not linked during import-export
     ];
 }
+
 $schema['import_process_data']['import_delivery_days'] = array(
     'function' => 'fn_exim_set_delivery_date',
     'args' => array('$primary_object_id', '$object'),
@@ -37,10 +38,10 @@ $schema['export_fields']['Delivery days'] = [
     'db_field' => 'delivery_date',
 ];
 
-$schema['export_fields']['iney delivery days'] = [
-    'db_field' => 'delivery_date',
-    'process_get' => array('fn_exim_get_delivery_date_line', '#this'),
-    'pre_insert' => array('fn_exim_set_delivery_date_line', '#this'),
-];
+if (Registry::get('addons.storages.status') == 'A') {
+    $schema['export_fields']['Ignore exception days'] = [
+        'db_field' => 'ignore_exception_days',
+    ];
+}
 
 return $schema;

@@ -49,4 +49,12 @@ $schema['import_process_data']['set_default_pass_for_baltika'] = array(
     'import_only' => true,
 );
 
+if (Registry::get('addons.calendar_delivery.status') == 'A') {
+    $schema['export_fields']['iney delivery days'] = [
+        'db_field' => 'delivery_date',
+        'process_get' => array('fn_exim_get_delivery_date_line', '#this'),
+        'pre_insert' => array('fn_exim_set_delivery_date_line', '#this'),
+    ];
+}
+
 return $schema;

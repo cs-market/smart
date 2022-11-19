@@ -7,6 +7,13 @@
 </div>
 {if $storages}
 <div class="control-group">
+    <label class="control-label" for="ignore_exception_days">{__("calendar_delivery.ignore_exception_days")}</label>
+    <input type="hidden" name="user_data[ignore_exception_days]" value="N">
+    <div class="controls">
+        <input id="ignore_exception_days" type="checkbox" name="user_data[ignore_exception_days]" value="Y" {if $user_data.ignore_exception_days == 'Y'}checked="_checked"{/if}>
+    </div>
+</div>
+<div class="control-group">
     <label class="control-label" for="delivery_date_by_storage">{__("delivery_date_by_storage")}</label>
     <div class="controls">
         <table class="table table-middle">

@@ -36,13 +36,14 @@
         <item lang="ru" id="calendar_delivery.choose_another_period_vendor">Выберите другой период доставки по продавцу</item>
         <item lang="ru" id="calendar_delivery.choose_another_period">Выберите другой период доставки</item>
         <item lang="ru" id="calendar_delivery.delivery_period">Период доставки</item>
-        <item lang="ru" id="calendar_delivery.exim_user_delivery_date">Shipping %day%</item>
+        <item lang="ru" id="calendar_delivery.exim_user_delivery_date">Delivery on %day%</item>
         <item lang="ru" id="calendar_delivery.exception_time_till">День-исключение работает до</item>
         <item lang="ru" id="calendar_delivery.exception_days">Дни-исключения</item>
         <item lang="ru" id="calendar_delivery.offer_documents">Прелдагать оригиналы документов</item>
         <item lang="ru" id="calendar_delivery.offer_documents_checked">Отмечено по-умолчанию</item>
         <item lang="ru" id="calendar_delivery.settings_depends_on_parent">Настройки зависят от общих настроек</item>
         <item lang="ru" id="calendar_delivery.holidays">Выходные дни</item>
+        <item lang="ru" id="calendar_delivery.ignore_exception_days">Игнорировать дни-исключения</item>
 
         <item lang="ru" id="weekday_exim_1">Monday</item>
         <item lang="ru" id="weekday_exim_2">Tuesday</item>
@@ -83,6 +84,9 @@
 
         <item>ALTER TABLE `?:users` ADD `delivery_date` VARCHAR(7) NOT NULL default '1111111';</item>
         <item for="uninstall">ALTER TABLE `?:users` DROP `delivery_date`;</item>
+
+        <item>ALTER TABLE `?:users` ADD `ignore_exception_days` VARCHAR(1) NOT NULL DEFAULT 'N';</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP `ignore_exception_days`;</item>
 
         <item>ALTER TABLE `?:usergroups` ADD `working_time_till` varchar(8)  NOT NULL default '';</item>
         <item for="uninstall">ALTER TABLE `?:usergroups` DROP `working_time_till`;</item>
