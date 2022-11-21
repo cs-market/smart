@@ -22,9 +22,9 @@
                         </div>
                     {/if}
                     <h2 class="ty-grid-promotions__header">{$promotion.name}</h2>
-                    {if $promotion.detailed_description || $promotion.short_description}
+                    {if $promotion.detailed_description}
                         <div class="ty-wysiwyg-content ty-grid-promotions__description">
-                            {$promotion.detailed_description|default:$promotion.short_description nofilter}
+                            {$promotion.detailed_description nofilter}
                         </div>
                     {/if}
             	</a>
