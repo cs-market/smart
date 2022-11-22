@@ -2,6 +2,8 @@
 
 use Tygh\Registry;
 
+defined('BOOTSTRAP') or die('Access denied');
+
 include_once(Registry::get('config.dir.addons') . 'user_price/schemas/exim/user_price.functions.php');
 
 $schema = array(

@@ -596,11 +596,10 @@ function fn_storages_user_price_exim_product_price_pre($object, &$price) {
     static $db_storages;
     if (empty($object['storage_id'])) {
         $storage_id = 0;  
-    } elseif (!isset($db_storages[$object['storage_id']])) {
-        $db_storages[$object['storage_id']] = db_get_field('SELECT storage_id FROM ?:storages WHERE code = ?s', $object['storage_id']);
+    } else {
+        if (!isset($db_storages[$object['storage_id']])) $db_storages[$object['storage_id']] = db_get_field('SELECT storage_id FROM ?:storages WHERE code = ?s', $object['storage_id']);
+        $storage_id = (!empty($db_storages[$object['storage_id']])) ? $db_storages[$object['storage_id']] : 0;
     }
-
-    $storage_id = (!empty($db_storages[$object['storage_id']])) ? $db_storages[$object['storage_id']] : 0;
 
     foreach ($price as &$row) {
         $row['storage_id'] = $storage_id;

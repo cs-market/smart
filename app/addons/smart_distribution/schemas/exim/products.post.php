@@ -23,14 +23,6 @@ if (fn_allowed_for('MULTIVENDOR') && (!Registry::get('runtime.company_id'))) {
 	$schema['export_fields']['Secondary categories']['process_put'][] = '%Vendor%';
 }
 
-$schema['export_fields']['Add user group IDs'] = [
-    'process_put' => array('fn_exim_set_add_product_usergroups', '#key', '#this'),
-    'import_only' => true,
-    'linked' => false,
-];
-
-$schema['export_fields']['Add usergroup IDs'] = $schema['export_fields']['Add user group IDs'];
-
 $schema['export_fields']['Features']['process_put'] = ['fn_exim_smart_distribution_set_product_features', '#key', '#this', '@features_delimiter', '#lang_code', '%Vendor%' ];
 $schema['import_process_data']['fill_vendor_ugroups_if_empty'] = array(
     'function' => 'fn_fill_vendor_ugroups_if_empty', 
@@ -47,20 +39,5 @@ if (fn_allowed_for('MULTIVENDOR')) {
 }
 
 $schema['export_fields']['Show out of stock']['db_field'] = 'show_out_of_stock_product';
-
-foreach ($schema['export_fields'] as &$field) {
-    if (isset($field['convert_put']) && $field['convert_put'][0] == 'fn_exim_import_price') {
-        $field['convert_put'][0] = 'fn_smart_distribution_exim_import_price';
-    }
-}
-unset($field);
-
-foreach (['Min quantity', 'Max quantity', 'Quantity step', 'Quantity', 'Weight'] as $field) {
-    if (isset($schema['export_fields'][$field])) {
-        $schema['export_fields'][$field]['convert_put'] = ['fn_smart_distribution_exim_import_price', '#this'];
-    }
-}
-
-$schema['export_fields']['Usergroup IDs']['convert_put'] = array('fn_exim_smart_distribution_convert_usergroups', '#this');
 
 return $schema;

@@ -13,6 +13,8 @@
 
 use Tygh\Registry;
 
+include_once(Registry::get('config.dir.addons') . 'maintenance/schemas/exim/exim.functions.php');
+
 function fn_promotion_import_glue_primary_field(&$import_data) {
     foreach ($import_data as $key => &$data) {
         if (!empty($data['suffix'])) {
@@ -238,9 +240,9 @@ function fn_promotion_import_get_value($type, $data, $company_id = 0) {
         ];
         return db_get_hash_single_array("SELECT product_id, product_code FROM ?:products WHERE 1 " . implode('', $condition), array('product_code', 'product_id'));
     } elseif ($type == 'usergroup') {
-        return fn_exim_smart_distribution_get_usergroup_ids($data);
+        return fn_maintenance_get_usergroup_ids($data);
     } elseif ($type == 'number') {
-        return fn_smart_distribution_exim_import_price($data);
+        return fn_maintenance_exim_import_price($data);
     }
 }
 

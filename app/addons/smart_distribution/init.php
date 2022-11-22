@@ -17,7 +17,6 @@ fn_register_hooks(
     'get_user_info',
     'update_user_pre',
     'update_user_profile_pre',
-    'update_profile',
     'gather_additional_product_data_post',
     'sales_reports_table_condition',
     'sales_reports_change_table',
@@ -78,8 +77,6 @@ fn_register_hooks(
     'get_filters_products_count_pre',
     'get_filters_products_count_post',
     'get_filters_pre',
-    'update_storage_usergroups_pre',
-    'update_product_prices',
     'get_available_destination_pre',
     'check_permission_manage_profiles'
 );

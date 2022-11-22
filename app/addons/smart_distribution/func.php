@@ -402,16 +402,6 @@ function fn_smart_distribution_update_user_profile_pre($user_id, &$user_data, $a
     $user_data['fields'] = fn_array_merge($data, $user_data['fields']);
 }
 
-function fn_smart_distribution_update_profile($action, $user_data, $current_user_data) {
-    if ((($action == 'add' && SiteArea::isStorefront(AREA)) || defined('API')) && !empty($user_data['usergroup_ids'])) {
-        $user_data['usergroup_ids'] = fn_exim_smart_distribution_get_usergroup_ids($user_data['usergroup_ids']);
-        db_query('DELETE FROM ?:usergroup_links WHERE user_id = ?i', $user_data['user_id']);
-        foreach ($user_data['usergroup_ids'] as $ug_id) {
-            fn_change_usergroup_status('A', $user_data['user_id'], $ug_id);
-        }
-    }
-}
-
 function fn_smart_distribution_gather_additional_product_data_post(&$product, $auth, $params) {
     if (SiteArea::isStorefront(AREA)) {
         // for discount label in mobile application
@@ -669,11 +659,6 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
             $qty_price = max(array_column($product_data['prices'], 'price'));
         }
         $product_data['price'] = ($qty_price > $price) ? $qty_price : $price;
-    }
-
-    // limit vendors usergroups
-    if (isset($product_data['usergroup_ids']) && !empty($product_data['usergroup_ids'])) {
-        $product_data['usergroup_ids'] = fn_exim_smart_distribution_get_usergroup_ids($product_data['usergroup_ids']);
     }
 
     $cid = (isset($product_data['company_id'])) ? $product_data['company_id'] : db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id);
@@ -1068,18 +1053,6 @@ function fn_smart_distribution_mailer_send_post($_this, $transport, $message, $r
     }
 }
 
-function fn_delete_notification_by_message($message) {
-    $notifications = &Tygh::$app['session']['notifications'];
-
-    if (!empty($notifications)) {
-        foreach ($notifications as $key => $data) {
-            if ($data['message'] == $message) {
-                unset($notifications[$key]);
-            }
-        }
-    }
-}
-
 function fn_smart_distribution_update_product_feature_pre(&$feature_data, $feature_id, $lang_code) {
     if (!intval($feature_id)) $feature_data['action'] = 'create';
 }
@@ -1325,14 +1298,6 @@ function fn_reward_points_promotion_give_percent_points($bonus, &$cart, &$auth, 
     return true;
 }
 
-function fn_smart_distribution_exim_import_price($price, $decimals_separator = false) {
-    if (is_string($price)) {
-        $price = str_replace([' ', ','], ['', '.'], $price);
-    }
-
-    return $price;
-}
-
 function fn_smart_distribution_sberbank_edit_item(&$item, $product, $order) {
     if ($order['company_id'] == 1815) {
         if ($mikale_specific = db_get_field('SELECT search_words FROM ?:product_descriptions WHERE product_id = ?i and lang_code = ?s', $product['product_id'], DESCR_SL)) {
@@ -1378,63 +1343,6 @@ function fn_smart_distribution_get_filters_products_count_post($params, $lang_co
 
 function fn_smart_distribution_get_filters_pre($params, &$cache_params) {
     $cache_params[] = 'for_api';
-}
-
-
-// refactor to fn_maintenance_exim_get_usergroup_ids
-function fn_exim_smart_distribution_get_usergroup_ids($data, $without_status = true) {
-    $pair_delimiter = ':';
-    $set_delimiter = ',';
-    $return = [];
-    if (is_array($data)) {
-        $usergroups = $data;
-    } else {
-        $data = str_replace(';', $set_delimiter, $data);
-        $usergroups = explode($set_delimiter, $data);
-    }
-
-    if (!empty($usergroups)) {
-        // trim helper
-        array_walk($usergroups, 'fn_trim_helper');
-        foreach ($usergroups as $ug) {
-            $ug_data = explode($pair_delimiter, $ug);
-            if (is_array($ug_data)) {
-                // Check if user group exists
-                $ug_id = false;
-                // search by ID
-                if (is_numeric($ug_data[0])) {
-                    if (in_array($ug_data[0], [USERGROUP_ALL, USERGROUP_GUEST, USERGROUP_REGISTERED])) {
-                        $ug_id = $ug_data[0];
-                    } elseif ($res = db_get_field("SELECT usergroup_id FROM ?:usergroups WHERE usergroup_id = ?i", $ug_data[0])) {
-                        $ug_id = $res;
-                    }
-                }
-                // search by name
-                if ($ug_id === false && ($db_id = db_get_field("SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s AND lang_code = ?s", $ug_data[0], DESCR_SL))) {
-                    $ug_id = $db_id;
-                }
-                if ($ug_id !== false) {
-                    $return[$ug_id] = isset($ug_data[1]) ? $ug_data[1] : 'A';
-                }
-            }
-        }
-    }
-
-    return ($without_status ? array_keys($return) : $return);
-}
-
-function fn_smart_distribution_update_storage_usergroups_pre(&$storage_data) {
-    $storage_data['usergroup_ids'] = fn_exim_smart_distribution_get_usergroup_ids($storage_data['usergroup_ids']);
-}
-
-function fn_smart_distribution_update_product_prices($product_id, &$_product_data, $company_id, $skip_price_delete, $table_name, $condition) {
-    foreach ($_product_data['prices'] as &$v) {
-        $v['product_id'] = $product_id;
-        $v['lower_limit'] = $v['lower_limit'] ?? 1;
-        if (isset($v['usergroup_id']) && !is_numeric($v['usergroup_id'])) {
-            list($v['usergroup_id']) = fn_exim_smart_distribution_get_usergroup_ids($v['usergroup_id']);
-        }
-    }
 }
 
 // we have removed russia moscow from default destinations, but shippings stop to work

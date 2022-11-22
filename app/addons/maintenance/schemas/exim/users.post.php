@@ -2,7 +2,9 @@
 
 use Tygh\Registry;
 
-include_once(Registry::get('config.dir.addons') . 'maintenance/schemas/exim/users.functions.php');
+defined('BOOTSTRAP') or die('Access denied');
+
+include_once(Registry::get('config.dir.addons') . 'maintenance/schemas/exim/exim.functions.php');
 
 $schema['export_fields']['Reward points'] = [
     'process_get' => array('unserialize', '#this'),

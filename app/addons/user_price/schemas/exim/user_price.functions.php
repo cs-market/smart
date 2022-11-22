@@ -1,11 +1,22 @@
 <?php
 
-function fn_import_user_price(&$primary_object_id, &$object, &$options, &$processed_data, &$processing_groups) {
+defined('BOOTSTRAP') or die('Access denied');
 
+function fn_import_user_price(&$primary_object_id, &$object, &$options, &$processed_data, &$processing_groups) {
+    static $db_users;
     if (!empty($primary_object_id)) {
         $name = trim($object['Name']);
+        if (is_callable('fn_maintenance_get_usergroup_ids')) {
+            $fn_load_usergroups = function ($name) {                
+                return reset(fn_maintenance_get_usergroup_ids($name));
+            };
+        } else {
+            $fn_load_usergroups = function ($name) use ($object) {
+                return db_get_field('SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s AND lang_code = ?s', $name, $object['lang_code']);
+            };
+        }
 
-        if ($ug_id = db_get_field('SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s AND lang_code = ?s', $name, $object['lang_code'])) {
+        if (!isset($db_users[$name]) && $ug_id = $fn_load_usergroups($name)) {
             $price = array(
                 'product_id' => $primary_object_id['product_id'],
                 'price' => $object['price'],
@@ -16,7 +27,6 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
             }
             //process_qty_discounts
         } else {
-            static $db_users;
             $users = array();
             if (!isset($db_users[$name])) {
                 $names = explode(',', $name);

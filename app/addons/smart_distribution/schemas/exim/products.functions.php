@@ -275,34 +275,6 @@ function fn_sd_import_prepare_default_categories(array &$import_process_data, $i
     ];
 }
 
-function fn_exim_set_add_product_usergroups($product_id, $data) {
-    if (!empty($data)) {
-        $old_usergroups = db_get_field("SELECT usergroup_ids FROM ?:products WHERE product_id = ?i", $product_id);
-        $usergroup_ids = fn_exim_smart_distribution_get_usergroup_ids($data);
-
-        if ($old_usergroups) {
-            $usergoups = array_unique(
-                array_merge(
-                    explode(',', $old_usergroups),
-                    $usergroup_ids
-                )
-            );
-        } else {
-            $usergoups = $usergroup_ids;
-        }
-
-        if (!empty($usergoups)) db_query("UPDATE ?:products SET usergroup_ids = ?s WHERE product_id = ?i", implode(',', $usergoups), $product_id);
-    }
-}
-
-function fn_exim_smart_distribution_convert_usergroups($data) {
-    if ($usergroup_ids = fn_exim_smart_distribution_get_usergroup_ids($data)) {
-        $data = implode(',', $usergroup_ids);
-    }
-
-    return $data;
-}
-
 /**
  * Import product features with vendor
  *  based on the fn_exim_set_product_features

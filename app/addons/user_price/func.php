@@ -94,11 +94,6 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
     if ($delete_price) {
         //  delete all old data
         db_query("DELETE FROM ?:user_price WHERE product_id = ?i", $product_id);
-    } else {
-        foreach($user_prices as $where) {
-            unset($where['price']);
-            db_query("DELETE FROM ?:user_price WHERE ?w", $where);
-        }
     }
 
     $user_prices = array_filter($user_prices, function($v) {
@@ -106,7 +101,7 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
     });
 
     if (!empty($user_prices)) {
-        db_query('INSERT INTO ?:user_price ?m', $user_prices);
+        db_query('REPLACE INTO ?:user_price ?m', $user_prices);
     }
     return true;
 }
