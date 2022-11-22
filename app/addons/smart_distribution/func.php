@@ -472,6 +472,7 @@ function fn_smart_distribution_sales_reports_change_table(&$value, $key) {
     }
 }
 
+// DEPRECATED. Use fn_group_array_by_key
 function fn_array_group(array $array, $key)
 {
     if (!is_string($key) && !is_int($key) && !is_float($key) && !is_callable($key) ) {
