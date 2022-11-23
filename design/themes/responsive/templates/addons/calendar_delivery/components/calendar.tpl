@@ -14,7 +14,12 @@
 <script type="text/javascript">
 (function(_, $) {$ldelim}
     $.ceEvent('on', 'ce.commoninit', function(context) {
-
+        current_date = new Date();
+        unix_offset = current_date.getTime();
+        uct_offset = current_date.getTimezoneOffset() / 60;
+        moscow_offset = 3;
+        delivery_offset = {$min_date|default:0} * 24;
+        min_date = new Date( unix_offset + (uct_offset + moscow_offset + delivery_offset) * 3600 * 1000 );
         $('#{$date_id}').datepicker({
             changeMonth: true,
             duration: 'fast',
@@ -41,7 +46,7 @@
             dayNamesMin: ['{__("weekday_abr_0")}', '{__("weekday_abr_1")}', '{__("weekday_abr_2")}', '{__("weekday_abr_3")}', '{__("weekday_abr_4")}', '{__("weekday_abr_5")}', '{__("weekday_abr_6")}'],
             monthNamesShort: ['{__("month_name_abr_1")|escape:"html"}', '{__("month_name_abr_2")|escape:"html"}', '{__("month_name_abr_3")|escape:"html"}', '{__("month_name_abr_4")|escape:"html"}', '{__("month_name_abr_5")|escape:"html"}', '{__("month_name_abr_6")|escape:"html"}', '{__("month_name_abr_7")|escape:"html"}', '{__("month_name_abr_8")|escape:"html"}', '{__("month_name_abr_9")|escape:"html"}', '{__("month_name_abr_10")|escape:"html"}', '{__("month_name_abr_11")|escape:"html"}', '{__("month_name_abr_12")|escape:"html"}'],
             yearRange: '{if $start_year}{$start_year}{else}c-100{/if}:c+10',
-            {if $min_date || $min_date === 0}minDate: {$min_date},{/if}
+            minDate: min_date,
             {if $max_date || $max_date === 0}maxDate: {$max_date},{/if}
             dateFormat: '{if $settings.Appearance.calendar_date_format == "month_first"}mm/dd/yy{else}dd/mm/yy{/if}'
         });
