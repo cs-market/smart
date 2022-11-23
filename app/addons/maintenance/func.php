@@ -113,7 +113,7 @@ function fn_maintenance_get_usergroup_ids($data, $without_status = true) {
                     }
                 }
                 // search by name
-                if ($ug_id === false && ($db_id = fn_get_usergroup_id($ug_data[0], DESCR_SL))) {
+                if ($ug_id === false && ($db_id = db_get_field("SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s AND lang_code = ?s", $ug_data[0], DESCR_SL))) {
                     $ug_id = $db_id;
                 }
                 if ($ug_id !== false) {
