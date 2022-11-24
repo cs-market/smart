@@ -16,10 +16,10 @@
     $.ceEvent('on', 'ce.commoninit', function(context) {
         current_date = new Date();
         unix_offset = current_date.getTime();
-        uct_offset = current_date.getTimezoneOffset() / 60;
+        utc_offset = current_date.getTimezoneOffset() / 60;
         moscow_offset = 3;
         delivery_offset = {$min_date|default:0} * 24;
-        min_date = new Date( unix_offset + (uct_offset + moscow_offset + delivery_offset) * 3600 * 1000 );
+        min_date = new Date( unix_offset + (utc_offset + moscow_offset + delivery_offset) * 3600 * 1000 );
         $('#{$date_id}').datepicker({
             changeMonth: true,
             duration: 'fast',

@@ -932,19 +932,19 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $user_xml[$cml['profile']] = $order_data['profile_id'];
         }
 
-        $user_xml[$cml['address']][$cml['presentation']] = "$zipcode, $country, $city, $address1 $address2";
-        $user_xml[$cml['address']][][$cml['address_field']] = array(
-            $cml['type'] => $cml['post_code'],
-            $cml['value'] => $zipcode
-        );
-        $user_xml[$cml['address']][][$cml['address_field']] = array(
-            $cml['type'] => $cml['country'],
-            $cml['value'] => $country
-        );
-        $user_xml[$cml['address']][][$cml['address_field']] = array(
-            $cml['type'] => $cml['city'],
-            $cml['value'] => $city
-        );
+        $user_xml[$cml['address']][$cml['presentation']] = "$address1 $address2";
+        // $user_xml[$cml['address']][][$cml['address_field']] = array(
+        //     $cml['type'] => $cml['post_code'],
+        //     $cml['value'] => $zipcode
+        // );
+        // $user_xml[$cml['address']][][$cml['address_field']] = array(
+        //     $cml['type'] => $cml['country'],
+        //     $cml['value'] => $country
+        // );
+        // $user_xml[$cml['address']][][$cml['address_field']] = array(
+        //     $cml['type'] => $cml['city'],
+        //     $cml['value'] => $city
+        // );
         $user_xml[$cml['address']][][$cml['address_field']] = array(
             $cml['type'] => $cml['address'],
             $cml['value'] => "$address1"
