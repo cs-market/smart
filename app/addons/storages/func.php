@@ -614,10 +614,12 @@ function fn_storages_delete_usergroups($usergroup_ids) {
 
 function fn_storages_api_runtime_handle_index_request($id, $params, $status, &$data) {
     if ($id == 'storage') $data['storage'] = Registry::get('runtime.current_storage');
+    if ($id == 'storage_id') $data['storage'] = Registry::get('runtime.current_storage');
 }
 
 function fn_storages_api_runtime_handle_create_request($params, $status, &$data) {
     if (isset($params['storage'])) $data['storage'] = Registry::get('runtime.current_storage');
+    if (isset($params['storage_id'])) $data['storage'] = Registry::get('runtime.current_storage');
 }
 
 function fn_storages_api_runtime_handle_delete_request($id, $status, $data) {
