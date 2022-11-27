@@ -619,7 +619,12 @@ function fn_storages_api_runtime_handle_index_request($id, $params, $status, &$d
 
 function fn_storages_api_runtime_handle_create_request($params, $status, &$data) {
     if (isset($params['storage'])) $data['storage'] = Registry::get('runtime.current_storage');
-    if (isset($params['storage_id'])) $data['storage'] = Registry::get('runtime.current_storage');
+    if (isset($params['storage_id'])) {
+        // support raw json post API request also form-data
+        $_REQUEST['storage_id'] = $params['storage_id'];
+        fn_init_storages();
+        $data['storage'] = Registry::get('runtime.current_storage');
+    }
 }
 
 function fn_storages_api_runtime_handle_delete_request($id, $status, $data) {
