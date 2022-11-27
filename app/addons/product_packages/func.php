@@ -36,3 +36,9 @@ function fn_product_packages_pre_add_to_cart(&$product_data) {
         }
     }
 }
+
+function fn_product_packages_exim_1c_import_value_fields(&$product, $value_field, $_name_field, $_v_field) {
+    if ($_name_field == 'КоличествоШтукВКоробке') {
+        $product['items_in_package'] = $_v_field;
+    }
+}

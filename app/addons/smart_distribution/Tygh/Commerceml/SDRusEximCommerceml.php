@@ -1583,6 +1583,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
                         $product = array_merge($product, $product_params);
                     }
                 }
+
+                fn_set_hook('exim_1c_import_value_fields', $product, $value_field, $_name_field, $_v_field, $cml);
+
                 // TODO move string to add-on settings
                 if (in_array($_name_field, array('КвантЗаказа'))) {
                     $product['qty_step'] = (float) $_v_field;
