@@ -370,7 +370,7 @@ function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user
 
 function fn_smart_distribution_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
     // fix to get correct profile fields
-    //$user_data['fields'] = fn_array_merge($user_data['fields'], fn_get_profile_fields_data(ProfileDataTypes::PROFILE, $profile_id));
+    $user_data['fields'] = fn_array_merge($user_data['fields'], fn_get_profile_fields_data(ProfileDataTypes::PROFILE, $profile_id));
 }
 
 function fn_smart_distribution_update_user_pre($user_id, &$user_data, $auth, $ship_to_another, $notify_user) {
