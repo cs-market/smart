@@ -326,7 +326,8 @@ function fn_init_storages() {
     if (!empty($storages)) {
         if (!empty($_REQUEST['storage']) && !empty($storages[$_REQUEST['storage']])) {
             $storage = $_REQUEST['storage'];
-
+        } elseif (!empty($_REQUEST['storage_id']) && !empty($storages[$_REQUEST['storage_id']])) {
+            $storage = $_REQUEST['storage_id'];
         } elseif (($s = fn_get_session_data('storage')) && !empty($storages[$s])) {
             $storage = $s;
         } else {
