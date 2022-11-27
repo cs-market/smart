@@ -54,10 +54,12 @@ function fn_trading_networks_get_users($params, &$fields, $sortings, &$condition
 }
 
 function fn_trading_networks_fill_auth(&$auth, $user_data, $area, $original_auth) {
-    list($network_users) = fn_get_users(['network_id' => $auth['user_id']], $auth);
-    if (!empty($network_users)) {
-        $network_users = fn_array_value_to_key($network_users, 'user_id');
-        $auth['network_users'] = $network_users;
+    if (SiteArea::isStorefront(AREA)) {
+        list($network_users) = fn_get_users(['network_id' => $auth['user_id']], $auth);
+        if (!empty($network_users)) {
+            $network_users = fn_array_value_to_key($network_users, 'user_id');
+            $auth['network_users'] = $network_users;
+        }
     }
 }
 

@@ -17,7 +17,7 @@
         <item>CREATE TABLE `?:user_managers` (
           `user_id` mediumint(8) unsigned NOT NULL,
           `manager_id` mediumint(8) unsigned NOT NULL,
-          UNIQUE KEY `user_manager` (`user_id`,`manager_id`)
+          PRIMARY KEY `user_manager` (`user_id`,`manager_id`)
         ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
         </item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:user_managers;</item>

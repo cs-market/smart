@@ -99,7 +99,8 @@
                 `storage_id` mediumint(8) unsigned NOT NULL,
                 `user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
                 `delivery_date` varchar(7) NOT NULL DEFAULT '1111111',
-                PRIMARY KEY (`storage_id`,`user_id`)
+                PRIMARY KEY (`storage_id`,`user_id`),
+                KEY `user_id` (`user_id`)
             ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
         </item>
         <item for="uninstall">DROP TABLE IF EXISTS `?:user_storages`;</item>

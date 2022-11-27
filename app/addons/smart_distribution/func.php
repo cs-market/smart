@@ -118,6 +118,7 @@ function fn_smart_distribution_vendor_plan_before_save(&$obj, $result) {
 }
 
 function fn_smart_distribution_get_usergroups($params, $lang_code, $field_list, $join, &$condition, $group_by, $order_by, $limit) {
+    if (!isset($params['usergroup_id'])) 
     $condition .= fn_smart_distribution_get_company_usergroup_condition(isset($params['company_id']) ? $params['company_id'] : null);
 }
 
@@ -155,7 +156,7 @@ function fn_smart_distribution_get_users_pre(&$params, $auth, $items_per_page, $
 }
 
 function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condition, &$join, $auth) {
-    $fields[] = 'last_update';
+    $fields['last_update'] = '?:users.last_update';
     if (Registry::get('runtime.company_id')) {
         $params['company_id'] = Registry::get('runtime.company_id');
     }
@@ -168,6 +169,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
     if (isset($params['company_id']) && !empty($params['company_id'])) {
         // temporary condition
         if (!(in_array(Registry::get('runtime.controller'), ['sd_exim_1c', 'commerceml']) && in_array($params['company_id'], [41,46])))
+        if (empty($params['user_managers'])) 
         $condition['sd_condition'] = ' AND (' . fn_get_company_condition('?:users.company_id', false, $params['company_id'], false, true) . db_quote(" OR ?:users.user_id IN (?n)" . ' )', fn_get_company_customers_ids($params['company_id']));
     }
     // for search in profile fields
@@ -359,21 +361,16 @@ function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user
             )
         ) {
             $condition = fn_get_company_condition('?:users.company_id');
-
             $condition = db_quote("(user_type IN (?a) $condition)", array('C', 'V'));
-            $company_customers = db_get_fields("SELECT user_id FROM ?:orders WHERE company_id = ?i", Registry::get('runtime.company_id'));
-            if ($company_customers) {
-                $condition = db_quote("(user_id IN (?n) OR $condition)", $company_customers);
-            }
+            $condition = db_quote("(user_id IN (SELECT user_id FROM ?:orders WHERE company_id = ?i) OR $condition)", Registry::get('runtime.company_id'));
             $condition = " AND $condition ";
-
         }
     }
 }
 
 function fn_smart_distribution_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
     // fix to get correct profile fields
-    $user_data['fields'] = fn_array_merge($user_data['fields'], fn_get_profile_fields_data(ProfileDataTypes::PROFILE, $profile_id));
+    //$user_data['fields'] = fn_array_merge($user_data['fields'], fn_get_profile_fields_data(ProfileDataTypes::PROFILE, $profile_id));
 }
 
 function fn_smart_distribution_update_user_pre($user_id, &$user_data, $auth, $ship_to_another, $notify_user) {

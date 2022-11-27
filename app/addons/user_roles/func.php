@@ -30,7 +30,7 @@ function fn_user_roles_get_users(&$params, &$fields, $sortings, &$condition, $jo
         if (!is_array($params['user_role'])) $params['user_role'] = explode(',', $params['user_role']);
         $condition['user_role'] = db_quote(' AND user_role IN (?a)', $params['user_role']);
         unset($params['exclude_user_types']);
-        $fields[] = 'user_role';
+        $fields['user_role'] = '?:users.user_role';
     }
 }
 

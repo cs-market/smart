@@ -14,7 +14,10 @@
     </language_variables>
 
     <queries>
-        <item>ALTER TABLE `?:users` ADD user_role varchar(1) NOT NULL DEFAULT 'C' after user_type;</item>
+        <item>ALTER TABLE `?:users` ADD user_role CHAR(1) NOT NULL DEFAULT 'C' after user_type;</item>
+        <item>ALTER TABLE `?:users` ADD INDEX (`user_role`);</item>
+
+        <item for="uninstall">ALTER TABLE `?:users` DROP INDEX user_role;</item>
         <item for="uninstall">ALTER TABLE `?:users` DROP user_role;</item>
     </queries>
 </addon>
