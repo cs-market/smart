@@ -42,3 +42,16 @@ function fn_product_packages_exim_1c_import_value_fields(&$product, $value_field
         $product['items_in_package'] = $_v_field;
     }
 }
+
+function fn_product_packages_exim_1c_import_features_definition(&$features_import, $feature_name, $_feature, $cml) {
+    if (in_array($feature_name, ['Количество в коробке'])) {
+        $features_import['items_in_package']['id'] = strval($_feature -> {$cml['id']});
+        $features_import['items_in_package']['name'] = 'items_in_package';
+    }
+}
+
+function fn_product_packages_exim_1c_import_features_values(&$product, $_feature, $features_commerceml, $cml) {
+    if (!empty($features_commerceml['items_in_package']['id']) && $features_commerceml['items_in_package']['id'] == $_feature -> {$cml['id']}) {
+        $product['items_in_package'] = intval($_feature -> {$cml['value']});
+    }
+}

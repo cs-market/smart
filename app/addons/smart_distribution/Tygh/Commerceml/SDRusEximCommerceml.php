@@ -1404,6 +1404,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     $features_import['product']['id'] = strval($_feature -> {$cml['id']});
                 }
 
+                fn_set_hook('exim_1c_import_features_definition', $features_import, $feature_name, $_feature, $cml);
+
                 if ($deny_or_allow_list == 'do_not_import') {
                     if (in_array($feature_name, $features_list)) {
                         $this->addMessageLog("Feature is not added (do not import): " . $feature_name);
@@ -1709,6 +1711,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
             foreach ($data_product -> {$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
                 $variant_data = array();
                 $feature_id = strval($_feature -> {$cml['id']});
+
+                fn_set_hook('exim_1c_import_features_values', $product, $_feature, $features_commerceml, $cml);
+
                 if (!isset($features_commerceml[$feature_id])) {
                     continue;
                 }
