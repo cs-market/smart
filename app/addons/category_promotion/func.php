@@ -334,7 +334,7 @@ function fn_category_promotion_check_amount_conditioned_products($id, $promo, $p
 
 function fn_category_promotion_check_unique_amount_conditioned_products($id, $promo, $products) {
     $cart_products = fn_category_promotion_get_cart_promotioned_products($id, $products);
-    return count(array_unique(array_column($cart_products, 'product_code')));
+    return count(array_unique(array_column($cart_products, 'product_id')));
 }
 
 function fn_category_promotion_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
