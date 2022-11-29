@@ -16,7 +16,16 @@ use Tygh\Registry;
 if (Registry::get('runtime.company_id')) {
     unset($schema['central']['vendors']);
 }
-list($tickets, ) = fn_get_tickets(['status' => 'N']);
+
+$tickets = Registry::getOrSetCache(
+    'fn_get_storages',
+    ['helpdesk_messages', 'helpdesk_tickets'],
+    'user',
+    static function () {
+        list($tickets) = fn_get_tickets(['status' => 'N']);
+        return $tickets;
+    }
+);
 
 if (!empty($tickets)) {
     $schema['central']['helpdesk']['attrs']['class'] = $schema['central']['helpdesk']['items']['new_tickets']['attrs']['class'] = 'notify-dot';

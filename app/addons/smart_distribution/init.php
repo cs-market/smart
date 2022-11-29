@@ -66,6 +66,7 @@ fn_register_hooks(
     'get_mailboxes_pre',
     'usergroup_types_get_map_user_type',
     //temporary
+    'pre_get_orders',
     'get_orders_post',
     'extract_cart',
     'get_promotions',

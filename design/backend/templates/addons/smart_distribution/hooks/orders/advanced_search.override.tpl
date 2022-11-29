@@ -29,6 +29,12 @@
     <input type="text" class="input-small" name="total_from" id="total_from" value="{$search.total_from}" size="3" /> - <input type="text" class="input-small" name="total_to" value="{$search.total_to}" size="3" />
 </div>
 
+<div class="sidebar-field" style="min-width: 180px;">
+    <label for="get_totals">{__("get_totals")}</label>
+    <input class="" type="hidden" name="get_totals" value="{"YesNo::NO"|enum}"/>
+    <input class="" type="checkbox" name="get_totals" id="get_totals" value="{"YesNo::YES"|enum}" {if $search.get_totals == "YesNo::YES"|enum}checked="_checked"{/if}/>
+</div>
+
 {/capture}
 
 {hook name="orders:advanced_search"}

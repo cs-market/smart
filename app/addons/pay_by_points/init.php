@@ -11,7 +11,7 @@ fn_register_hooks(
     'post_add_to_cart',
     'save_cart_content_pre',
     'pre_place_order',
-    'get_orders_post',
+    //'get_orders_post',
     'get_order_info',
     'change_order_status',
     'calculate_cart_post',

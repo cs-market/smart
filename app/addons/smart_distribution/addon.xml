@@ -26,6 +26,7 @@
         <item lang="en" id="show_out_of_stock_product">Показывать отсутствующий в наличии товар</item>
         <item lang="en" id="measure">Eдиница измерения</item>
         <item lang="en" id="promotion_cond_csv_users">Пользователи из CSV</item>
+        <item lang="en" id="get_totals">Посчитать тоталы</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:category_descriptions` ADD `alternative_names` TEXT NOT NULL;</item>

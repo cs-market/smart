@@ -13,6 +13,10 @@ use Tygh\BlockManager\Block;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+function fn_smart_distribution_pre_get_orders($params, $fields, $sortings, &$get_totals, $lang_code) {
+    $get_totals = isset($params['get_totals']) ? YesNo::toBool($params['get_totals']) : 0;
+}
+
 function fn_smart_distribution_get_orders($params, $fields, $sortings, &$condition, &$join, &$group) {
     $auth = Tygh::$app['session']['auth'];
     if (!empty($params['usergroup_id'])) {
