@@ -2283,6 +2283,7 @@ fn_print_die($orders_wo_points);
 } elseif ($mode == 'remove_heavy_carts') {
     $user_ids = db_get_fields("SELECT user_id FROM ?:user_session_products WHERE type = 'C' GROUP BY user_id HAVING count(product_id) > 80");
     $res = db_query("DELETE FROM ?:user_session_products WHERE type = 'C' AND user_id IN (?a)", $user_ids);
+    fn_print_die($res);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
