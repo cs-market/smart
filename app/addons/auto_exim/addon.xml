@@ -10,16 +10,18 @@
     <default_language>ru</default_language>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
     <language_variables>
         <item lang="ru" id="export_orders">Экспортировать заказы</item>
         <item lang="ru" id="export_statuses">Экспортируемые статусы заказа</item>
         <item lang="ru" id="log_type_exim">Экспорт/Импорт</item>
         <item lang="ru" id="log_action_start_import">Запустился импорт</item>
         <item lang="ru" id="log_action_finish_import">Завершился импорт</item>
+        <item lang="ru" id="autoimport">Автоимпорт</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `export_orders` char(1) NOT NULL DEFAULT 'N';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP `export_order`;</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `export_orders`;</item>
         <item>ALTER TABLE `?:companies` ADD `autoimport` char(1) NOT NULL DEFAULT 'N';</item>
         <item for="uninstall">ALTER TABLE `?:companies` DROP `autoimport`;</item>
         <item>ALTER TABLE `?:companies` ADD `export_statuses` varchar(128) NOT NULL DEFAULT '';</item>

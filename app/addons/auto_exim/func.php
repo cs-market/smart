@@ -246,6 +246,7 @@ function fn_auto_exim_find_files($cid) {
 function fn_auto_exim_run_import($imports, $company_id) {
     Registry::set('runtime.company_id', $company_id);
     foreach ($imports as $import) {
+        $res = false;
         // make sure no another import processes are still active
         $debug = isset($_REQUEST['debug']);
 
