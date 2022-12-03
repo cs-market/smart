@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>extended_exim_1c</id>
+    <name>Расширенный обмен с 1с</name>
+    <description>Изменения и улучшения экспорта-импорта с 1с</description>
+    <status>active</status>
+    <version>1.0.1</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <compatibility>
+        <dependencies>rus_exim_1c</dependencies>
+    </compatibility>
+    <queries>
+        <item>ALTER TABLE `?:products` ADD `send_price_1c` CHAR(1) NOT NULL DEFAULT 'Y' AFTER `update_1c`</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `send_price_1c`;</item>
+    </queries>
+    <language_variables>
+        <item lang="ru" id="1c.send_price_1c">Отправлять цену в заказе в 1С</item>
+    </language_variables>
+</addon>

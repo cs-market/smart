@@ -1,20 +1,6 @@
 <?php
-/***************************************************************************
-*                                                                          *
-*   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
-*                                                                          *
-* This  is  commercial  software,  only  users  who have purchased a valid *
-* license  and  accept  to the terms of the  License Agreement can install *
-* and use this program.                                                    *
-*                                                                          *
-****************************************************************************
-* PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
-* "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
-****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Commerceml\SDRusEximCommerceml;
-use \Tygh\Database\Connection;
+use Tygh\Commerceml\ExRusEximCommerceml;
 use Tygh\Commerceml\Logs;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -47,7 +33,7 @@ $path = fn_get_files_dir_path() . $path_file;
 $path_commerceml = fn_get_files_dir_path();
 
 $log = new Logs($path_file, $path);
-$exim_commerceml = new SDRusEximCommerceml(Tygh::$app['db'], $log, $path_commerceml);
+$exim_commerceml = new ExRusEximCommerceml(Tygh::$app['db'], $log, $path_commerceml);
 
 $exim_commerceml->import_params['service_exchange'] = $service_exchange;
 $exim_commerceml->import_params['manual'] = $manual;

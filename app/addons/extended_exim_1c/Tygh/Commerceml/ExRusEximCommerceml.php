@@ -14,7 +14,7 @@ use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
 use Tygh\Enum\ImagePairTypes;
 use Tygh\Addons\ProductVariations\ServiceProvider as VariationsServiceProvider;
 
-class SDRusEximCommerceml extends RusEximCommerceml 
+class ExRusEximCommerceml extends RusEximCommerceml 
 {
     public $prices_commerseml = array();
     public $data_prices = array();

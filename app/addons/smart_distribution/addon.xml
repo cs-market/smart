@@ -35,9 +35,6 @@
         <item>ALTER TABLE `?:vendor_plans` ADD `usergroups` TEXT NOT NULL;</item>
         <item for="uninstall">ALTER TABLE `?:vendor_plans` DROP `usergroups`;</item>
 
-        <item>ALTER TABLE `?:products` ADD `send_price_1c` CHAR(1) NOT NULL DEFAULT 'Y' AFTER `update_1c`</item>
-        <item for="uninstall">ALTER TABLE `?:products` DROP `send_price_1c`;</item>
-
         <item>ALTER TABLE `?:products` ADD `measure` VARCHAR(255) NOT NULL DEFAULT '' AFTER `amount`;</item>
         <item for="uninstall">ALTER TABLE `?:products` DROP `measure`;</item>
 
