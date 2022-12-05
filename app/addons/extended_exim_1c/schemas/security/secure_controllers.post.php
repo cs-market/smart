@@ -12,7 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-$schema['sd_exim_1c'] = array(
+$schema['ex_exim_1c'] = array(
     'none' => 'passive',
     'partial' => 'passive',
     'full' => 'passive',
