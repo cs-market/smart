@@ -491,7 +491,10 @@ function fn_promotion_apply_discount($promotion_id, $bonus, &$product, $use_base
     // [cs-market] do not apply the several discounts at once
     if ($discount > $product['discount']) {
         $product['discount'] = $discount;
+    } else {
+        return true;
     }
+
     $product['price'] = $base_price - $discount;
 
     if ($product['price'] < 0) {
