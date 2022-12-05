@@ -299,20 +299,20 @@ function fn_category_promotion_split_promotion_by_type($promotions) {
     return array($promotions, $products, $search);
 }
 
-function fn_category_promotion_get_cart_promotioned_products($id, $products) {
-    $product_ids = [];
+function fn_category_promotion_get_cart_promotioned_products($id, $products, $filter_amount = false) {
+    $promo_products = [];
     $promotion = fn_get_promotion_data($id);
     if ($promotion['condition_categories']) {
         $category_ids = explode(',', $promotion['condition_categories']);
-        list($categories_products) = fn_get_products(['cid' => $category_ids, 'subcats' => 'Y', 'load_products_extra_data' => false]);
-        if ($categories_products) {
-            $product_ids = array_keys($categories_products);
-        }
+        list($promo_products) = fn_get_products(['cid' => $category_ids, 'subcats' => 'Y', 'load_products_extra_data' => false]);
     } elseif ($promotion['products']) {
-        $product_ids = explode(',', $promotion['products']);
-
+        $product_cond = fn_find_promotion_condition($promotion['conditions'], 'products');
+        if (!empty($product_cond['value'])) $promo_products = fn_array_value_to_key($product_cond['value'], 'product_id');
     }
-    return array_filter($products, function($v) use ($product_ids) {return in_array($v['product_id'], $product_ids);});
+    
+    return array_filter($products, function($v) use ($products, $filter_amount, $promo_products) {
+        return in_array($v['product_id'], array_keys($promo_products)) & ($filter_amount ? $v['amount'] >= $promo_products[$v['product_id']]['amount'] : true);
+    });
 }
 
 function fn_category_promotion_check_total_conditioned_products($id, $promo, $products) {
@@ -333,7 +333,7 @@ function fn_category_promotion_check_amount_conditioned_products($id, $promo, $p
 }
 
 function fn_category_promotion_check_unique_amount_conditioned_products($id, $promo, $products) {
-    $cart_products = fn_category_promotion_get_cart_promotioned_products($id, $products);
+    $cart_products = fn_category_promotion_get_cart_promotioned_products($id, $products, true);
     return count(array_unique(array_column($cart_products, 'product_id')));
 }
 
