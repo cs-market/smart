@@ -572,7 +572,7 @@ function fn_storages_calculate_cart_items(&$cart, &$cart_products, $auth, $apply
 
 function fn_storages_reorder_product($order_info, &$cart, $auth, $product, $amount, $price, $zero_price_action, $k) {
     if ($storages = Registry::get('runtime.storages')) {
-        if (empty($product['extra']['storage_id'])) $cart['products'][$k]['extra']['storage_id'] = Registry::get('runtime.current_storage.storage_id');
+        if (empty($product['extra']['storage_id']) || !in_array($product['extra']['storage_id'], array_keys($storages))) $cart['products'][$k]['extra']['storage_id'] = Registry::get('runtime.current_storage.storage_id');
     }
 }
 

@@ -391,7 +391,7 @@ if ($mode == 'invoice') {
 
     fn_reorder($_REQUEST['order_id'], Tygh::$app['session']['cart'], $auth);
 
-    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.cart');
+    return array(CONTROLLER_STATUS_OK, 'checkout.cart');
 
 } elseif ($mode == 'downloads') {
 
