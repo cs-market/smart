@@ -41,3 +41,7 @@ function fn_get_fresh_user_auth_token($user_id, $ttl = 604800)
 
     return array($token, $expiry_time);
 }
+
+function fn_extended_api_update_user_pre($user_id, $user_data, $auth, &$ship_to_another, $notify_user, $can_update) {
+    if (isset($user_data['ship_to_another'])) $ship_to_another = $user_data['ship_to_another'];
+}

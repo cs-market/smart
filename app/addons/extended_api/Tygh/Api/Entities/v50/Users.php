@@ -102,6 +102,7 @@ class Users extends BaseUsers
     public function update($id, $params)
     {
         if (!empty($params['password'])) $params['password'] = fn_password_hash($params['password']);
+        if (empty($params['ship_to_another'])) $params['ship_to_another'] = true;
         return parent::update($id, $params);
     }
 }
