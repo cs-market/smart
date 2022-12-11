@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>dashboard</id>
+    <version>1.0.1</version>
+    <default_language>ru</default_language>
+    <priority>100</priority>
+    <status>active</status>
+    <name>Dashboard</name>
+    <description>Изменяет домашнюю страницу админ-панели</description>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <language_variables>
+        <item lang="ru" id="avg_total">Средний чек</item>
+        <item lang="ru" id="avg_sku">Среднее кол-во SKU в заказе</item>
+        <item lang="ru" id="avg_sku_per_customer">Среднее кол-во SKU на 1 клиента</item>
+        <item lang="ru" id="diff_period">Изменение за период</item>
+    </language_variables>
+</addon>

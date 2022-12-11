@@ -1,6 +1,6 @@
 <?php
 
-// use Tygh\Registry;
+use Tygh\Registry;
 // use Tygh\Models\Vendor;
 // use Tygh\Enum\ObjectStatuses;
 // use Tygh\Enum\ProfileDataTypes;
@@ -47,6 +47,26 @@ function fn_maintenance_update_profile($action, $user_data, $current_user_data) 
             fn_change_usergroup_status(ObjectStatuses::ACTIVE, $user_data['user_id'], $ug_id);
         }
     }
+}
+
+
+function fn_maintenance_dispatch_assign_template($controller, $mode, $area, &$controllers_cascade) {
+    $root_dir = Registry::get('config.dir.root') . '/app';
+    $addon_dir = Registry::get('config.dir.addons');
+    $addons = (array) Registry::get('addons');
+    $area_name = fn_get_area_name($area);
+    foreach ($controllers_cascade as &$ctrl) {
+        $path = str_replace([$root_dir, '/controllers'], ['', ''], $ctrl);
+        foreach ($addons as $addon_name => $data) {
+            if ($data['status'] == 'A') {
+                $dir = $addon_dir . $addon_name . '/controllers/overrides';
+                if (is_readable($dir . $path)) {
+                    $ctrl = $dir . $path;
+                }
+            }
+        }
+    }
+    unset($crtl);
 }
 
 /* END HOOKS */
@@ -173,4 +193,44 @@ function fn_delete_notification_by_message($message) {
             }
         }
     }
+}
+
+function fn_init_addon_override_controllers($controller, $area = AREA)
+{
+    $controllers = array();
+    static $addons = array();
+
+    $prefix = '';
+    $area_name = fn_get_area_name($area);
+
+    $prefix = '.override';
+
+    $addon_dir = Registry::get('config.dir.addons');
+
+    foreach ((array) Registry::get('addons') as $addon_name => $data) {
+        if ($data['status'] == 'A') {
+            // try to find area-specific controller
+            $dir = $addon_dir . $addon_name . '/controllers/' . $area_name . '/';
+
+            if (is_readable($dir . $controller . $prefix . '.php')) {
+                $controllers[] = $dir . $controller . $prefix . '.php';
+                $addons[$addon_name] = true;
+                if (empty($prefix)) {
+                    fn_define('LOADED_ADDON_PATH', $addon_name);
+                }
+            }
+
+            // try to find common controller
+            $dir = $addon_dir . $addon_name . '/controllers/common/';
+            if (is_readable($dir . $controller . $prefix . '.php')) {
+                $controllers[] = $dir . $controller . $prefix . '.php';
+                $addons[$addon_name] = true;
+                if (empty($prefix)) {
+                    fn_define('LOADED_ADDON_PATH', $addon_name);
+                }
+            }
+        }
+    }
+
+    return array($controllers, $addons);
 }

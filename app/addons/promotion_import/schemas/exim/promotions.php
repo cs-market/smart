@@ -74,7 +74,7 @@ $schema = array(
             'return_result' => true
         ],
         'Stop other rules' => [
-            'db_field'      => 'stop',
+            'db_field'      => 'stop_other_rules',
         ],
         'Priority' => [
             'db_field'      => 'priority',
