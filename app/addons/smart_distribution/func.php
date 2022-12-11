@@ -1028,6 +1028,7 @@ function fn_smart_distribution_get_product_features($fields, $join, &$condition,
     // [/only vendor features]
 }
 
+// TODO no more need
 function fn_timestamp_to_date_wo_time($timestamp) {
     return !empty($timestamp) ? date('d.m.Y', intval($timestamp)) : '';
 }

@@ -61,17 +61,17 @@
         <item>ALTER TABLE `?:orders` ADD `delivery_period` varchar(30) NOT NULL default '';</item>
         <item for="uninstall">ALTER TABLE `?:orders` DROP `delivery_period`;</item>
 
-        <item >ALTER TABLE `?:companies` 
+        <item >ALTER TABLE `?:companies`
             ADD `nearest_delivery` VARCHAR(1) NOT NULL DEFAULT '1',
             ADD `working_time_till` VARCHAR(8) NOT NULL DEFAULT '17:00',
             ADD `saturday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y',
-            ADD `sunday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y', 
+            ADD `sunday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y',
             ADD `monday_rule` VARCHAR(1) NOT NULL DEFAULT 'Y',
             ADD `period_start` varchar(8) NOT NULL DEFAULT '',
             ADD `period_finish` varchar(8) NOT NULL DEFAULT '',
             ADD `period_step` varchar(8) NOT NULL DEFAULT '';
         </item>
-        <item for="uninstall" >ALTER TABLE `?:companies` 
+        <item for="uninstall" >ALTER TABLE `?:companies`
             DROP `nearest_delivery`,
             DROP `working_time_till`,
             DROP `saturday_shipping`,
@@ -92,7 +92,7 @@
         <item for="uninstall">ALTER TABLE `?:usergroups` DROP `working_time_till`;</item>
 
         <item>ALTER TABLE `?:usergroups` ADD `delivery_date` VARCHAR(7) NOT NULL default '1111111';</item>
-        <item for="uninstall">ALTER TABLE `?:usergroups` DROP `usergroups`;</item>
+        <item for="uninstall">ALTER TABLE `?:usergroups` DROP `delivery_date`;</item>
 
         <item>
             CREATE TABLE `?:user_storages` (
