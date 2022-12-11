@@ -18,6 +18,6 @@
         }
     </div>
 </div>
-{elseif $user_data.user_role == 'N' && $network_users}
-    {include file="pickers/users/picker.tpl" display="checkbox" but_meta="btn" item_ids=$network_users data_id="0" input_name="user_data[network_users]"}
+{elseif $user_data.user_role == 'N'}
+    {include file="pickers/users/picker.tpl" display="checkbox" but_meta="btn" item_ids=$network_users data_id="0" input_name="user_data[network_users]" extra_url="&user_type=C&user_role=C"}
 {/if}

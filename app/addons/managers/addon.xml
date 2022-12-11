@@ -2,6 +2,7 @@
 <addon scheme="2.0">
     <id>managers</id>
     <name>Smart distribution: Менеджеры пользователя</name>
+    <description>Добавляет типовые админские роли</description>
     <version>1.0.1</version>
     <position>0</position>
     <status>active</status>

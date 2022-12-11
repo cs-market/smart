@@ -9,6 +9,9 @@
     <position>0</position>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
     <default_language>ru</default_language>
+    <has_icon>Y</has_icon>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
     <language_variables>
         <item lang="ru" id="user_role">Роль пользователя</item>
     </language_variables>

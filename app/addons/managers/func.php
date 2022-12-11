@@ -36,7 +36,7 @@ function fn_get_managers($params = []) {
 
 function fn_managers_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
     // get managers for single user
-    if (SiteArea::isAdmin(AREA)) {
+    if (SiteArea::isAdmin(AREA) && !empty($user_id)) {
         if ($user_data['user_type'] == UserTypes::CUSTOMER) {
             $user_data['managers'] = fn_get_managers(['user_managers' => $user_id]);
         } elseif (fn_user_roles_is_management_user($user_id)) {

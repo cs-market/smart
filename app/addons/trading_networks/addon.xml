@@ -9,8 +9,15 @@
     <position>0</position>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
     <default_language>ru</default_language>
+    <has_icon>Y</has_icon>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
     <language_variables>
         <item lang="ru" id="trading_network">Торговая сеть</item>
+        <item lang="ru" id="block_network_switcher">Попап выбора сетевых клиентов</item>
+        <item lang="ru" id="block_network_logout_switcher">Смена текущего клиента</item>
+        <item lang="ru" id="logout_from_system">Выйти из системы</item>
+        <item lang="ru" id="trade_network_switcher">Выберите торговую точку, для которой размещаете заказ</item>
     </language_variables>
     <compatibility>
         <dependencies>user_roles</dependencies>

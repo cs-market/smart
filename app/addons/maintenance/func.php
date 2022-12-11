@@ -69,6 +69,22 @@ function fn_maintenance_dispatch_assign_template($controller, $mode, $area, &$co
     unset($crtl);
 }
 
+function fn_maintenance_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
+    if (defined('ORDER_MANAGEMENT') && !empty($params['promotion_id'])) {
+        return;
+    }
+    if (!empty($params['fields'])) {
+        if (!is_array($params['fields'])) {
+            $params['fields'] = explode(',', $params['fields']);
+        }
+        $fields = $params['fields'];
+    }
+    if (!empty($params['exclude_promotion_ids'])) {
+        if (!is_array($params['exclude_promotion_ids'])) $params['exclude_promotion_ids'] = [$params['exclude_promotion_ids']];
+        $condition .= db_quote(' AND ?:promotions.promotion_id NOT IN (?a)', $params['exclude_promotion_ids']);
+    }
+}
+
 /* END HOOKS */
 
 function fn_maintenance_promotion_get_dynamic($promotion_id, $promotion, $condition, &$cart, &$auth = NULL) {
