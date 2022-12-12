@@ -134,31 +134,6 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
             }
         }
     }
-
-    if (
-        !empty($params['promotion_pid'])
-        && !empty($params['block_data']['content']['items']['filling'])
-        && $params['block_data']['content']['items']['filling'] === 'promotion_products'
-    ) {
-        list($promotions, ) = list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $params['promotion_pid'], 'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'], 'active' => true, 'track' => true], 10);
-
-        if ($promotions) {
-            $promotion = reset($promotions);
-            $promotion_product_ids  = explode(',', $promotion['products']);
-            $promotion_category_ids = explode(',', $promotion['condition_categories']);
-
-            $promotion_product_ids = array_merge(
-                $promotion_product_ids,
-                db_get_fields('SELECT product_id FROM ?:products_categories WHERE category_id IN (?n)', $promotion_category_ids)
-            );
-
-            $params['pid'] = implode(',', array_unique($promotion_product_ids));
-        } else {
-            // To skip get products request
-            $params['force_get_by_ids'] = true;
-            unset($params['pid'], $params['product_id'], $params['get_conditions']);
-        }
-    }
 }
 
 function fn_category_promotion_get_products(&$params, $fields, $sortings, &$condition, $join, $sorting, $group_by, $lang_code, $having) {
@@ -193,28 +168,11 @@ function fn_category_promotion_get_promotions_pre(&$params, $items_per_page, $la
 }
 
 function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
-    if (defined('ORDER_MANAGEMENT') && !empty($params['promotion_id'])) {
-        return;
-    }
     if (!empty($params['product_ids'])) {
         $condition .=' AND (' . fn_find_array_in_set($params['product_ids'], "products", false) . ')';
     }
-    if (!empty($params['fields'])) {
-        if (!is_array($params['fields'])) {
-            $params['fields'] = explode(',', $params['fields']);
-        }
-        $fields = $params['fields'];
-    }
     if (!empty($params['category_id'])) {
         $condition .=' AND (' . fn_find_array_in_set([$params['category_id']], "categories", true) . ')';
-    }
-    if (isset($params['product_or_bonus_product'])) {
-        $category_ids = db_get_fields('SELECT category_id FROM ?:products_categories WHERE product_id = ?i', $params['product_or_bonus_product']);
-        $condition .=' AND (' . fn_find_array_in_set([$params['product_or_bonus_product']], "products", false) . ' OR ' . fn_find_array_in_set([$params['product_or_bonus_product']], "bonus_products", false) . ' OR ' . fn_find_array_in_set($category_ids, "condition_categories", false) . ')';
-    }
-    if (!empty($params['exclude_promotion_ids'])) {
-        if (!is_array($params['exclude_promotion_ids'])) $params['exclude_promotion_ids'] = [$params['exclude_promotion_ids']];
-        $condition .= db_quote(' AND ?:promotions.promotion_id NOT IN (?a)', $params['exclude_promotion_ids']);
     }
 }
 
@@ -227,7 +185,7 @@ function fn_category_promotion_get_promotions_post($params, $items_per_page, $la
             $conditions = (is_string($promotion['conditions'])) ? unserialize($promotion['conditions']) : $promotion['conditions'];
             fn_cleanup_promotion_condition($conditions, ['usergroup', 'users']);
             $promotion['conditions'] = $conditions;
-            $cart_products = [];
+            $data = $cart_products = [];
             return fn_check_promotion_conditions($promotion, $data, Tygh::$app['session']['auth'], $cart_products);
         });
     }
@@ -261,23 +219,6 @@ function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth
     }
 }
 
-function fn_category_promotion_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
-{
-    if (!empty($product_data['product_id']) && SiteArea::isStorefront(AREA)) {
-        list($promotions) = fn_get_promotions(['product_or_bonus_product' => $product_data['product_id'], 'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'], 'active' => true]);
-
-        if ($promotions) {
-            $promotion = reset($promotions);
-            $product_data['promo_text'] = "<div class='ty-promotion-motivation__body'>".$promotion['detailed_description']."</div>";
-            if (!empty(trim($product_data['promo_text']))) {
-                $product_data['promo_text'] = '<div class="ty-promotion-motivation"><div class="ty-promotion-motivation__title">' . __('promo_subheader') . '</div>' . $product_data['promo_text']."</div>";
-            }
-        }
-        // correct after November 2020
-        if (defined('API')) $product_data['promo_text_plain'] = $product_data['promo_text'] = strip_tags($product_data['promo_text']);
-    }
-}
-
 function fn_category_promotion_split_promotion_by_type($promotions) {
     $simple_promotions = array_filter($promotions, function($v) {
         return $v['view_separate'] == 'N';
@@ -299,20 +240,20 @@ function fn_category_promotion_split_promotion_by_type($promotions) {
     return array($promotions, $products, $search);
 }
 
-function fn_category_promotion_get_cart_promotioned_products($id, $products, $filter_amount = false) {
-    $promo_products = [];
+function fn_category_promotion_get_cart_promotioned_products($id, $products) {
+    $product_ids = [];
     $promotion = fn_get_promotion_data($id);
     if ($promotion['condition_categories']) {
         $category_ids = explode(',', $promotion['condition_categories']);
-        list($promo_products) = fn_get_products(['cid' => $category_ids, 'subcats' => 'Y', 'load_products_extra_data' => false]);
+        list($categories_products) = fn_get_products(['cid' => $category_ids, 'subcats' => 'Y', 'load_products_extra_data' => false]);
+        if ($categories_products) {
+            $product_ids = array_keys($categories_products);
+        }
     } elseif ($promotion['products']) {
-        $product_cond = fn_find_promotion_condition($promotion['conditions'], 'products');
-        if (!empty($product_cond['value'])) $promo_products = fn_array_value_to_key($product_cond['value'], 'product_id');
+        $product_ids = explode(',', $promotion['products']);
+
     }
-    
-    return array_filter($products, function($v) use ($products, $filter_amount, $promo_products) {
-        return in_array($v['product_id'], array_keys($promo_products)) & ($filter_amount ? $v['amount'] >= $promo_products[$v['product_id']]['amount'] : true);
-    });
+    return array_filter($products, function($v) use ($product_ids) {return in_array($v['product_id'], $product_ids);});
 }
 
 function fn_category_promotion_check_total_conditioned_products($id, $promo, $products) {
@@ -333,18 +274,6 @@ function fn_category_promotion_check_amount_conditioned_products($id, $promo, $p
 }
 
 function fn_category_promotion_check_unique_amount_conditioned_products($id, $promo, $products) {
-    $cart_products = fn_category_promotion_get_cart_promotioned_products($id, $products, true);
+    $cart_products = fn_category_promotion_get_cart_promotioned_products($id, $products);
     return count(array_unique(array_column($cart_products, 'product_id')));
-}
-
-function fn_category_promotion_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
-    if (!defined(API)) {
-        $applied_promotions = array_keys($cart['applied_promotions']);
-        foreach ($cart_products as &$product) {
-            list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product['product_id'], 'zone' => 'cart', 'usergroup_ids' => $auth['usergroup_ids'], 'active' => true, 'track' => true, 'exclude_promotion_ids' => $applied_promotions], 10);
-            if ($promotions) {
-                $product['participates_in_promo'] = reset($promotions);
-            }
-        }
-    }
 }

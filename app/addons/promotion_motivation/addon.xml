@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
     <id>promotion_motivation</id>
-    <name>Smart distribution: promotion motivation</name>
+    <name>Smart distribution: Promotion motivation</name>
+    <description>Добавляет мотивации к использованию промо в витрине</description>
     <version>1.0.1</version>
     <priority>4294967294</priority>
     <position>0</position>
@@ -15,5 +16,6 @@
         <item lang="ru" id="motivation_subtotal_gt">Закажите еще на [diff] и получите подарок [gift]</item>
         <item lang="ru" id="motivation_subtotal_gte">Закажите еще на [diff] и получите подарок [gift]</item>
         <item lang="ru" id="move_to_catalog">Перейти в Каталог</item>
+        <item lang="ru" id="promotion_motivation.participates_in_promo"><![CDATA[Товар участвует в промо <a href=[promotion_link]>[promotion]</a>. Перейдите в промо и добавьте товар, чтобы получить бонус.]]></item>
     </language_variables>
 </addon>

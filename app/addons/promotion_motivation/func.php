@@ -1,5 +1,8 @@
 <?php
 
+use Tygh\Registry;
+use Tygh\Enum\SiteArea;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_promotion_motivation_promotion_apply_pre($promotions, $zone, &$data, $auth, $cart_products) {
@@ -193,4 +196,69 @@ function fn_promotion_get_current_value($promotion_id, $promotion, $data, $auth,
     }
 
     return $value;
+}
+
+function fn_promotion_motivation_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
+    if (Registry::get('addons.category_promotion.status') == 'A') {
+        if (isset($params['product_or_bonus_product'])) {
+            $category_ids = db_get_fields('SELECT category_id FROM ?:products_categories WHERE product_id = ?i', $params['product_or_bonus_product']);
+            $condition .=' AND (' . fn_find_array_in_set([$params['product_or_bonus_product']], "products", false) . ' OR ' . fn_find_array_in_set([$params['product_or_bonus_product']], "bonus_products", false) . ' OR ' . fn_find_array_in_set($category_ids, "condition_categories", false) . ')';
+        }
+    }
+}
+
+function fn_promotion_motivation_get_product_data_post(&$product_data, $auth, $preview, $lang_code) {
+    if (!empty($product_data['product_id']) && SiteArea::isStorefront(AREA)) {
+        list($promotions) = fn_get_promotions(['product_or_bonus_product' => $product_data['product_id'], 'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'], 'active' => true]);
+
+        if ($promotions) {
+            $promotion = reset($promotions);
+            $product_data['promo_text'] = "<div class='ty-promotion-motivation__body'>".$promotion['detailed_description']."</div>";
+            if (!empty(trim($product_data['promo_text']))) {
+                $product_data['promo_text'] = '<div class="ty-promotion-motivation"><div class="ty-promotion-motivation__title">' . __('promo_subheader') . '</div>' . $product_data['promo_text']."</div>";
+            }
+        }
+        // correct after November 2020
+        if (defined('API')) $product_data['promo_text_plain'] = $product_data['promo_text'] = strip_tags($product_data['promo_text']);
+    }
+}
+
+function fn_promotion_motivation_get_products_before_select(&$params, $join, &$condition, $u_condition, $inventory_join_cond, $sortings, $total, $items_per_page, $lang_code, $having) {
+    if (
+        !empty($params['promotion_pid'])
+        && !empty($params['block_data']['content']['items']['filling'])
+        && $params['block_data']['content']['items']['filling'] === 'promotion_products'
+    ) {
+        list($promotions, ) = list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $params['promotion_pid'], 'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'], 'active' => true, 'track' => true], 10);
+
+        if ($promotions) {
+            $promotion = reset($promotions);
+            $promotion_product_ids  = explode(',', $promotion['products']);
+            $promotion_category_ids = explode(',', $promotion['condition_categories']);
+
+            $promotion_product_ids = array_merge(
+                $promotion_product_ids,
+                db_get_fields('SELECT product_id FROM ?:products_categories WHERE category_id IN (?n)', $promotion_category_ids)
+            );
+
+            $params['pid'] = implode(',', array_unique($promotion_product_ids));
+        } else {
+            // To skip get products request
+            $params['force_get_by_ids'] = true;
+            unset($params['pid'], $params['product_id'], $params['get_conditions']);
+        }
+    }
+}
+
+function fn_promotion_motivation_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
+    if (!defined(API)) {
+        $applied_promotions = array_keys($cart['applied_promotions']);
+        foreach ($cart_products as &$product) {
+            list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product['product_id'], 'zone' => 'cart', 'usergroup_ids' => $auth['usergroup_ids'], 'active' => true, 'track' => true, 'exclude_promotion_ids' => $applied_promotions], 10);
+
+            if ($promotions) {
+                $product['participates_in_promo'] = reset($promotions);
+            }
+        }
+    }
 }

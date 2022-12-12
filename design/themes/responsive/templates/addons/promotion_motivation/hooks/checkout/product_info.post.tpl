@@ -4,5 +4,5 @@
     {else}
         {$promotion_link = "promotions.list"|fn_url}
     {/if}
-    <p class="ty-cart-content__participates-in-promo">{__('category_promotion.participates_in_promo', ['[promotion]' => $product.participates_in_promo.name, '[promotion_link]' => $promotion_link])}</p>
+    <p class="ty-cart-content__participates-in-promo">{__('promotion_motivation.participates_in_promo', ['[promotion]' => $product.participates_in_promo.name, '[promotion_link]' => $promotion_link])}</p>
 {/if}

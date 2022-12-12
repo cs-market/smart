@@ -16,6 +16,10 @@ msgctxt "Addons::name::category_promotion"
 msgid "Smart distribution: Category Promotion"
 msgstr "Smart distribution: Category Promotion"
 
+msgctxt "Addons::description::category_promotion"
+msgid "Adds a category that contains promotion products"
+msgstr "Добавляет раздел с акциями в витрину"
+
 msgctxt "SettingsSections::category_promotion::general"
 msgid "General"
 msgstr "Общие"
@@ -35,6 +39,14 @@ msgstr "Товары промоакций"
 msgctxt "Languages::promotion_cond_total_conditioned_products"
 msgid "Subtotal by promo's condition products"
 msgstr "Итого по указанным в условиях товарам"
+
+msgctxt "Languages::view_separate"
+msgid "View separate"
+msgstr "Отображать отдельно"
+
+msgctxt "Languages::promo_subheader"
+msgid "Promotion!"
+msgstr "Акция!"
 
 msgctxt "Languages::promotion_cond_amount_conditioned_products"
 msgid "Subtotal by promo's condition products"
