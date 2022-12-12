@@ -18,6 +18,7 @@ fn_register_hooks(
     'get_cart_product_data',
     'generate_cart_id',
     ['check_amount_in_stock_before_check', 100],
+    'calculate_cart_content_before_shipping_calculation',
     'shippings_group_products_list',
     'pre_update_order',
     'update_product_amount_pre',

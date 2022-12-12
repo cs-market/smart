@@ -489,6 +489,17 @@ function fn_storages_check_amount_in_stock_before_check($product_id, $amount, $p
     }
 }
 
+function fn_storages_calculate_cart_content_before_shipping_calculation($cart, $auth, &$calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $shipping_cache_tables, $shipping_cache_key) {
+    if ($storages = Registry::get('runtime.storages') && !empty($cart['product_groups'])) {
+        foreach ($cart['product_groups'] as $group) {
+            if (empty($group['storage_id'])) {
+                $calculate_shipping = 'A';
+                break;
+            }
+        }
+    }
+}
+
 function fn_storages_shippings_group_products_list(&$products, &$groups) {
     if ($storages = Registry::get('runtime.storages')) {
 
