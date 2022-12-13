@@ -55,7 +55,7 @@ if ($mode == 'cron') {
     if (empty($action)) fn_print_die('missing order_id');
     $xml = fn_monolith_generate_xml($action);
     if (fn_monolith_send_xml($xml)) {
-        fn_change_order_status($action, 'E');
+        fn_change_order_status($action, 'L');
         fn_print_die('success', $action);
     }
     fn_print_die('failure', $action);
