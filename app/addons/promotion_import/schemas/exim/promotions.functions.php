@@ -63,16 +63,20 @@ function fn_promotion_import_build_conditions(&$object, $primary_object_id, &$pr
                 array_walk($value, function(&$v) {list($t['product_code'], $t['amount']) = explode(':', $v);$v = $t;});
                 $products = fn_promotion_import_get_value('products', array_column($value, 'product_code'), $company_id);
                 // без amount просто имплодим, зону мы можем и не знать
-                foreach ($value as &$data) {
-                    $data['product_id'] = $products[$data['product_code']];
-                    unset($data['product_code']);
-                    if (empty($data['amount'])) unset($data['amount']);
+                foreach ($value as $key => &$data) {
+                    if (isset($products[$data['product_code']])) {
+                        $data['product_id'] = $products[$data['product_code']];
+                        unset($data['product_code']);
+                        if (empty($data['amount'])) unset($data['amount']);
+                    } else {
+                        unset($value[$key]);
+                    }
                 }
                 if ($amount = array_column($value, 'amount')) {
                     $conditions_to_db['conditions'][] = [
                         'condition' => $condition,
                         'operator' => $operator,
-                        'value' => fn_promotion_import_get_value('number', $value, $company_id)
+                        'value' => $value
                     ];
                 } else {
                     $conditions_to_db['conditions'][] = [
