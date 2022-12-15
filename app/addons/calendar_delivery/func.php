@@ -212,6 +212,10 @@ function fn_calendar_delivery_place_order($order_id, $action, $order_status, $ca
     }
 }
 
+function fn_calendar_delivery_place_suborders($cart, &$suborder_cart, $key_group) {
+    $suborder_cart['product_groups']['0']['delivery_date'] = $cart['product_groups'][$key_group]['delivery_date'];
+}
+
 function fn_calendar_delivery_update_cart_by_data_post(&$cart, $new_cart_data, $auth) {
     if (isset($new_cart_data['delivery_date'])) $cart['delivery_date'] = $new_cart_data['delivery_date'];
     if (isset($new_cart_data['delivery_period'])) $cart['delivery_period'] = $new_cart_data['delivery_period'];
@@ -280,13 +284,15 @@ function fn_calendar_delivery_update_usergroup_pre(&$usergroup_data, $usergroup_
 }
 
 function fn_calendar_delivery_fill_auth(&$auth, $user_data, $area, $original_auth) {
-    if (!empty($user_data['user_id'])) {
+    if (!empty($user_data['user_id']) && Registry::get('addons.storages.status') == 'A') {
         $auth['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i ORDER BY storage_id', 'storage_id', $user_data['user_id']);
     }
 }
 
 function fn_calendar_delivery_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
-    $user_data['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i ORDER BY storage_id', 'storage_id', $user_id);
+    if (!empty($user_id) && Registry::get('addons.storages.status') == 'A') {
+        $user_data['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i ORDER BY storage_id', 'storage_id', $user_id);
+    }
 }
 
 function fn_calendar_delivery_get_user_short_info_pre($user_id, &$fields, $condition, $join, $group_by) {
@@ -295,7 +301,7 @@ function fn_calendar_delivery_get_user_short_info_pre($user_id, &$fields, $condi
 }
 
 function fn_calendar_delivery_user_init(&$auth, &$user_info) {
-    if (!empty($auth['user_id'])) {
+    if (!empty($auth['user_id']) && Registry::get('addons.storages.status') == 'A') {
         // user_info is empty in API
         $auth['delivery_date_by_storage'] = $user_info['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i ORDER BY storage_id', 'storage_id', $auth['user_id']);
     }
@@ -309,12 +315,12 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
             // user_info is empty in API. user_info wrong in backend :)
             //if (!$user_info = Registry::get('user_info')) {
                 $user_info = fn_get_user_short_info($auth['user_id']);
-                $user_info['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i', 'storage_id', $auth['user_id']);
+                if (Registry::get('addons.storages.status') == 'A') $user_info['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i', 'storage_id', $auth['user_id']);
             //}
 
             $user_weekdays = $user_info['delivery_date'] ?? '1111111';
 
-            if (!empty($group['storage_id']) && !empty($user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'])) {
+            if (!empty($group['storage_id']) && Registry::get('addons.storages.status') == 'A' && !empty($user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'])) {
                 $user_weekdays = $user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'];
             }
             if (!empty($auth['usergroup_ids'])) {
@@ -389,7 +395,7 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
 
             if (!empty($chosen_delivery_date)) {
                 $group['delivery_date'] = $chosen_delivery_date;
-            } elseif (!empty($group['chosen_shippings']) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
+            } elseif (!empty($group['chosen_shippings']) && reset($group['chosen_shippings'])['service_code'] == 'calendar' && !$cart['parent_order_id']) {
                 $chosen_shipping_id = reset($group['chosen_shippings'])['shipping_id'];
                 $nearest_delivery_day = $group['shippings'][$chosen_shipping_id]['service_params']['nearest_delivery_day'];
                 $group['delivery_date'] = fn_date_format(strtotime("+ $nearest_delivery_day day"), Registry::get('settings.Appearance.date_format'));
