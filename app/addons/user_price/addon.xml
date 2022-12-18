@@ -6,15 +6,18 @@
     <priority>4294967294</priority>
     <position>0</position>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
-    <default_language>en</default_language>
-  	<queries>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <queries>
       <item>CREATE TABLE `?:user_price` (
-  		  `product_id` mediumint(8) unsigned NOT NULL,
-  		  `user_id` mediumint(8) unsigned NOT NULL,
-  		  `price` decimal(12,2) NOT NULL default '0.00',
-  		  PRIMARY KEY `product_user` (`product_id`,`user_id`)
-  		) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-  		</item>
-  		<!-- <item for="uninstall">DROP TABLE IF EXISTS ?:user_price;</item> -->
+          `product_id` mediumint(8) unsigned NOT NULL,
+          `user_id` mediumint(8) unsigned NOT NULL,
+          `price` decimal(12,2) NOT NULL default '0.00',
+          PRIMARY KEY `product_user` (`product_id`,`user_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:user_price;</item>
     </queries>
 </addon>

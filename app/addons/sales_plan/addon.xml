@@ -1,63 +1,86 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
-	<id>sales_plan</id>
-	<version>1.0.1</version>
-	<default_language>en</default_language>
-	<priority>100</priority>
-	<status>active</status>
-	<name>Reports and sales plan</name>
-	<description></description>
-	<auto_install>MULTIVENDOR,ULTIMATE</auto_install>
-	<settings>
-		<sections>
-			<section id="general">
-				<name>General</name>
-				<items>
-					<item id="orders_amount">
-						<name>Orders amount</name>
-						<type>input</type>
-					</item>
-				</items>
-			</section>
-		</sections>
-	</settings>
-	<language_variables>
-		<item lang="en" id="plan">Plan</item>
-		<item lang="en" id="fact">Fact</item>
-		<item lang="en" id="sales_report">Sales report</item>
-		<item lang="en" id="sales_plan">Sales plan and report</item>
-		<item lang="en" id="sales_plan_menu_description">Allows to generate and export sales history and compare with the plan</item>
-		<item lang="ru" id="plan">План</item>
-		<item lang="ru" id="fact">Факт</item>
-		<item lang="ru" id="sales_report">Отчет пордаж</item>
-		<item lang="ru" id="sales_plan">План и отчет продаж</item>
-		<item lang="ru" id="sales_plan_menu_description">Позволяет сформировать и экспортировать продажи и сравнить с планом</item>
+    <id>sales_plan</id>
+    <version>1.0.1</version>
+    <default_language>ru</default_language>
+    <priority>100</priority>
+    <status>active</status>
+    <has_icon>Y</has_icon>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <name>Отчет и план продаж</name>
+    <description>Позволяет задавать план продаж и формировать отчеты</description>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <settings>
+        <sections>
+            <section id="general">
+                <name>General</name>
+                <items>
+                    <item id="orders_amount">
+                        <name>Orders amount</name>
+                        <type>input</type>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+    <language_variables>
+        <item lang="en" id="plan">Plan</item>
+        <item lang="en" id="fact">Fact</item>
+        <item lang="en" id="sales_report">Sales report</item>
+        <item lang="en" id="sales_plan">Sales plan and report</item>
+        <item lang="en" id="sales_plan_menu_description">Allows to generate and export sales history and compare with the plan</item>
+        <item lang="ru" id="plan">План</item>
+        <item lang="ru" id="fact">Факт</item>
+        <item lang="ru" id="sales_report">Отчет продаж</item>
+        <item lang="ru" id="sales_plan">План и отчет продаж</item>
+        <item lang="ru" id="sales_plan_menu_description">Позволяет сформировать и экспортировать продажи и сравнить с планом</item>
 
-		<item lang="en" id="frequency">Frequency</item>
-		<item lang="ru" id="frequency">Частота</item>
-		<item lang="en" id="notify_manager_order_insufficient">Уведомлять менеджеров если сумма заказа меньше среднего</item>
+        <item lang="en" id="frequency">Frequency</item>
+        <item lang="ru" id="frequency">Частота</item>
+        <item lang="en" id="notify_manager_order_insufficient">Уведомлять менеджеров если сумма заказа меньше среднего</item>
 
-		<item lang="ru" id="sales_plan.approve_order_action">Подтверждение заказов</item>
-		<item lang="ru" id="sales_plan.approve_all">Подтверждать все заказы</item>
-		<item lang="ru" id="sales_plan.approve_above_plan">Подтверждать выше плана</item>
-		<item lang="ru" id="sales_plan.do_not_approve">Не подтверждать автоматически</item>
-	</language_variables>
-	<queries>
-		<item>
-		CREATE TABLE `?:sales_plan` (
-		  `user_id` mediumint(8) unsigned NOT NULL,
-		  `company_id` mediumint(8) unsigned NOT NULL,
-		  `amount_plan` decimal(12,2) unsigned NOT NULL DEFAULT '0.00',
-		  `frequency` decimal(4,2) unsigned NOT NULL DEFAULT '0.00',
-		  UNIQUE KEY `user_company` (`user_id`,`company_id`)
-		) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-		</item>
-		<item for="uninstall">DROP TABLE `?:sales_plan`</item>
+        <item lang="ru" id="sales_plan.approve_order_action">Подтверждение заказов</item>
+        <item lang="ru" id="sales_plan.approve_all">Подтверждать все заказы</item>
+        <item lang="ru" id="sales_plan.approve_above_plan">Подтверждать выше плана</item>
+        <item lang="ru" id="sales_plan.do_not_approve">Не подтверждать автоматически</item>
 
-		<item>ALTER TABLE `?:companies` ADD `notify_manager_order_insufficient` char(1) NOT NULL DEFAULT 'Y';</item>
-		<item for="uninstall">ALTER TABLE `?:companies` DROP `notify_manager_order_insufficient`;</item>
+        <item lang="ru" id="category_report">Отчет по категориям</item>
+        <item lang="ru" id="category_report_menu_description">Детальная статистика продаж</item>
+        <item lang="ru" id="order_reviews_report">Отчет по отзывам заказа</item>
+        <item lang="ru" id="order_reviews_report_menu_description">и выгрузка отчета в файл</item>
+        <item lang="ru" id="unsold_report">Отчет по продажам продуктов</item>
+        <item lang="ru" id="unsold_report_menu_description">Отображает пользователей, которые оформили заказ меньше минимальной суммы</item>
 
-		<item>ALTER TABLE `?:users` ADD `approve_order_action` char(1) NOT NULL DEFAULT 'D';</item>
-		<item for="uninstall">ALTER TABLE `?:users` DROP `approve_order_action`;</item>
-	</queries>
+        <item lang="ru" id="sales_plan.summ">Cумма итого</item>
+        <item lang="ru" id="sales_plan.amount">Количество итого</item>
+        <item lang="ru" id="sales_plan.only_zero">Нулевой факт</item>
+        <item lang="ru" id="sales_plan.with_purchases">С заказами в этот период</item>
+        <item lang="ru" id="sales_plan.show_plan">Добавить столбец План</item>
+        <item lang="ru" id="sales_plan.show_user_id">Показать user_id</item>
+        <item lang="ru" id="sales_plan.show_manager">Показать менеджера</item>
+        <item lang="ru" id="sales_plan.group_by">Группировка</item>
+        <item lang="ru" id="sales_plan.hide_null">Скрыть пользователей без заказов</item>
+        <item lang="ru" id="export_push_notifications">Экспорт в push уведомления</item>
+        <item lang="ru" id="export_newsletters">Экспорт в рассылки</item>
+        <item lang="ru" id="export_promotion">Экспорт в промо-акции</item>
+    </language_variables>
+    <queries>
+        <item>
+        CREATE TABLE `?:sales_plan` (
+          `user_id` mediumint(8) unsigned NOT NULL,
+          `company_id` mediumint(8) unsigned NOT NULL,
+          `amount_plan` decimal(12,2) unsigned NOT NULL DEFAULT '0.00',
+          `frequency` decimal(4,2) unsigned NOT NULL DEFAULT '0.00',
+          UNIQUE KEY `user_company` (`user_id`,`company_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+        </item>
+        <item for="uninstall">DROP TABLE `?:sales_plan`</item>
+
+        <item>ALTER TABLE `?:companies` ADD `notify_manager_order_insufficient` char(1) NOT NULL DEFAULT 'Y';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `notify_manager_order_insufficient`;</item>
+
+        <item>ALTER TABLE `?:users` ADD `approve_order_action` char(1) NOT NULL DEFAULT 'D';</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP `approve_order_action`;</item>
+    </queries>
 </addon>

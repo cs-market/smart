@@ -55,21 +55,28 @@ $schema = array(
     'button_delimeter' => array(
         'type' => 'delimeter',
     ),
-    'push_notifications' => array(
+);
+
+if (Registry::get('addons.push_notifications.status') == 'A') {
+    $schema['push_notifications'] = array(
         'type' => 'button',
         'but_name' => "dispatch[reports.view.export.push_notifications]",
         'but_role' => 'submit-button',
         'but_text' => __('export_push_notifications'),
         'data_url' => 'push_notifications.add&user_ids=',
-    ),
-    'newsletters' => array(
+    );
+}
+
+if (Registry::get('addons.newsletters.status') == 'A') {
+    $schema['newsletters'] = array(
         'type' => 'button',
         'but_name' => 'dispatch[reports.view.export.newsletters]',
         'but_role' => 'submit-button',
         'but_text' => __('export_newsletters'),
         'data_url' => 'newsletters.add&type=N&user_ids=',
-    ),
-);
+    );
+}
+
 //if (!Registry::get('runtime.company_id')) {
     $schema['promotion'] = array(
         'type' => 'button',
@@ -82,5 +89,4 @@ $schema = array(
         ),
     );
 //}
-
 return $schema;

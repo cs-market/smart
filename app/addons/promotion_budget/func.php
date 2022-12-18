@@ -18,7 +18,7 @@ function fn_promotion_budget_change_order_status($status_to, $status_from, $orde
                     $data = [];
                     $data['conditions_hash'] = fn_promotion_serialize($promotion['conditions']['conditions']);
                     $data['conditions'] = serialize($promotion['conditions']);
-                    db_query('UPDATE ?:promotions SET ?u WHERE promotion_id = ?i', $data, $profile_id);
+                    db_query('UPDATE ?:promotions SET ?u WHERE promotion_id = ?i', $data, $promotion_id);
                     return;
                 }
                 if ($order_statuses[$status_to]['params']['inventory'] == 'D' && $order_statuses[$status_from]['params']['inventory'] == 'I') {
@@ -27,7 +27,7 @@ function fn_promotion_budget_change_order_status($status_to, $status_from, $orde
                     $data = [];
                     $data['conditions_hash'] = fn_promotion_serialize($promotion['conditions']['conditions']);
                     $data['conditions'] = serialize($promotion['conditions']);
-                    db_query('UPDATE ?:promotions SET ?u WHERE promotion_id = ?i', $data, $profile_id);
+                    db_query('UPDATE ?:promotions SET ?u WHERE promotion_id = ?i', $data, $promotion_id);
                     return;
                 }
             }
