@@ -1630,7 +1630,7 @@ function fn_place_suborders($order_id, $cart, &$auth, $action, $issuer_id)
 
         $suborder_cart['product_groups'] = array($group);
 
-        fn_set_hook('place_suborders', $cart, $suborder_cart);
+        fn_set_hook('place_suborders', $cart, $suborder_cart, $key_group);
 
         list($order_ids[],) = fn_place_order($suborder_cart, $auth, $action, $issuer_id, $order_id);
     }
