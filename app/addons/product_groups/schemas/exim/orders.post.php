@@ -1,7 +1,5 @@
 <?php
 
-use Tygh\Registry;
-
 $schema['export_fields']['Product group'] = array (
     'db_field' => 'group_id',
     'linked' => true,
