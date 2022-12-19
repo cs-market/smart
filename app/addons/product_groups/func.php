@@ -123,7 +123,7 @@ function fn_product_groups_get_package_info(&$group) {
             } else {
                 $product_price = 0;
             }
-
+            if (!isset($group['subtotal'])) $group['subtotal'] = 0;
             $group['subtotal'] += $product['price'] * $product['amount'];
 
             if (!(!empty($product['free_shipping']) && $product['free_shipping'] == 'Y')) {
@@ -146,7 +146,7 @@ function fn_product_groups_split_cart($cart, $only_mandatory_order_split = false
         foreach ($cart['product_groups'] as $group_key => $group_data) {
             if ($groups = fn_product_groups_get_groups_from_products($group_data['products'])) {
                 foreach ($groups as $group_id => $group) {
-                    if (!(YesNo::toBool($group['mandatory_order_split']) || (YesNo::toBool($cart['split_order'][$group_id]) && !$only_mandatory_order_split))) continue;
+                    if (!(YesNo::toBool($group['mandatory_order_split']) || (isset($cart['split_order']) && YesNo::toBool($cart['split_order'][$group_id]) && !$only_mandatory_order_split))) continue;
 
                     $proto = $group_data;
                     $proto['group_id'] = $group_id;

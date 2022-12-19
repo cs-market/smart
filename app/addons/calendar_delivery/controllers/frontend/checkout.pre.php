@@ -9,6 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         foreach($_REQUEST['delivery_date'] as $group_id => $delivery_date) {
             $cart['delivery_date'][$group_id] = $delivery_date;
         }
+    }
+    if (!empty($_REQUEST['delivery_period']) && is_array($_REQUEST['delivery_period'])) {
         foreach ($_REQUEST['delivery_period'] as $group_id => $period) {
             $cart['delivery_period'][$group_id] = $period;
         }

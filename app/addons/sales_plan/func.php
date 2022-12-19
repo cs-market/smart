@@ -500,7 +500,7 @@ function fn_sales_plan_create_order($order) {
         
         $mailer = Tygh::$app['mailer'];
 
-        if ($notification_data) {
+        if (!empty($notification_data)) {
             foreach ($notification_data as $manager_email => $data) {
                 $mailer->send(array(
                     'to' => $manager_email,

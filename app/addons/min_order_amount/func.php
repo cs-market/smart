@@ -118,7 +118,7 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
                 $cart['min_order_notification'] = __('text_min_products_weight_required') . ' ' . $mins['min_order_weight'] . ' ' . Registry::get('settings.General.weight_symbol');
             }
 
-            if ($group['storage_id']) {
+            if (!empty($group['storage_id'])) {
                 if ($mins = Registry::get('runtime.storages.'.$group['storage_id'])) {
                     if ($mins['min_order_amount'] && $mins['min_order_amount'] > $group['package_info']['C'] && $cart['total'] && empty($group_orders)) {
                         $cart['min_order_failed'] = true;
