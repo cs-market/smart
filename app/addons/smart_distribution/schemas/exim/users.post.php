@@ -27,11 +27,6 @@ $schema['export_fields']['Profile id'] = [
     'table' => 'user_profiles',
 ];
 
-$schema['references']['user_data'] = array(
-    'reference_fields' => array('user_id' => '#key', 'type' => POINTS),
-    'join_type' => 'LEFT'
-);
-
 $schema['export_fields']['Profile name'] = [
     'db_field' => 'profile_name',
     'table' => 'user_profiles',

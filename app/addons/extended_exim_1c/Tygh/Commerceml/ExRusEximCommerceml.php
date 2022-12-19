@@ -1002,9 +1002,9 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 }
 
                 // do not disturb old orders
-                if (empty($order_info['order_id']) || $order_info['timestamp'] + SECONDS_IN_DAY * 14 < time()) {
-                    continue;
-                }
+                // if (empty($order_info['order_id']) || $order_info['timestamp'] + SECONDS_IN_DAY * 14 < time()) {
+                //     continue;
+                // }
                 $order_id = $order_info['order_id'];
                 foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
                     $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);

@@ -6,6 +6,11 @@ defined('BOOTSTRAP') or die('Access denied');
 
 include_once(Registry::get('config.dir.addons') . 'maintenance/schemas/exim/exim.functions.php');
 
+$schema['references']['user_data'] = array(
+    'reference_fields' => array('user_id' => '#key', 'type' => POINTS),
+    'join_type' => 'LEFT'
+);
+
 $schema['export_fields']['Reward points'] = [
     'process_get' => array('unserialize', '#this'),
     'export_only' => true,
