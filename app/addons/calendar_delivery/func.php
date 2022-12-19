@@ -336,7 +336,7 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
 
             //TODO может начать кэшировать эти запросы в бд?
             $usergroup_working_time_till = [];
-            if (!empty($auth['usergroup_ids'])) {
+            if (!empty($auth['user_id']['usergroup_ids'])) {
                 $usergroup_working_time_till = db_get_row('SELECT working_time_till FROM ?:usergroups WHERE usergroup_id IN (?a) AND working_time_till != ""', $auth['user_id']['usergroup_ids']);
             }
 
