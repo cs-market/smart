@@ -159,9 +159,9 @@ function fn_product_groups_split_cart($cart, $only_mandatory_order_split = false
                         if ($product['group_id'] == $group_id) {
                             $proto['products'][$cart_id] = $product;
                             unset($group_data['products'][$cart_id]);
-                            fn_product_groups_get_package_info($proto);
                         }
                     }
+                    fn_product_groups_get_package_info($proto);
                     $p_groups[] = $proto;
                 }
             }

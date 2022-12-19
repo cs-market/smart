@@ -284,7 +284,11 @@ function fn_calendar_delivery_update_usergroup_pre(&$usergroup_data, $usergroup_
 }
 
 function fn_calendar_delivery_fill_auth(&$auth, $user_data, $area, $original_auth) {
-    if (!empty($user_data['user_id']) && Registry::get('addons.storages.status') == 'A') {
+    if (empty($user_data['user_id'])) return;
+    $user_info = Registry::get('user_info');
+    if (isset($user_info['delivery_date_by_storage'])) {
+        $auth['delivery_date_by_storage'] = $user_info['delivery_date_by_storage'];
+    } elseif (Registry::get('addons.storages.status') == 'A') {
         $auth['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i ORDER BY storage_id', 'storage_id', $user_data['user_id']);
     }
 }
