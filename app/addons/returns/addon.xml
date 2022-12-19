@@ -2,7 +2,7 @@
 <addon scheme="2.0">
     <id>returns</id>
     <name>Smart distribution: Возвраты</name>
-    <description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <description><![CDATA[Позволяет создавать заявки на возврат © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
     <priority>41000</priority>
     <version>1.0.1</version>
     <position>0</position>
@@ -10,6 +10,7 @@
     <default_language>ru</default_language>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
     <language_variables>
         <item lang="ru" id="returns">Возвраты</item>
         <item lang="ru" id="support_returns">Разрешить возвраты</item>

@@ -1,5 +1,5 @@
 <div class="control-group" id="product_group_selector">
-    <label class="control-label" for="group_id">{__("product_group")}</label>
+    <label class="control-label" for="group_id">{__("product_groups.product_group")}</label>
     <div class="controls">
         <input type="hidden" name="product_data[group_id]" id="group_id" value="{$product_data.group_id}" />
         <div class="text-type-value ajax-select-wrap">

@@ -58,19 +58,19 @@ msgstr "Служба поддержки"
 
 msgctxt "Languages::tickets"
 msgid "Tickets"
-msgstr "Тикеты"
+msgstr "Диалоги"
 
 msgctxt "Languages::tickets_menu_description"
 msgid "View all tickets"
-msgstr "Посмотреть все тикеты"
+msgstr "Посмотреть все диалоги"
 
-msgctxt "Languages::open_tickets"
-msgid "Open tickets"
-msgstr "Открытые тикеты"
+msgctxt "Languages::new_tickets"
+msgid "New tickets"
+msgstr "Новые диалоги"
 
-msgctxt "Languages::open_tickets_menu_description"
-msgid "View only open tickets"
-msgstr "Просмотр только открытых тикетов"
+msgctxt "Languages::new_tickets_menu_description"
+msgid "View only new tickets"
+msgstr "Просмотр диалогов с новыми сообщениями"
 
 msgctxt "Languages::waiting_tickets"
 msgid "Waiting tickets"
@@ -78,7 +78,7 @@ msgstr "Ожидающие ответа"
 
 msgctxt "Languages::waiting_tickets_menu_description"
 msgid "View only waiting tickets"
-msgstr "Просмотр тикетов, ожидающих ответа"
+msgstr "Просмотр диалогов, ожидающих ответа"
 
 msgctxt "Languages::mailboxes"
 msgid "Mailboxes"

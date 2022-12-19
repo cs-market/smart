@@ -19,3 +19,15 @@ msgstr "Promotion step"
 msgctxt "Languages::promotion_bonus_promotion_step_free_products"
 msgid "Promotion step(free product)"
 msgstr "Promotion step(free product)"
+
+msgctxt "Languages::promotion_cond_promotion_package_step"
+msgid "Promotion package step"
+msgstr "Promotion package step"
+
+msgctxt "Languages::promotion_step_give_condition_products"
+msgid "Promotion step(free product from condition)"
+msgstr "Promotion step(free product from condition)"
+
+msgctxt "Languages::promotion_cond_promotion_step_limit"
+msgid "Limit bonus products"
+msgstr "Limit bonus products"

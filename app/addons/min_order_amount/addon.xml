@@ -2,14 +2,15 @@
 <addon scheme="2.0">
     <id>min_order_amount</id>
     <name>Smart distribution: Min order amount</name>
-    <description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <description><![CDATA[Добавляет ограничение заказа по минимальной сумме © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
     <priority>26732300</priority>
     <version>1.0.1</version>
     <position>0</position>
     <status>active</status>
-    <default_language>en</default_language>
+    <default_language>ru</default_language>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
     <compatibility>
         <dependencies>product_groups</dependencies>
         <core_version>
@@ -23,7 +24,10 @@
         <item lang="ru" id="allow_additional_ordering">Разрешить дозаказ</item>
         
         <item lang="en" id="min_order_weight">Min order weight</item>
-        <item lang="ru" id="min_order_weight">Минимальный вес заказа</item>
+        <item lang="ru" id="min_order_amount.min_order_weight">Минимальный вес заказа</item>
+
+        <item lang="ru" id="notify_manager_order_insufficient">Уведомлять менеджеров если сумма заказа меньше среднего</item>
+        <item lang="ru" id="with_company">для продавца</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `min_order_amount` mediumint(8) UNSIGNED NOT NULL DEFAULT 0;</item>
@@ -44,4 +48,3 @@
         <item for="uninstall">ALTER TABLE `?:companies` DROP `min_order_weight`;</item>        
     </queries>
 </addon>
-

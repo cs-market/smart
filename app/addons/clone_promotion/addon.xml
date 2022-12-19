@@ -1,14 +1,20 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
-	<id>clone_promotion</id>
-	<name>Clone Promotion</name>
-	<priority>31337</priority>
-	<position>0</position>
-	<status>active</status>
+    <id>clone_promotion</id>
+    <name>Smart distribution: Clone Promotion</name>
+    <description>Позволяет клонировать промо-акции</description>
+    <version>1.0.1</version>
+    <priority>31337</priority>
+    <position>0</position>
+    <status>active</status>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <default_language>ru</default_language>
     <language_variables>
         <item lang="en" id="clone_promotion">Clone promotion</item>
-		<item lang="en" id="promotion_cloned">The promotion has been cloned</item>
-		<item lang="ru" id="clone_promotion">Клонировать промоакцию</item>
-		<item lang="ru" id="promotion_cloned">Промоакция склонирована</item>
-	</language_variables>
+        <item lang="en" id="promotion_cloned">The promotion has been cloned</item>
+        <item lang="ru" id="clone_promotion">Клонировать промоакцию</item>
+        <item lang="ru" id="promotion_cloned">Промоакция склонирована</item>
+    </language_variables>
 </addon>

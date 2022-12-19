@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
     <id>push_notifications</id>
-    <name>Push notifications</name>
-    <description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <name>Push уведомления</name>
+    <description><![CDATA[Позволяет отправлять push уведомления и push рассылки в мобильное приложение © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
     <priority>26732300</priority>
     <version>1.0.1</version>
     <position>0</position>
@@ -29,6 +29,7 @@
         <item lang="ru" id="save_and_send">Сохранить и отправить</item>
         <item lang="ru" id="add_recipients_from_users">Добавить получателей из списка пользователей</item>
         <item lang="en" id="push_notification">Push notification</item>
+        <item lang="ru" id="push_notification">Push уведомление</item>
     </language_variables>
     <queries>
         <item>CREATE TABLE `?:push_notifications` (

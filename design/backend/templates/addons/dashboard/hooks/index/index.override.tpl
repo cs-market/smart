@@ -19,16 +19,16 @@
                     <h3>
                         {include file="common/price.tpl" value=$period_stat.total}
                     </h3>
-                    {if $period_stat.total_rel}{$period_stat.total_rel}%{else}&nbsp;{/if}
+                    {if $period_stat.total_rel}{$period_stat.total_rel nofilter}%{else}&nbsp;{/if}
                 </div>
             </div>
             <div class="dashboard-card dashboard-card--balance">
                 <div class="dashboard-card-title">{__("reports_parameter_2")}</div>
                 <div class="dashboard-card-content">
                     <h3>
-                        {$period_stat.count_orders}
+                        {$period_stat.count_orders|default:0}
                     </h3>
-                    {if $period_stat.count_orders_rel}{$period_stat.count_orders_rel}%{else}&nbsp;{/if}
+                    {if $period_stat.count_orders_rel}{$period_stat.count_orders_rel nofilter}%{else}&nbsp;{/if}
                 </div>
             </div>
             <div class="dashboard-card dashboard-card--balance">
@@ -37,34 +37,34 @@
                     <h3>
                         {include file="common/price.tpl" value=$period_stat.avg_total}
                     </h3>
-                    {if $period_stat.avg_total_rel}{$period_stat.avg_total_rel}%{else}&nbsp;{/if}
+                    {if $period_stat.avg_total_rel}{$period_stat.avg_total_rel nofilter}%{else}&nbsp;{/if}
                 </div>
             </div>
             <div class="dashboard-card dashboard-card--balance">
                 <div class="dashboard-card-title">{__("avg_sku")}</div>
                 <div class="dashboard-card-content">
                     <h3>
-                        {$period_stat.avg_sku}
+                        {$period_stat.avg_sku|default:0}
                     </h3>
-                    {if $period_stat.avg_sku_rel}{$period_stat.avg_sku_rel}%{else}&nbsp;{/if}
+                    {if $period_stat.avg_sku_rel}{$period_stat.avg_sku_rel nofilter}%{else}&nbsp;{/if}
                 </div>
             </div>
             <div class="dashboard-card dashboard-card--balance">
                 <div class="dashboard-card-title">{__("customers")}</div>
                 <div class="dashboard-card-content">
                     <h3>
-                        {$period_stat.customers}
+                        {$period_stat.customers|default:0}
                     </h3>
-                    {if $period_stat.customers_rel}{$period_stat.customers_rel}%{else}&nbsp;{/if}
+                    {if $period_stat.customers_rel}{$period_stat.customers_rel nofilter}%{else}&nbsp;{/if}
                 </div>
             </div>
             <div class="dashboard-card dashboard-card--balance">
                 <div class="dashboard-card-title">{__("avg_sku_per_customer")}</div>
                 <div class="dashboard-card-content">
                     <h3>
-                        {$period_stat.avg_sku_per_customer}
+                        {$period_stat.avg_sku_per_customer|default:0}
                     </h3>
-                    {if $period_stat.avg_sku_per_customer_rel}{$period_stat.avg_sku_per_customer_rel}%{else}&nbsp;{/if}
+                    {if $period_stat.avg_sku_per_customer_rel}{$period_stat.avg_sku_per_customer_rel nofilter}%{else}&nbsp;{/if}
                 </div>
             </div>
         </div>

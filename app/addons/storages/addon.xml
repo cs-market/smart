@@ -26,6 +26,9 @@
         <item lang="ru" id="text_remove_user_storages">При импорте пользовательских дней по складам существующие дни по складу обновляемого пользователя будут удалены</item>
         <item lang="ru" id="storages.storage_already_exist">Склад с таким кодом уже существует</item>
         <item lang="ru" id="storages.access_denied">Доступ запрещен</item>
+        <item lang="ru" id="block_storages_popup_picker">Попап выбора складов</item>
+        <item lang="ru" id="storages_popup_picker">Попап выбора складов</item>
+        <item lang="ru" id="storage_switcher">Выберите дистрибьютора, осуществляющего доставку</item>
     </language_variables>
     <queries>
         <!-- company_id only for multivendor -->
@@ -68,12 +71,10 @@
         <item for="uninstall">DROP TABLE IF EXISTS `?:storage_usergroups`;</item>
 
         <item>ALTER TABLE `?:orders` ADD `storage_id` mediumint(8) unsigned NOT NULL;</item>
-        <item for="uninstall">ALTER TABLE `?:products` DROP `storage_id`;</item>
+        <item for="uninstall">ALTER TABLE `?:orders` DROP `storage_id`;</item>
     </queries>
     <functions>
         <item for="install">fn_storages_install</item>
-    </functions>
-    <functions>
-        <item for="install">fn_storages_uninstall</item>
+        <item for="uninstall">fn_storages_uninstall</item>
     </functions>
 </addon>

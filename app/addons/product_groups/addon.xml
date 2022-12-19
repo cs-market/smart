@@ -2,6 +2,7 @@
 <addon scheme="2.0">
     <id>product_groups</id>
     <name>Smart distribution: Группы товаров</name>
+    <description>Позволяет разделить корзину в разные заказы от разных групп товаров</description>
     <priority>26732300</priority>
     <version>1.0.2</version>
     <position>0</position>
@@ -9,12 +10,14 @@
     <default_language>ru</default_language>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
     <language_variables>
         <item lang="ru" id="product_groups.add_product_group">Добавить группу товаров</item>
         <item lang="ru" id="product_groups.new_product_group">Новая группа товаров</item>
         <item lang="ru" id="product_groups.product_group">Группа товаров</item>
         <item lang="ru" id="product_groups.split_order">Отдельная накладная для товаров [group_name]</item>
         <item lang="ru" id="product_groups.mandatory_order_split">Выделять в отдельный заказ</item>
+        <item lang="ru" id="product_groups_menu_description">Просмотр, добавление и редактирование групп товаров</item>
         <item lang="ru" id="group_id">Группа товаров</item>
     </language_variables>
     <queries>
@@ -33,6 +36,6 @@
         <item for="uninstall">ALTER TABLE `?:products` DROP `group_id`;</item>
 
         <item>ALTER TABLE `?:orders` ADD `group_id` mediumint(8) unsigned NOT NULL;</item>
-        <item for="uninstall">ALTER TABLE `?:products` DROP `group_id`;</item>
+        <item for="uninstall">ALTER TABLE `?:orders` DROP `group_id`;</item>
     </queries>
 </addon>

@@ -24,3 +24,10 @@ msgctxt "Languages::promotion_cond_promotion_package_step"
 msgid "Promotion package step"
 msgstr "Шаг применения акции в упаковках (Кратность начисления бонуса)"
 
+msgctxt "Languages::promotion_step_give_condition_products"
+msgid "Promotion step(free product from condition)"
+msgstr "Шаг применения акции (Бесплатные товары из условий)"
+
+msgctxt "Languages::promotion_cond_promotion_step_limit"
+msgid "Limit bonus products"
+msgstr "Лимит бонусных товаров (кратность шага до)"

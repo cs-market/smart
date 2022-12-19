@@ -11,7 +11,7 @@
         <input type="hidden" name="ticket_data[ticket_id]" value="{$ticket.ticket_id}" />
         <input type ="hidden" name="redirect_url" value="{$config.current_url}" />
 
-        <div style="width: 80%; float:left;">
+        <div {if $templates}style="width: 80%; float:left;"{/if}>
             {include file="addons/helpdesk/views/tickets/components/message.tpl"}
 
             <div class="control-group">
@@ -39,28 +39,30 @@
             </div>
         </div>
 
-        <div style="margin-right: 10px; margin-top: 10px;" class="open pull-right">
-            <ul id="template_picker" class="dropdown-menu" style="position: static;">
-            {foreach from=$templates item="template_section" name='templates'}
-                {foreach from=$template_section item="template" }
-                    <li id="template_{$template.template_id}" data-ca-template-value="{$template.template }" class="cm-helpdesk-message-template"><a>{$template.name}</a></li>
+        {if $templates}
+            <div style="margin-right: 10px; margin-top: 10px;" class="open pull-right">
+                <ul id="template_picker" class="dropdown-menu" style="position: static;">
+                {foreach from=$templates item="template_section" name='templates'}
+                    {foreach from=$template_section item="template" }
+                        <li id="template_{$template.template_id}" data-ca-template-value="{$template.template }" class="cm-helpdesk-message-template"><a>{$template.name}</a></li>
+                    {/foreach}
+                    {if !$smarty.foreach.templates.last}
+                        <li class="divider"></li>
+                    {/if}
                 {/foreach}
-                {if !$smarty.foreach.templates.last}
-                    <li class="divider"></li>
-                {/if}
-            {/foreach}
-            </ul>
-        </div>
-        {literal}
-        <script>
-            $(document).ready(function () {
-                $('#template_picker li').click(function () {
-                    template = $( this ).data('caTemplateValue');
-                    $("#helpdesk_message").ceEditor("val", $("#helpdesk_message").ceEditor("val") + template);
+                </ul>
+            </div>
+            {literal}
+            <script>
+                $(document).ready(function () {
+                    $('#template_picker li').click(function () {
+                        template = $( this ).data('caTemplateValue');
+                        $("#helpdesk_message").ceEditor("val", $("#helpdesk_message").ceEditor("val") + template);
+                    });
                 });
-            });
-        </script>
-        {/literal}
+            </script>
+            {/literal}
+        {/if}
     </div>
 </form>
 {/if}

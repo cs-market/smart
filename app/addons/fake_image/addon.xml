@@ -1,25 +1,26 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
-	<id>fake_image</id>
-	<name>Fake product images</name>
-	<description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
-	<priority>26732300</priority>
-	<version>1.0.1</version>
-	<position>0</position>
-	<status>active</status>
-	<default_language>en</default_language>
-	<supplier>CS-Market</supplier>
-	<supplier_link>http://cs-market.com/</supplier_link>
-	<settings>
-		<sections>
-			<section id="general">
-				<items>
-					<item id="image">
-						<name>Image</name>
-						<type>input</type>
-					</item>
-				</items>
-			</section>
-		</sections>
-	</settings>
+    <id>fake_image</id>
+    <name>Fake product images</name>
+    <description><![CDATA[Позволяет задать отсутствие картинки к товару © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <priority>26732300</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <status>active</status>
+    <has_icon>Y</has_icon>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="image">
+                        <name>Image</name>
+                        <type>input</type>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
 </addon>

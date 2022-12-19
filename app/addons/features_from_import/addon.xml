@@ -2,13 +2,14 @@
 <addon scheme="2.0">
     <id>features_from_import</id>
     <name>Smart distribution: Features from import</name>
-    <description></description>
+    <description>Позволяет указать создание новой характеристики в новом импорте при разметке полей</description>
     <version>1.0.1</version>
     <priority>4100</priority>
     <status>active</status>
     <default_language>en</default_language>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
     <compatibility>
         <core_version>
             <min>4.3.1</min>

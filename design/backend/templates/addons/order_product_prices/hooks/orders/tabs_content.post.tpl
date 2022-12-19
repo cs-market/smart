@@ -12,7 +12,6 @@
             </tr>
         </thead>
         {foreach from=$order_info.products item="oi" key="key"}
-        {hook name="orders:items_list_row"}
         {if !$oi.extra.parent}
         <tr>
             <td data-th="{__("product")}">
@@ -40,10 +39,7 @@
             {/if}
         </tr>
         {/if}
-        {/hook}
         {/foreach}
-        {hook name="orders:extra_list"}
-        {/hook}
         </table>
     </div>
 <!--content_prices--></div>

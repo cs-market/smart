@@ -1,16 +1,15 @@
 <?xml version="1.0"?>
 <addon scheme="3.0">
-<id>promotion_step</id>
-<version>1.0</version>
-<position>0</position>
-<status>active</status>
-<default_language>en</default_language>
-<compatibility>
-    <!-- fn_cleanup_promotion_condition -->
-    <dependencies>category_promotion</dependencies>
-</compatibility>
-<queries>
-</queries>
-<functions>
-</functions>
+    <id>promotion_step</id>
+    <version>1.0</version>
+    <position>0</position>
+    <default_language>ru</default_language>
+    <status>active</status>
+    <has_icon>Y</has_icon>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <compatibility>
+        <!-- fn_cleanup_promotion_condition -->
+        <dependencies>category_promotion</dependencies>
+    </compatibility>
 </addon>

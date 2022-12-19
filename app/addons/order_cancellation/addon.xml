@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
     <id>order_cancellation</id>
-    <name>Order cancellation</name>
+    <name>Smart distribution: Order cancellation</name>
+    <description>Позволяет отменять заказ на определенных статусах</description>
     <version>1.0</version>
     <priority>3000</priority>
     <position>0</position>
     <status>active</status>
-    <default_language>en</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <default_language>ru</default_language>
     <settings>
         <sections>
             <section id="general">

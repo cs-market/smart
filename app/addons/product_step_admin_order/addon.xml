@@ -7,4 +7,7 @@
     <status>active</status>
     <position>0</position>
     <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
 </addon>

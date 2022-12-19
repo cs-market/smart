@@ -13,7 +13,7 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="elm_company_min_order_weight">{__("min_order_weight")}:</label>
+    <label class="control-label" for="elm_company_min_order_weight">{__("min_order_amount.min_order_weight")}:</label>
     <div class="controls">
         <input type="text" name="company_data[min_order_weight]" id="elm_company_min_order_weight" value="{$company_data.min_order_weight}" />
     </div>

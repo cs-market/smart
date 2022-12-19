@@ -21,14 +21,14 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 function fn_storages_install() {
     if (Registry::get('addons.user_price.status') == 'A') {
         db_query("ALTER TABLE ?:user_price ADD storage_id mediumint UNSIGNED NOT NULL DEFAULT '0' AFTER user_id");
-        db_query("ALTER TABLE ?:user_price DROP INDEX `product_user`, ADD PRIMARY `product_user_storage` (`product_id`, `user_id`, `storage_id`)"); 
+        db_query("ALTER TABLE ?:user_price DROP PRIMARY KEY, ADD PRIMARY KEY (`product_id`, `user_id`, `storage_id`)"); 
     }
 }
 
 function fn_storages_uninstall() {
     if (Registry::get('addons.user_price.status') == 'A') {
-        db_query("ALTER TABLE ?:user_price DROP INDEX `product_user_storage`, ADD PRIMARY `product_user` (`product_id`, `user_id`)");
-        db_query("ALTER TABLE ?:user_price DROP storage_id");
+        db_query("ALTER TABLE ?:user_price DROP PRIMARY KEY, ADD PRIMARY KEY (`product_id`, `user_id`)");
+        db_query("ALTER TABLE ?:user_price DROP `storage_id`");
     }
 }
 
@@ -197,6 +197,7 @@ function fn_get_storages_amount($product_id) {
 }
 
 function fn_storages_get_product_data($product_id, &$field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
+
     if ($storage = Registry::get('runtime.current_storage')) {
         $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
         

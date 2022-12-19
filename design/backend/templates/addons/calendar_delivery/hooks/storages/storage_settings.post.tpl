@@ -17,7 +17,7 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="elm_storage_exception_days">{__("exception_days")}</label>
+    <label class="control-label" for="elm_storage_exception_days">{__("calendar_delivery.exception_days")}</label>
     <div class="controls">
         {include file="addons/calendar_delivery/components/weekdays_table.tpl" name="storage_data[exception_days]" value=$storage.exception_days}
     </div>

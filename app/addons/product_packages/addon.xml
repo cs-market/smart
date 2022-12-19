@@ -17,6 +17,7 @@
         <item lang="ru" id="product_packages.package_switcher">Переключатель штук/упаковок</item>
         <item lang="ru" id="product_packages.items">Штуки</item>
         <item lang="ru" id="product_packages.packages">Упаковки</item>
+        <item lang="ru" id="of_box">упаковки</item>
     </language_variables>
     <settings edition_type="ULT:ROOT">
         <sections>
