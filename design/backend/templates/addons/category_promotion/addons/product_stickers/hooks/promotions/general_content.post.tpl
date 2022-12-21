@@ -1,5 +1,5 @@
 {if $runtime.mode == 'update' && ($addons.product_stickers.vendor_stickers == 'Y' || !("MULTIVENDOR"|fn_allowed_for && $runtime.company_id))}
-{include file="common/subheader.tpl" title=__("stickers") target="#stickers_promotion_setting"}
+{*include file="common/subheader.tpl" title=__("stickers") target="#stickers_promotion_setting"*}
 <div id="stickers_promotion_setting" class="in collapse">
     <label for="promotion_ids" class="control-label">{__("stickers")}:</label>
     <div class="controls">
