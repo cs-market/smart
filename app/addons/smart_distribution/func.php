@@ -913,18 +913,9 @@ function fn_smart_distribution_get_products_post(&$products, $params, $lang_code
 }
 
 function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fields, $group_by, $sortings, $lang_code) {
-    if (isset($params['search_query']) && !fn_is_empty($params['search_query'])) {
-        $search = db_quote(' AND ?:category_descriptions.category LIKE ?l', '%' . trim($params['search_query']) . '%');
-        $condition = str_replace($search, '', $condition);
-        $condition .= db_quote(' AND (?:category_descriptions.category LIKE ?l OR ?:category_descriptions.alternative_names LIKE ?l)', '%' . trim($params['search_query']) . '%', '%' . trim($params['search_query']) . '%');
-    }
-    if (isset($params['is_search']) && $params['is_search'] == 'Y') {
+    if (isset($params['is_search']) && YesNo::toBool($params['is_search'])) {
         $params['group_by_level'] = false;
         $params['simple'] = false;
-    }
-    if (in_array(Registry::get('runtime.controller'), ['sd_exim_1c', 'exim_1c', 'commerceml'])) {
-        $remove = " AND (" . fn_find_array_in_set(Tygh::$app['session']['auth']['usergroup_ids'], '?:categories.usergroup_ids', true) . ")";
-        $condition = str_replace($remove, '', $condition);
     }
 }
 
@@ -1345,18 +1336,4 @@ function fn_smart_distribution_get_filters_pre($params, &$cache_params) {
 // we have removed russia moscow from default destinations, but shippings stop to work
 function fn_smart_distribution_get_available_destination_pre(&$location) {
     $location['country'] = !empty($location['country']) ? $location['country'] : 'RU';
-}
-
-function fn_smart_distribution_check_permission_manage_profiles(&$result, $user_type) {
-    $params = array (
-        'user_type' => $user_type
-    );
-
-    $can_manage_profiles = !fn_is_restricted_admin($params) || $user_type !== UserTypes::ADMIN;
-
-    if ($can_manage_profiles && Registry::get('runtime.company_id')) {
-        $can_manage_profiles = ($user_type == 'V' || $user_type == 'C') && Registry::get('runtime.company_id');
-    }
-
-    $result = $can_manage_profiles;
 }

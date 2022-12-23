@@ -10,4 +10,7 @@ fn_register_hooks(
     'update_profile',
     'get_promotions',
     'dispatch_assign_template',
+    'check_permission_manage_profiles',
+    ['check_rights_delete_user', 1],
+    'get_users',
 );

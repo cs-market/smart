@@ -4,7 +4,7 @@
     <name>Smart distribution: Order cancellation</name>
     <description>Позволяет отменять заказ на определенных статусах</description>
     <version>1.0</version>
-    <priority>3000</priority>
+    <priority>32342353000</priority>
     <position>0</position>
     <status>active</status>
     <supplier>CS-Market</supplier>
@@ -17,7 +17,7 @@
                 <items>
                     <item id="cancellation_status">
                         <type>selectbox</type>
-                        <name>Canceled Order Status</name>
+                        <name>Отмененный статус заказа</name>
                         <default_value>C</default_value>
                     </item>
                 </items>
@@ -27,11 +27,14 @@
     <language_variables>
         <item lang="en" id="cancel_order">Cancel the order</item>
         <item lang="ru" id="cancel_order">Отменить заказ</item>
-
+        <item lang="ru" id="order_cancellation">Отмена заказа</item>
+        
         <item lang="en" id="allow_order_cancellation">Allow to cancel the order</item>
         <item lang="ru" id="allow_order_cancellation">Разрешить отмену заказа</item>
     </language_variables>
     <queries>
+        <item for="install" editions="MULTIVENDOR">ALTER TABLE ?:companies ADD `allow_order_cancellation` VARCHAR(1) default 'Y'</item>
+        <item for="uninstall" editions="MULTIVENDOR">ALTER TABLE ?:companies DROP `allow_order_cancellation`</item>
         <item for="uninstall">DELETE FROM ?:status_data WHERE param = 'allow_cancel'</item>
     </queries>
 </addon>

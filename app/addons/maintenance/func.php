@@ -11,6 +11,7 @@ use Tygh\Enum\SiteArea;
 use Tygh\Enum\YesNo;
 // use Tygh\BlockManager\Block;
 use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\UserTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -49,6 +50,21 @@ function fn_maintenance_update_profile($action, $user_data, $current_user_data) 
     }
 }
 
+function fn_maintenance_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
+    if (defined('ORDER_MANAGEMENT') && !empty($params['promotion_id'])) {
+        return;
+    }
+    if (!empty($params['fields'])) {
+        if (!is_array($params['fields'])) {
+            $params['fields'] = explode(',', $params['fields']);
+        }
+        $fields = $params['fields'];
+    }
+    if (!empty($params['exclude_promotion_ids'])) {
+        if (!is_array($params['exclude_promotion_ids'])) $params['exclude_promotion_ids'] = [$params['exclude_promotion_ids']];
+        $condition .= db_quote(' AND ?:promotions.promotion_id NOT IN (?a)', $params['exclude_promotion_ids']);
+    }
+}
 
 function fn_maintenance_dispatch_assign_template($controller, $mode, $area, &$controllers_cascade) {
     $root_dir = Registry::get('config.dir.root') . '/app';
@@ -69,19 +85,32 @@ function fn_maintenance_dispatch_assign_template($controller, $mode, $area, &$co
     unset($crtl);
 }
 
-function fn_maintenance_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
-    if (defined('ORDER_MANAGEMENT') && !empty($params['promotion_id'])) {
-        return;
+function fn_maintenance_check_permission_manage_profiles(&$result, $user_type) {
+    $can_manage_profiles = true;
+
+    if (Registry::get('runtime.company_id')) {
+        $can_manage_profiles = (in_array($user_type, [UserTypes::CUSTOMER, UserTypes::VENDOR])) && Registry::get('runtime.company_id');
     }
-    if (!empty($params['fields'])) {
-        if (!is_array($params['fields'])) {
-            $params['fields'] = explode(',', $params['fields']);
-        }
-        $fields = $params['fields'];
+
+    $result = $can_manage_profiles;
+}
+
+function fn_maintenance_check_rights_delete_user($user_data, $auth, &$result) {
+    $result = true;
+
+    if (
+        ($user_data['is_root'] == 'Y' && !$user_data['company_id']) // root admin
+        || (!empty($auth['user_id']) && $auth['user_id'] == $user_data['user_id']) // trying to delete himself
+        || (Registry::get('runtime.company_id') && $user_data['is_root'] == 'Y') // vendor root admin
+        || (Registry::get('runtime.company_id') && fn_allowed_for('ULTIMATE') && $user_data['company_id'] != Registry::get('runtime.company_id')) // user from other store
+    ) {
+        $result = false;
     }
-    if (!empty($params['exclude_promotion_ids'])) {
-        if (!is_array($params['exclude_promotion_ids'])) $params['exclude_promotion_ids'] = [$params['exclude_promotion_ids']];
-        $condition .= db_quote(' AND ?:promotions.promotion_id NOT IN (?a)', $params['exclude_promotion_ids']);
+}
+
+function fn_maintenance_get_users($params, $fields, $sortings, &$condition, $join, $auth) {
+    if (UserTypes::isAdmin($params['user_type']) && fn_is_restricted_admin(['user_type' => $auth['user_type']])) {
+        $condition['wo_root_admins'] .= db_quote(' AND is_root != ?s ', YesNo::YES);
     }
 }
 

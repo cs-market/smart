@@ -29,9 +29,6 @@
         <item lang="en" id="get_totals">Посчитать тоталы</item>
     </language_variables>
     <queries>
-        <item>ALTER TABLE `?:category_descriptions` ADD `alternative_names` TEXT NOT NULL;</item>
-        <item for="uninstall">ALTER TABLE `?:category_descriptions` DROP `alternative_names`;</item>
-
         <item>ALTER TABLE `?:vendor_plans` ADD `usergroups` TEXT NOT NULL;</item>
         <item for="uninstall">ALTER TABLE `?:vendor_plans` DROP `usergroups`;</item>
 

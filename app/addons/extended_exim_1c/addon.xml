@@ -18,6 +18,9 @@
     <queries>
         <item>ALTER TABLE `?:products` ADD `send_price_1c` CHAR(1) NOT NULL DEFAULT 'Y' AFTER `update_1c`</item>
         <item for="uninstall">ALTER TABLE `?:products` DROP `send_price_1c`;</item>
+
+        <item>ALTER TABLE `?:category_descriptions` ADD `alternative_names` TEXT NOT NULL;</item>
+        <item for="uninstall">ALTER TABLE `?:category_descriptions` DROP `alternative_names`;</item>
     </queries>
     <language_variables>
         <item lang="ru" id="1c.send_price_1c">Отправлять цену в заказе в 1С</item>

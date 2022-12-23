@@ -22,7 +22,7 @@ function fn_order_cancellation_get_status_params_definition(&$status_params, &$t
 }
 
 function fn_order_cancellation_get_order_info(&$order, $additional_data) {
-    if (!empty($order)) {
+    if (!empty($order) && (fn_allowed_for('ULTIMATE') || (!empty($order['company_id']) && YesNo::toBool(db_get_field('SELECT allow_order_cancellation FROM ?:companies WHERE company_id = ?i', $order['company_id']))))) {
         $status_data = fn_get_status_params($order['status'], STATUSES_ORDER);
         if (!empty($status_data) && YesNo::toBool($status_data['allow_cancel'])) {
             $order['allow_cancel'] = YesNo::YES;
