@@ -190,7 +190,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
         
 
         $this->importWarehousesFromOffersFile($data_offers, $import_params);
-        $this->importStoragesFromOffersFile($data_offers, $import_params);
+        if (Registry::get('addons.storages.status') == 'A') $this->importStoragesFromOffersFile($data_offers, $import_params);
 
         if (isset($data_offers -> {$cml['prices_types']} -> {$cml['price_type']})) {
             $params['price_offers'] = $this->dataPriceOffers($data_offers -> {$cml['prices_types']});
@@ -393,7 +393,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
             }
 
             $warehouses_amounts = $this->importProductWarehousesStock($product_id, $offer, $warehouses_amounts);
-            $storages_amounts = $this->importProductStoragesStock($product_id, $offer, $storages_amounts);
+            if (Registry::get('addons.storages.status') == 'A') $storages_amounts = $this->importProductStoragesStock($product_id, $offer, $storages_amounts);
 
             $this->addProductPrice($product_id, $prices);
             $this->addProductXmlFeaturesAsOptions($offer, $product_id, $import_params, $combination_id, [], isset($product['product_code']) ? $product['product_code'] : false);
