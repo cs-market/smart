@@ -1044,11 +1044,14 @@ class ExRusEximCommerceml extends RusEximCommerceml
                             $cart['delivery_date'] = strtotime(strval($data_field->{$cml['value']}));
                         }
                     }
+                    $backup_auth = Tygh::$app['session']['auth'];
+                    Tygh::$app['session']['auth'] = $customer_auth;
 
                     fn_calculate_cart_content($cart, $customer_auth);
                     if (!fn_cart_is_empty($cart)) {
                         fn_place_order($cart, $customer_auth, 'save');
                     }
+                    Tygh::$app['session']['auth'] = $backup_auth;
                 }
 
                 foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
