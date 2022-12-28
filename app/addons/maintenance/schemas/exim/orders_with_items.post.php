@@ -11,4 +11,11 @@ $schema['export_fields']['Product discount'] = array(
     'process_get' => array('fn_exim_orders_with_items_get_product_discount', '#this'),
 );
 
+$schema['export_fields']['Product promotions'] = array(
+    'table' => 'order_details',
+    'db_field' => 'extra',
+    'linked' => true,
+    'process_get' => array('fn_exim_orders_with_items_get_product_promotions', '#this'),
+);
+
 return $schema;
