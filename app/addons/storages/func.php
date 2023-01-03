@@ -278,7 +278,7 @@ function fn_storages_get_products(array &$params, array &$fields, array &$sortin
         $auth = Tygh::$app['session']['auth'];
 
         // и тут же отработать пользовательские цены
-        $join .= db_quote(' LEFT JOIN ?:user_price AS up ON up.product_id = products.product_id AND user_id = ?i AND up.storage_id = ?i', $auth['user_id'], $storage['storage_id']);
+        $join .= db_quote(' LEFT JOIN ?:user_price AS up ON up.product_id = products.product_id AND up.user_id = ?i AND up.storage_id = ?i', $auth['user_id'], $storage['storage_id']);
 
         $old_price_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
         $price_condition = db_quote(' AND ((prices.usergroup_id IN (?n) AND prices.price IS NOT NULL) OR up.price IS NOT NULL)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
