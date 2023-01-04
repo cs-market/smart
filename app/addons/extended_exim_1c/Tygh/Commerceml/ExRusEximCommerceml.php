@@ -816,6 +816,8 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 $product = array('external_id' => $product['external_id']);
             }
 
+            fn_set_hook('exim_1c_pre_update_product', $product, $product_id, $xml_product_data, $cml);
+
             $product_id = fn_update_product($product, $product_id, $import_params['lang_code']);
 
             $log_message = "\n Added product: " . $product['product'] . " commerceml_id: " . strval($xml_product_data->{$cml['id']});

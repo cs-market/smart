@@ -1,15 +1,15 @@
 <?php
 
 use Tygh\Registry;
+use Tygh\Enum\UserTypes;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return;
 }
 
 if ($mode == 'update') {
-
+    $user_data = Tygh::$app['view']->getTemplateVars('user_data');
     if (!Registry::ifget('navigation.tabs.usergroups', false)) {
-        $user_data = Tygh::$app['view']->getTemplateVars('user_data');
         $user_type = $user_data['user_type'];
 
         if ((!fn_check_user_type_admin_area($user_type) && in_array($auth['user_type'], ['A', 'V']) )
@@ -41,6 +41,28 @@ if ($mode == 'update') {
         });
 
         Tygh::$app['view']->assign('usergroups', $usergroups);
+    }
+
+    if (
+        fn_check_user_type_admin_area($user_data)
+        && !empty($user_data['user_id'])
+        && (
+            $auth['user_type'] === UserTypes::ADMIN
+            || $user_data['api_key']
+        )
+    ) {
+        $navigation = Registry::get('navigation.tabs');
+        $navigation['api'] = [
+            'title' => __('api_access'),
+            'js'    => true
+        ];
+        Registry::set('navigation.tabs', $navigation);
+
+        Tygh::$app['view']->assign('show_api_tab', true);
+
+        if ($auth['user_type'] !== UserTypes::ADMIN) {
+            Tygh::$app['view']->assign('hide_api_checkbox', true);
+        }
     }
 } elseif ($mode == 'manage') {
     Tygh::$app['view']->assign('can_add_user', true);

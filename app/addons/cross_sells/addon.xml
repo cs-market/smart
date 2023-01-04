@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>cross_sells</id>
+    <name>Cross-sells</name>
+    <description><![CDATA[Allows to handle yours cross-sells: define product relations and assign related to the chosen one. © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <version>3.0.1</version>
+    <priority>45200</priority>
+    <position>0</position>
+    <status>active</status>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <default_language>en</default_language>
+    <has_icon>Y</has_icon>
+    <compatibility>
+        <core_version>
+            <min>4.3.1</min>
+        </core_version>
+    </compatibility>
+    <settings edition_type="ROOT,ULT:VENDOR">
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="license_key">
+                        <type>input</type>
+                        <name>License key</name>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+    <language_variables>
+        <item lang="en" id="cross_sell">Кросс-товары</item>
+        <item lang="en" id="only_in_stock">Only "in stock" products</item>
+    </language_variables>
+    <queries>
+        <item>DROP TABLE IF EXISTS ?:product_relations;</item>
+        <item>
+            CREATE TABLE `?:product_relations` (
+                `product_id` mediumint(8) unsigned NOT NULL default '0',
+                `related_id` mediumint(8) unsigned NOT NULL default '0',
+                `related_type` varchar(1) NOT NULL default '',
+                PRIMARY KEY  (`product_id`,`related_id`, `related_type`)
+            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:product_relations;</item>
+    </queries>
+    <functions><item for="install">fn_install_cross_tabs</item></functions>
+</addon>
