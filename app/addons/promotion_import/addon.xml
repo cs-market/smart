@@ -12,8 +12,10 @@
     <has_icon>Y</has_icon>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
-    <dependencies>maintenance</dependencies>
-    <!-- dependencies smart_distribution fn_maintenance_exim_import_price, fn_maintenance_get_usergroup_ids, api -->
+    <compatibility>
+        <dependencies>maintenance</dependencies>
+        <!-- dependencies maintenance fn_maintenance_exim_import_price, fn_maintenance_get_usergroup_ids, api -->
+    </compatibility>
     <language_variables>
         <item lang="ru" id="promotion_import.disabled_promo_notification">Следующие промо были выключены:</item>
     </language_variables>

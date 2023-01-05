@@ -12,6 +12,10 @@
     <has_icon>Y</has_icon>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
+    <compatibility>
+        <dependencies>maintenance</dependencies>
+        <!-- dependencies by fn_find_promotion_condition -->
+    </compatibility>
     <language_variables>
         <item lang="en" id="promotion_cond_budget">Promotion budget</item>
         <item lang="ru" id="promotion_cond_budget">Бюджет на промо-акцию</item>

@@ -82,8 +82,8 @@ function fn_promotion_step_unconditional_true() {
 }
 
 function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_products) {
-    $promotion =  fn_get_promotion_data($bonus['promotion_id']);
     if ($bonus['bonus'] == 'promotion_step_free_products') {
+        $promotion =  fn_get_promotion_data($bonus['promotion_id']);
 
         $conditions = $promotion['conditions'];
         fn_cleanup_promotion_condition($conditions, ['promotion_step']);
@@ -172,6 +172,7 @@ function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_produc
     }
 
     if ($bonus['bonus'] == 'promotion_step_give_condition_products') {
+        $promotion =  fn_get_promotion_data($bonus['promotion_id']);
         if ($step = fn_find_promotion_condition($promotion['conditions'], 'promotion_step')) {
             $step_condition = 'promotion_step';
         } elseif ($step = fn_find_promotion_condition($promotion['conditions'], 'promotion_package_step')) {

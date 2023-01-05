@@ -14,6 +14,10 @@
     <language_variables>
         <item lang="ru" id="total_sales">Итого продаж в периоде</item>
     </language_variables>
+    <compatibility>
+        <dependencies>maintenance</dependencies>
+        <!-- dependencies by fn_find_promotion_condition -->
+    </compatibility>
     <settings>
         <sections>
             <section id="general">

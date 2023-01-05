@@ -55,3 +55,7 @@ msgstr "Суммарное количество по указанным в ус�
 msgctxt "Languages::promotion_cond_unique_amount_conditioned_products"
 msgid "Subtotal by promo's condition products"
 msgstr "Количество позиций по указанным в условиях товарам"
+
+msgctxt "Languages::promotion_bonus_discount_on_products_from_conditions"
+msgid "Discount on products from conditions"
+msgstr "Скидка на товары, удовлетворяющие условия"
