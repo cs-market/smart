@@ -320,4 +320,37 @@ function fn_category_promotion_apply_cart_rule($bonus, &$cart, &$auth, &$cart_pr
             }
         }
     }
+    if ($bonus['bonus'] == 'static_discount_on_products_from_conditions') {
+        $condition_products = fn_category_promotion_get_cart_promotioned_products($bonus['promotion_id'], $cart_products);
+
+        foreach ($cart_products as $k => $v) {
+            if (isset($v['exclude_from_calculate']) || (!floatval($v['base_price']) && $v['base_price'] != 0)) {
+                continue;
+            }
+
+            $valid = false;
+
+            if ($bonus['bonus'] == 'static_discount_on_products_from_conditions') {
+                $valid = fn_promotion_validate_attribute($v['product_id'], array_column($condition_products, 'product_id'), 'in');
+            }
+
+            if ($valid) {
+                if (!isset($cart_products[$k]['promotions'])) {
+                    $cart_products[$k]['promotions'] = array();
+                }
+
+                if (isset($cart['products'][$k]['extra']['promotions'][$bonus['promotion_id']])) {
+                    $cart_products[$k]['promotions'][$bonus['promotion_id']] = $cart['products'][$k]['extra']['promotions'][$bonus['promotion_id']];
+                }
+
+                if (!isset($cart_products[$k]['promotions'][$bonus['promotion_id']])
+                    && fn_promotion_apply_discount($bonus['promotion_id'], $bonus, $cart_products[$k], true, $cart, $cart_products)
+                ) {
+                    $cart['use_discount'] = true;
+                }
+            }
+        }
+    }
+
+    return true;
 }

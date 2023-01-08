@@ -36,6 +36,14 @@ if (!fn_allowed_for('ULTIMATE:FREE')) {
         'filter' => 'floatval',
         'filter_field' => 'discount_value'
     );
+
+    $schema['bonuses']['static_discount_on_products_from_conditions'] = array(
+        'function' => array('fn_category_promotion_apply_cart_rule', '#this', '@cart', '@auth', '@cart_products'),
+        'discount_bonuses' => array('to_percentage', 'by_percentage', 'to_fixed', 'by_fixed'),
+        'zones' => array('cart'),
+        'filter' => 'floatval',
+        'filter_field' => 'discount_value'
+    );
 }
 
 return $schema;

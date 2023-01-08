@@ -59,3 +59,7 @@ msgstr "Количество позиций по указанным в усло�
 msgctxt "Languages::promotion_bonus_discount_on_products_from_conditions"
 msgid "Discount on products from conditions"
 msgstr "Скидка на товары, удовлетворяющие условия"
+
+msgctxt "Languages::static_discount_on_products_from_conditions"
+msgid "Common discount on products from conditions"
+msgstr "Общая скидка на товары, удовлетворяющие условия"
