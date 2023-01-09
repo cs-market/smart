@@ -92,8 +92,25 @@
             display: none;
         }
     }
-    .ty-cart-content__qty .quantity {
-        float: left;
+    .ty-cart-content {
+        &__qty .quantity {
+            float: left;
+        }
+        &__top-buttons {
+            display: none;
+        }
+        &__image-block {
+            padding: 13px 0;
+        }
+        &__description {
+            display: inline-block;
+            width: calc(~"100% - 80px");
+        }
+        &__image {
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: top;
+        }
     }
     .common-menu {
         display: none;
@@ -111,18 +128,6 @@
         display: none;
     }
     .ty-grid-list__sku {
-        display: none;
-    }
-    .ty-cart-content__image {
-        display: inline-block;
-        margin-right: 10px;
-        vertical-align: top;
-    }
-    .ty-cart-content__description {
-        display: inline-block;
-        width: calc(~"100% - 80px");
-    }
-    .ty-cart-content__top-buttons {
         display: none;
     }
     .debt-stats {

@@ -18,7 +18,7 @@ if ($mode == 'cart') {
             $group['weight'] = $group['package_info_full']['W'];
             foreach($group['products'] as $cart_id => &$product) {
                 $product['display_subtotal'] = $cart_products[$cart_id]['display_subtotal'];
-                if (!empty($cart_products[$cart_id]['box_contains'])) $product['box_contains'] = $cart_products[$cart_id]['box_contains'];
+                if (Registry::get('addons.product_packages.status') == 'A' && !empty($cart_products[$cart_id]['items_in_package'])) $product['items_in_package'] = $cart_products[$cart_id]['items_in_package'];
             }
         }
         Tygh::$app['view']->assign('product_groups', $product_groups);
