@@ -2284,6 +2284,11 @@ fn_print_die($orders_wo_points);
     $user_ids = db_get_fields("SELECT user_id FROM ?:user_session_products WHERE type = 'C' GROUP BY user_id HAVING count(product_id) > 80");
     $res = db_query("DELETE FROM ?:user_session_products WHERE type = 'C' AND user_id IN (?a)", $user_ids);
     fn_print_die($res);
+} elseif ($mode == 'remove_zero_prices') {
+    $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = 2186');
+    $res[] = db_query('DELETE FROM ?:product_prices WHERE price = 0 AND usergroup_id != 0 AND product_id IN (?a)', $product_ids);
+    $res[] = db_query('DELETE FROM ?:user_price WHERE price = 0 AND product_id IN (?a)', $product_ids);
+    fn_print_die($res);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
