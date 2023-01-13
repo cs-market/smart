@@ -990,7 +990,7 @@ function fn_smart_distribution_load_products_extra_data(&$extra_fields, $product
 
 function fn_smart_distribution_load_products_extra_data_post(&$products, $product_ids, $params, $lang_code) {
     if (!empty($params['auth_usergroup_ids'])) {
-        $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a)", 'product_id', $product_ids, 1, $params['auth_usergroup_ids']);
+        $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, min(prices.price), prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a) GROUP BY product_id", 'product_id', $product_ids, 1, $params['auth_usergroup_ids']);
         $products = fn_array_merge($products, $prices);
     }
 }
