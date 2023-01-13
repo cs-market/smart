@@ -1,11 +1,16 @@
-{* REMOVE HELPDESK CONNECTION *}
+{* REMOVED HELPDESK CONNECTION *}
+{* ADDED COMPANY PICKER FOR MVE *}
 {include file="views/profiles/components/profiles_account.tpl"}
 
-{if ("ULTIMATE"|fn_allowed_for || $user_type == "V") && $id != $auth.user_id}
+{if (($user_type == "V") && $id != $auth.user_id) || $user_type == "C"}
 
     {$zero_company_id_name_lang_var = false}
     {if "ULTIMATE"|fn_allowed_for && $user_type|fn_check_user_type_admin_area}
         {$zero_company_id_name_lang_var = 'all_vendors'}
+    {/if}
+
+    {if "MULTIVENDOR"|fn_allowed_for}
+        {assign var="zero_company_id_name_lang_var" value="none"}
     {/if}
 
     {include file="views/companies/components/company_field.tpl"
