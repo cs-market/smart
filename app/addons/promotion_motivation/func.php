@@ -238,7 +238,7 @@ function fn_promotion_motivation_calculate_cart_post($cart, $auth, $calculate_sh
     if (!defined('API')) {
         foreach ($cart_products as $cart_id => &$product) {
             $applied_promotions = !empty($cart['products'][$cart_id]['promotions']) ? array_keys($cart['products'][$cart_id]['promotions']) : [];
-            list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product['product_id'], 'zone' => 'cart', 'usergroup_ids' => $auth['usergroup_ids'], 'active' => true, 'track' => true, 'exclude_promotion_ids' => $applied_promotions], 10);
+            list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product['product_id'], 'zone' => 'cart', 'usergroup_ids' => $auth['usergroup_ids'], 'active' => true, 'track' => true, 'exclude_promotion_ids' => $applied_promotions]);
 
             if ($promotions) {
                 $product['participates_in_promo'] = reset($promotions);
