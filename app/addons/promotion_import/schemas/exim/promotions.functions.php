@@ -159,7 +159,7 @@ function fn_promotion_import_build_bonuses(&$object) {
                 array_walk($value, function(&$v) {list($t['product_code'], $t['discount']) = explode(':', $v);$v = $t;});
                 $value = array_filter($value, function($v) {return !empty($v['discount']);});
                 if (empty($value)) continue;
-                $value = fn_array_group($value, 'discount');
+                $value = fn_group_array_by_key($value, 'discount');
 
                 foreach ($value as $discount_value => $data) {
                     $products = fn_promotion_import_get_value('products', array_column($data, 'product_code'), $company_id);

@@ -27,4 +27,7 @@ $schema['export_fields']['Add usergroup IDs'] = [
 
 $schema['export_fields']['Usergroup IDs']['convert_put'] = array('fn_maintenance_exim_convert_usergroups', '#this');
 
+// allow to create category via import
+unset($schema['import_process_data']['vendor_plans_import_skip_products_with_unavailable_categories']);
+
 return $schema;

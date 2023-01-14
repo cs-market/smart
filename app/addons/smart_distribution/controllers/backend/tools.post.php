@@ -95,7 +95,7 @@ if ($mode == 'base_price' && $action) {
         'get_features' => true,
         'features_display_on' => 'A',
     ));
-    $product_groups = fn_array_group($products, 'product_code');
+    $product_groups = fn_group_array_by_key($products, 'product_code');
     $empty_codes = array();
     foreach ($product_groups as $code => $products) {
         $barcode = '';
@@ -1021,7 +1021,7 @@ fn_print_r($fantoms);
             }
             $feature['description'] = trim(mb_strtolower($feature['description']));
         }
-        $feature_groups = fn_array_group($features, 'description');
+        $feature_groups = fn_group_array_by_key($features, 'description');
         foreach ($feature_groups as $group) {
             if (count($group) > 1) {
                 unset($target_feature);

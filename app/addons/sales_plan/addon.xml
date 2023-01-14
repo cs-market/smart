@@ -24,6 +24,10 @@
             </section>
         </sections>
     </settings>
+    <compatibility>
+        <dependencies>maintenance</dependencies>
+        <!--fn_group_array_by_key-->
+    </compatibility>
     <language_variables>
         <item lang="en" id="plan">Plan</item>
         <item lang="en" id="fact">Fact</item>

@@ -14,7 +14,7 @@
     <supplier_link>http://cs-market.com/</supplier_link>
     <compatibility>
         <dependencies>maintenance</dependencies>
-        <!-- dependencies maintenance fn_maintenance_exim_import_price, fn_maintenance_get_usergroup_ids, api -->
+        <!-- dependencies maintenance fn_maintenance_exim_import_price, fn_maintenance_get_usergroup_ids, api, fn_group_array_by_key -->
     </compatibility>
     <language_variables>
         <item lang="ru" id="promotion_import.disabled_promo_notification">Следующие промо были выключены:</item>

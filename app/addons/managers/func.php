@@ -28,7 +28,7 @@ function fn_get_managers($params = []) {
         if (fn_allowed_for('MULTIVENDOR')) {
             $params['group_by'] = 'company_name';
         }
-        $managers = fn_array_group($managers, $params['group_by']);
+        $managers = fn_group_array_by_key($managers, $params['group_by']);
     }
 
     return $managers;
@@ -250,7 +250,7 @@ function fn_managers_generate_sales_report_post($params, &$row, $user) {
             $v['name'] = trim($v['firstname'] . ' ' . $v['lastname']);
         });
 
-        $managers = fn_array_group($user['managers'], 'user_role');
+        $managers = fn_group_array_by_key($user['managers'], 'user_role');
         foreach ($roles as $role => $role_descr) {
             $row[__($role_descr)] = implode(',', array_column($managers[$role], 'name'));
         }

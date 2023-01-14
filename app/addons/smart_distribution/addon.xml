@@ -29,9 +29,6 @@
         <item lang="en" id="get_totals">Посчитать тоталы</item>
     </language_variables>
     <queries>
-        <item>ALTER TABLE `?:vendor_plans` ADD `usergroups` TEXT NOT NULL;</item>
-        <item for="uninstall">ALTER TABLE `?:vendor_plans` DROP `usergroups`;</item>
-
         <item>ALTER TABLE `?:products` ADD `measure` VARCHAR(255) NOT NULL DEFAULT '' AFTER `amount`;</item>
         <item for="uninstall">ALTER TABLE `?:products` DROP `measure`;</item>
 

@@ -12,7 +12,8 @@
     <default_language>ru</default_language>
     <priority>99999999</priority>
     <compatibility>
-        <dependencies>user_roles</dependencies>
+        <dependencies>user_roles,maintenance</dependencies>
+        <!--fn_group_array_by_key-->
     </compatibility>
     <queries>
         <item>CREATE TABLE `?:user_managers` (

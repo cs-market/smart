@@ -109,7 +109,7 @@ function fn_maintenance_check_rights_delete_user($user_data, $auth, &$result) {
 }
 
 function fn_maintenance_get_users($params, $fields, $sortings, &$condition, $join, $auth) {
-    if (UserTypes::isAdmin($params['user_type']) && fn_is_restricted_admin(['user_type' => $auth['user_type']])) {
+    if ((!isset($params['user_type']) || UserTypes::isAdmin($params['user_type'])) && fn_is_restricted_admin(['user_type' => $auth['user_type']])) {
         $condition['wo_root_admins'] .= db_quote(' AND is_root != ?s ', YesNo::YES);
     }
 }

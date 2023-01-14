@@ -251,7 +251,7 @@ function fn_generate_category_report($params) {
         }
         $periods = array_unique(fn_array_column($orders_info, 'timestamp'));
         sort($periods);
-        $user_categories_ts_products = fn_array_group($orders_info, 'user_id', 'category_id', 'timestamp', 'product_id');
+        $user_categories_ts_products = fn_group_array_by_key($orders_info, 'user_id', 'category_id', 'timestamp', 'product_id');
         foreach ($user_categories_ts_products as $user_id => &$categories_ts_products) {
             $usergroup_ids = fn_define_usergroups(array('user_id' => $user_id), 'C');
             $ud_condition = 'AND (' . fn_find_array_in_set($usergroup_ids, 'p.usergroup_ids', true) . ')' . db_quote(' AND p.status = ?s', 'A');
