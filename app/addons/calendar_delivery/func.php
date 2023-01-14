@@ -611,7 +611,7 @@ function fn_calendar_delivery_get_storages($params, $join, &$condition) {
 }
 
 function fn_calendar_delivery_delete_storages($storage_ids) {
-    db_query("DELETE FROM ?:user_storages WHERE storage_id IN (?n)", $storage_ids);
+    db_query("DELETE FROM ?:user_storages WHERE storage_id IN (?a)", $storage_ids);
 }
 
 function fn_calendar_delivery_post_delete_user($user_id, $user_data, $result) {

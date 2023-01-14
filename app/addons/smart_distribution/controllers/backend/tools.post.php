@@ -2289,6 +2289,13 @@ fn_print_die($orders_wo_points);
     $res[] = db_query('DELETE FROM ?:product_prices WHERE price = 0 AND usergroup_id != 0 AND product_id IN (?a)', $product_ids);
     $res[] = db_query('DELETE FROM ?:user_price WHERE price = 0 AND product_id IN (?a)', $product_ids);
     fn_print_die($res);
+} elseif ($mode == 'storages_maintenance') {
+    list($storages) = fn_get_storages();
+    $wrong_storages = array_filter($storages, function($s) {
+        return !$s['company_id'];
+    });
+    $tmp = fn_delete_storages(array_keys($wrong_storages));
+    fn_print_die($tmp, count($wrong_storages), array_keys($wrong_storages));
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)

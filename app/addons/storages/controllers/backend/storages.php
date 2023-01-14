@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'manage') {
     $params = $_REQUEST;
-    list($storages, $search) = fn_get_storages($params);
+    list($storages, $search) = fn_get_storages($params, Registry::get('settings.Appearance.admin_elements_per_page'));
 
     Tygh::$app['view']->assign('storages', $storages);
     Tygh::$app['view']->assign('search', $search);

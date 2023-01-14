@@ -4,6 +4,8 @@
 <input type="hidden" name="fake" value="1" />
 {assign var="c_url" value=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
 {assign var="rev" value=$smarty.request.content_id|default:"pagination_contents"}
+
+{include file="common/pagination.tpl" save_current_page=true save_current_url=true}
 {if $storages}
 <div class="items-container type-methods {if $draggable}cm-sortable{/if}" {if $draggable}data-ca-sortable-table="types" data-ca-sortable-id-name="type_id"{/if} id="types_list">
     <div class="table-wrapper">
@@ -39,6 +41,8 @@
 {else}
     <p class="no-items">{__("no_data")}</p>
 {/if}
+
+{include file="common/pagination.tpl"}
 
 {capture name="adv_buttons"}
     {capture name="add_new_picker"}

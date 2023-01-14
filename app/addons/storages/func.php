@@ -37,6 +37,13 @@ function fn_get_storages($params = [], $items_per_page = 0) {
         return [false, false];
     }
 
+    $default_params = [
+        'page'           => 1,
+        'items_per_page' => $items_per_page
+    ];
+
+    $params = array_merge($default_params, $params);
+
     $condition = $join = '';
 
     if (SiteArea::isStorefront(AREA)) {
@@ -55,7 +62,7 @@ function fn_get_storages($params = [], $items_per_page = 0) {
         $params['company_id'] = Registry::get('runtime.company_id');
     }
 
-    if (isset($params['company_id'])) {
+    if (!empty($params['company_id'])) {
         $condition .= db_quote(" AND ?:storages.company_id = ?i", $params['company_id']);
     }
 
@@ -86,7 +93,17 @@ function fn_get_storages($params = [], $items_per_page = 0) {
 
     fn_set_hook('get_storages', $params, $join, $condition);
 
-    $storages = db_get_hash_array("SELECT ?:storages.* FROM ?:storages $join WHERE 1 ?p", 'storage_id', $condition);
+    $limit = '';
+    if (!empty($params['items_per_page'])) {
+        $params['total_items'] = db_get_field(
+            'SELECT COUNT(*) FROM ?:storages ?p WHERE 1 ?p ?p',
+            $join,
+            $condition
+        );
+        $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
+    }
+
+    $storages = db_get_hash_array("SELECT ?:storages.* FROM ?:storages $join WHERE 1 ?p ?p", 'storage_id', $condition, $limit);
 
     if (isset($params['storage_id']) || (isset($params['get_usergroups']) && $params['get_usergroups'] === 'true')) {
         foreach ($storages as &$storage) {
