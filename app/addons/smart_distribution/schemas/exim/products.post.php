@@ -12,7 +12,6 @@ $schema['export_fields']['Category']['process_put'][0] = 'fn_exim_sd_set_product
 $schema['export_fields']['Secondary categories']['process_put'][0] = 'fn_exim_sd_set_product_categories';
 $schema['pre_processing']['prepare_default_categories']['function'] = 'fn_sd_import_prepare_default_categories';
 $schema['pre_processing']['prepare_default_categories']['args'][] = '$import_data';
-unset($schema['import_process_data']['vendor_plans_import_skip_products_with_unavailable_categories']);
 
 if (fn_allowed_for('MULTIVENDOR') && (!Registry::get('runtime.company_id'))) {
 	$schema['export_fields']['Category']['process_put'][] = '%Vendor%';

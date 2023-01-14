@@ -9,7 +9,7 @@ class Vendor extends Company
     public function getFields($params)
     {
         $fields = parent::getFields($params);
-        $fields[] = 'p.usergroup_ids';
+        $fields[] = 'p.usergroups';
         return $fields;
     }
 
@@ -17,7 +17,7 @@ class Vendor extends Company
     {
         parent::gatherAdditionalItemsData($items, $params);
         foreach ($items as $key => $item) {
-            $items[$key]['usergroup_ids'] = !empty($item['usergroup_ids']) ? explode(',', $item['usergroup_ids']) : array();
+            $items[$key]['usergroups'] = !empty($item['usergroups']) ? explode(',', $item['usergroups']) : [];
         }
     }
 }

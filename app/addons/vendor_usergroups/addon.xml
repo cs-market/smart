@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>vendor_usergroups</id>
+    <name>Vendor usergroups</name>
+    <description>Позволяет указывать юзергруппы к тарифу вендора</description>
+    <version>1.0</version>
+    <priority>1000</priority>
+    <position>45</position>
+    <default_language>ru</default_language>
+    <status>active</status>
+    <has_icon>Y</has_icon>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <compatibility>
+        <core_edition>
+            MULTIVENDOR
+        </core_edition>
+        <dependencies>vendor_plans</dependencies>
+    </compatibility>
+</addon>

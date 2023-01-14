@@ -1,7 +1,6 @@
 <?php
 
 use Tygh\Registry;
-use Tygh\Models\Vendor;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProfileDataTypes;
 use Tygh\Enum\SiteArea;
@@ -113,44 +112,6 @@ if (fn_allowed_for('MULTIVENDOR') && !function_exists('fn_ult_is_shared_product'
     function fn_ult_is_shared_product($pid) {
         return 'N';
     }
-}
-
-function fn_smart_distribution_vendor_plan_before_save(&$obj, $result) {
-    if (!empty($obj->usergroup_ids) && is_array($obj->usergroup_ids)) {
-        $obj->usergroup_ids = implode(',', $obj->usergroup_ids);
-    }
-}
-
-function fn_smart_distribution_get_usergroups($params, $lang_code, $field_list, $join, &$condition, $group_by, $order_by, $limit) {
-    if (!isset($params['usergroup_id'])) 
-    $condition .= fn_smart_distribution_get_company_usergroup_condition(isset($params['company_id']) ? $params['company_id'] : null);
-}
-
-function fn_smart_distribution_get_simple_usergroups($type, $get_default, $lang_code, &$where) {
-    $where .= fn_smart_distribution_get_company_usergroup_condition();
-}
-
-function fn_smart_distribution_get_company_usergroup_condition($company_id = null) {
-    $condition = '';
-    $company_id = $company_id ?? Registry::get('runtime.company_id');
-
-    if (!empty($company_id)) {
-        $company = Vendor::model()->find($company_id);
-        if (!empty($company) && !empty($company->usergroup_ids)) {
-            $condition = db_quote(' AND a.usergroup_id IN (?a)', $company->usergroup_ids);
-        }
-    }
-
-    return $condition;
-}
-
-function fn_smart_distribution_update_usergroup($usergroup_data, $usergroup_id, $create) {
-    if ($create && $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', Registry::get('runtime.company_id'))) {
-        db_query("UPDATE ?:vendor_plans SET usergroup_ids = ?p  WHERE plan_id = ?i", fn_add_to_set('usergroup_ids', $usergroup_id), $plan_id);
-    }
-}
-function fn_smart_distribution_delete_usergroups($usergroup_ids) {
-    foreach ($usergroup_ids as $usergroup_id) db_query("UPDATE ?:vendor_plans SET usergroup_ids = ?p", fn_remove_from_set('usergroup_ids', $usergroup_id));
 }
 
 function fn_smart_distribution_get_users_pre(&$params, $auth, $items_per_page, $custom_view) {
@@ -470,70 +431,6 @@ function fn_smart_distribution_sales_reports_change_table(&$value, $key) {
         if (isset($dynamic_conditions['display'])) {
             $value['display'] = $dynamic_conditions['display'];
         }
-    }
-}
-
-// DEPRECATED. Use fn_group_array_by_key
-function fn_array_group(array $array, $key)
-{
-    if (!is_string($key) && !is_int($key) && !is_float($key) && !is_callable($key) ) {
-        trigger_error('array_group_by(): The key should be a string, an integer, or a callback', E_USER_ERROR);
-        return null;
-    }
-    $func = (!is_string($key) && is_callable($key) ? $key : null);
-    $_key = $key;
-    // Load the new array, splitting by the target key
-    $grouped = [];
-    foreach ($array as $value) {
-        $key = null;
-        if (is_callable($func)) {
-            $key = call_user_func($func, $value);
-        } elseif (is_object($value) && property_exists($value, $_key)) {
-            $key = $value->{$_key};
-        } elseif (isset($value[$_key])) {
-            $key = $value[$_key];
-        }
-        if ($key === null) {
-            continue;
-        }
-        $grouped[$key][] = $value;
-    }
-    // Recursively build a nested grouping if more parameters are supplied
-    // Each grouped array value is grouped according to the next sequential key
-    if (func_num_args() > 2) {
-        $args = func_get_args();
-        foreach ($grouped as $key => $value) {
-            $params = array_merge([ $value ], array_slice($args, 2, func_num_args()));
-            $grouped[$key] = call_user_func_array('fn_array_group', $params);
-        }
-    }
-    return $grouped;
-}
-
-function fn_smart_distribution_get_default_usergroups(&$default_usergroups, $lang_code) {
-    if (Registry::get('runtime.company_id')) {
-        $default_usergroups = array();
-    }
-}
-
-function fn_smart_distribution_update_category_pre(&$category_data, $category_id, $lang_code) {
-    if (isset($_REQUEST['preset_id']) && !$category_id) {
-        list($presets) = fn_get_import_presets(array(
-            'preset_id' => $_REQUEST['preset_id'],
-        ));
-        $preset = reset($presets);
-        if ($preset['company_id']) {
-            // TODO replace with $company = Vendor::model()->current(); but via find company_id
-            $usergroup_ids = db_get_field("SELECT usergroup_ids FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $preset['company_id']);
-            $category_data['usergroup_ids'] = explode(',',$usergroup_ids);
-        }
-        $category_data['add_category_to_vendor_plan'] = $preset['company_id'];
-    }
-}
-
-function fn_smart_distribution_update_category_post($category_data, $category_id, $lang_code) {
-    if (isset($category_data['add_category_to_vendor_plan']) && $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', $category_data['add_category_to_vendor_plan'])) {
-        db_query("UPDATE ?:vendor_plans SET categories = ?p  WHERE plan_id = ?i", fn_add_to_set('categories', $category_id), $plan_id);
     }
 }
 
