@@ -2294,8 +2294,11 @@ fn_print_die($orders_wo_points);
     $wrong_storages = array_filter($storages, function($s) {
         return !$s['company_id'];
     });
-    $tmp = fn_delete_storages(array_keys($wrong_storages));
-    fn_print_die($tmp, count($wrong_storages), array_keys($wrong_storages));
+    $res[] = fn_delete_storages(array_keys($wrong_storages));
+    list($storages) = fn_get_storages();
+    $res[] = db_query('DELETE FROM ?:user_storages WHERE storage_id NOT IN (?a)', array_keys($storages));
+    $res[] = db_query('DELETE FROM ?:storages_products WHERE storage_id NOT IN (?a)', array_keys($storages));
+    fn_print_die($res);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
