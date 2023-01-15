@@ -794,21 +794,6 @@ function fn_smart_distribution_get_products_before_select(&$params, $join, $cond
     }
 }
 
-// TODO удалить костыль когда в поиске в приложении будет поддержка стикеров
-function fn_smart_distribution_get_products_post(&$products, $params, $lang_code) {
-    if (defined('API') && !empty($params['q'])) {
-        foreach ($products as &$product) {
-            $cur_id_path = db_get_field("SELECT id_path FROM ?:categories WHERE category_id = ?i", $product['main_category']);
-            if (!empty($cur_id_path)) {
-                $cur_id_path = explode('/', $cur_id_path);
-                $root_cat = array_shift($cur_id_path);
-                if ($root_cat == '8676' || $root_cat == '8978') $product['product'] = 'Опт: ' . $product['product'];
-                if ($root_cat == '8596' || $root_cat == '9019') $product['product'] = 'Розница: ' . $product['product'];
-            }
-        }
-    }
-}
-
 function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fields, $group_by, $sortings, $lang_code) {
     if (isset($params['is_search']) && YesNo::toBool($params['is_search'])) {
         $params['group_by_level'] = false;

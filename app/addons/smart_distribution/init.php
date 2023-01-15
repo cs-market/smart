@@ -35,7 +35,6 @@ fn_register_hooks(
     'get_products_pre',
     'get_products',
     'get_products_before_select',
-    'get_products_post',
     'get_categories',
     'get_product_data',
     'get_product_data_post',
