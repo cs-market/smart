@@ -81,7 +81,7 @@ function fn_get_progress_promotions($cart) {
     if (!Tygh::$app['session']['auth']['user_id']) return [];
     if (empty($progress_promotions)) {
 
-        list($promotions) = fn_get_promotions(['progressed_promotions' => true]);
+        list($promotions) = fn_get_promotions(['progressed_promotions' => true, 'active' => true]);
 
         foreach($promotions AS &$promotion) {
             $promotion['conditions'] = unserialize($promotion['conditions']);
