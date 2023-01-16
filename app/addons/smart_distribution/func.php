@@ -442,7 +442,7 @@ function fn_smart_distribution_set_product_categories_exist($category_id) {
         ));
         $preset = reset($presets);
         if ($preset['company_id'] && $preset['company_id'] != 45) {
-            $usergroups = db_get_field("SELECT usergroup_ids FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $preset['company_id']);
+            $usergroups = db_get_field("SELECT usergroups FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $preset['company_id']);
             if (!empty($usergroups)) {
                 $c_groups = array();
                 if ($category_id) {

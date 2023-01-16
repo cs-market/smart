@@ -32,12 +32,12 @@ function fn_vendor_usergroups_get_company_usergroup_condition($company_id = null
 
 function fn_vendor_usergroups_update_usergroup($usergroup_data, $usergroup_id, $create) {
     if ($create && !empty(Registry::get('runtime.company_id')) && $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', Registry::get('runtime.company_id'))) {
-        db_query("UPDATE ?:vendor_plans SET usergroup_ids = ?p WHERE plan_id = ?i", fn_add_to_set('usergroup_ids', $usergroup_id), $plan_id);
+        db_query("UPDATE ?:vendor_plans SET usergroups = ?p WHERE plan_id = ?i", fn_add_to_set('usergroups', $usergroup_id), $plan_id);
     }
 }
 
 function fn_vendor_usergroups_delete_usergroups($usergroup_ids) {
-    foreach ($usergroup_ids as $usergroup_id) db_query("UPDATE ?:vendor_plans SET usergroup_ids = ?p", fn_remove_from_set('usergroup_ids', $usergroup_id));
+    foreach ($usergroup_ids as $usergroup_id) db_query("UPDATE ?:vendor_plans SET usergroups = ?p", fn_remove_from_set('usergroups', $usergroup_id));
 }
 
 function fn_vendor_usergroups_get_default_usergroups(&$default_usergroups, $lang_code) {
