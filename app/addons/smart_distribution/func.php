@@ -9,6 +9,7 @@ use Tygh\Enum\UsergroupTypes;
 use Tygh\Storage;
 use Tygh\Enum\YesNo;
 use Tygh\BlockManager\Block;
+use Tygh\Models\Vendor;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
