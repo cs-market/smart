@@ -9,5 +9,6 @@ fn_register_hooks(
     'delete_usergroups',
     'get_default_usergroups',
     'update_category_pre',
-    'update_category_post'
+    'update_category_post',
+    'vendor_plan_before_save',
 );

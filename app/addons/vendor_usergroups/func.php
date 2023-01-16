@@ -66,3 +66,17 @@ function fn_vendor_usergroups_update_category_post($category_data, $category_id,
         db_query("UPDATE ?:vendor_plans SET categories = ?p  WHERE plan_id = ?i", fn_add_to_set('categories', $category_id), $category_data['add_category_to_vendor_plan']);
     }
 }
+
+
+function fn_vendor_usergroups_vendor_plan_before_save(&$_this, $result) {
+    if (version_compare(PRODUCT_VERSION, '4.13.1', '<')) {
+        if (empty($_this->usergroups)) {
+            $_this->usergroup_ids = [];
+        } elseif (is_array($_this->usergroups)) {
+            $_this->usergroup_ids = $_this->usergroups;
+            $_this->usergroups = implode(',', $_this->usergroups);
+        } elseif (is_string($_this->usergroups)) {
+            $_this->usergroup_ids = array_map('intval', explode(',', $_this->usergroups));
+        }
+    }
+}
