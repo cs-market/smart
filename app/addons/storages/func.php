@@ -432,7 +432,7 @@ function fn_storages_get_cart_product_data($product_id, &$_pdata, $product, $aut
 
         $usergroup_ids = array_filter($usergroup_ids);
         if ($usergroup_ids) {
-            $_pdata['price'] = db_get_field("SELECT IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id = ?i AND lower_limit = ?i AND usergroup_id IN (?a)", $product_id, 1, $usergroup_ids);
+            $_pdata['price'] = db_get_field("SELECT min(IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100)) as price FROM ?:product_prices prices WHERE product_id = ?i AND lower_limit = ?i AND usergroup_id IN (?a)", $product_id, 1, $usergroup_ids);
         }
 
         // исключить товар без цены

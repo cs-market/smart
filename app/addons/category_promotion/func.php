@@ -3,6 +3,8 @@
 use Tygh\Registry;
 use Tygh\Enum\SiteArea;
 
+if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
 function fn_get_conditions($conditions, &$promo_extra) {
     
     foreach ($conditions as $condition) {
