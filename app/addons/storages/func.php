@@ -178,15 +178,6 @@ function fn_delete_storages($storage_ids) {
     return $res;
 }
 
-function fn_storages_get_usergroups_pre(&$params, $lang_code) {
-    if (fn_allowed_for('MULTIVENDOR')) {
-        if (isset($params['company_id']) && !empty($params['company_id'])) {
-            $usergroup_ids = db_get_field("SELECT usergroup_ids FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $params['company_id']);
-            if (!empty($usergroup_ids)) $params['usergroup_id'] = explode(',',$usergroup_ids);
-        }
-    }
-}
-
 function fn_storages_update_product_post($product_data, $product_id, $lang_code, $create) {
     if (isset($product_data['storages'])) {
         db_query('DELETE FROM ?:storages_products WHERE product_id = ?i', $product_id);
