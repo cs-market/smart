@@ -82,7 +82,7 @@ class Users extends BaseUsers
 
         if ($valid_params) {
             if (!empty($params['password'])) $params['password'] = fn_password_hash($params['password']);
-            list($user_id, $profile_id) = fn_update_user($user_id, $params, $auth, false, false);
+            list($user_id, $profile_id) = fn_update_user($user_id, $params, $auth, true, false);
 
             if ($user_id) {
                 $status = Response::STATUS_CREATED;
