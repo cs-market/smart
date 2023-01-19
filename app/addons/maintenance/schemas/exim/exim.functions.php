@@ -1,19 +1,33 @@
 <?php
 
+use Tygh\Registry;
+
 defined('BOOTSTRAP') or die('Access denied');
 
 function fn_maintenance_exim_set_usergroups($user_id, $data, $cleanup = true) {
     if ($cleanup) db_query("DELETE FROM ?:usergroup_links WHERE user_id = ?i", $user_id);
+
+    $usergroups = [];
     if (!empty($data)) {
         $usergroups = fn_maintenance_get_usergroup_ids($data, false);
-        foreach ($usergroups as $ug_id => $status) {
-            $_data = array(
-                'user_id' => $user_id,
-                'usergroup_id' => $ug_id,
-                'status' => $status
-            );
-            db_query('REPLACE INTO ?:usergroup_links ?e', $_data);
-        }
+    }
+
+    $service_usergroups = Registry::get('addons.maintenance.service_usergroups');
+    if ($service_usergroups) {
+        $service_usergroups_formated = array_fill_keys(array_keys($service_usergroups), 'A');
+        $usergroups = fn_array_merge(
+            $usergroups,
+            $service_usergroups_formated
+        );
+    }
+
+    foreach ($usergroups as $ug_id => $status) {
+        $_data = array(
+            'user_id' => $user_id,
+            'usergroup_id' => $ug_id,
+            'status' => $status
+        );
+        db_query('REPLACE INTO ?:usergroup_links ?e', $_data);
     }
 
     return true;

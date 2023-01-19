@@ -15,6 +15,12 @@ use Tygh\Enum\UserTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+/* ADDON SETTINGS */
+function fn_settings_variants_addons_maintenance_service_usergroups() {
+    return array_column(fn_get_usergroups(), 'usergroup', 'usergroup_id');
+}
+/* /ADDON SETTINGS */
+
 /* HOOKS */
 function fn_maintenance_pre_add_to_cart($product_data, &$cart, $auth, $update) {
     $cart['skip_notification'] = true;

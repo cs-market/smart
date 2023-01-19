@@ -12,6 +12,20 @@
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
     <has_icon>Y</has_icon>
+    <settings edition_type="ROOT,ULT:VENDOR">
+        <sections>
+            <section id="general">
+                <name>Главная</name>
+                <items>
+                    <item id="service_usergroups">
+                        <type>multiple select</type>
+                        <name>Сервисные юзергруппы</name>
+                        <variants/>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
     <language_variables>
         <item lang="ru" id="promotion_cond_catalog_once_per_customer">Один раз для покупателя</item>
     </language_variables>
