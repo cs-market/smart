@@ -1281,6 +1281,8 @@ class ExRusEximCommerceml extends RusEximCommerceml
                     $cml['rate_discounts'] => round((1 - $product['price'] / $product['base_price']) * 100),
                     $cml['in_total'] => 'true'
                 );
+
+                fn_set_hook('exim_1c_export_ordered_product_with_discount', $product, $data_product, $cml);
             }
 
             if (!empty($data_taxes['products'][$product['item_id']])) {
