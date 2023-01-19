@@ -6,7 +6,7 @@ use Tygh\Registry;
 // use Tygh\Enum\ProfileDataTypes;
 use Tygh\Enum\SiteArea;
 // use Tygh\Enum\UserTypes;
-// use Tygh\Enum\UsergroupTypes;
+use Tygh\Enum\UsergroupTypes;
 // use Tygh\Storage;
 use Tygh\Enum\YesNo;
 // use Tygh\BlockManager\Block;
@@ -17,7 +17,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 /* ADDON SETTINGS */
 function fn_settings_variants_addons_maintenance_service_usergroups() {
-    return array_column(fn_get_usergroups(), 'usergroup', 'usergroup_id');
+    return array_column(fn_get_usergroups(['type' => UsergroupTypes::TYPE_CUSTOMER]), 'usergroup', 'usergroup_id');
 }
 /* /ADDON SETTINGS */
 

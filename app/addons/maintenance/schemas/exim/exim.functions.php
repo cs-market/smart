@@ -5,6 +5,12 @@ use Tygh\Registry;
 defined('BOOTSTRAP') or die('Access denied');
 
 function fn_maintenance_exim_set_usergroups($user_id, $data, $cleanup = true) {
+
+    $service_usergroups = Registry::get('addons.maintenance.service_usergroups');
+    if ($service_usergroups) {
+        $existed_service_usergroups = db_get_array("SELECT usergroup_id, status FROM ?:usergroup_links WHERE user_id = ?i AND usergroup_id IN (?a)", $user_id, array_keys($service_usergroups));
+    }
+
     if ($cleanup) db_query("DELETE FROM ?:usergroup_links WHERE user_id = ?i", $user_id);
 
     $usergroups = [];
@@ -12,9 +18,8 @@ function fn_maintenance_exim_set_usergroups($user_id, $data, $cleanup = true) {
         $usergroups = fn_maintenance_get_usergroup_ids($data, false);
     }
 
-    $service_usergroups = Registry::get('addons.maintenance.service_usergroups');
-    if ($service_usergroups) {
-        $service_usergroups_formated = array_fill_keys(array_keys($service_usergroups), 'A');
+    if (!empty($existed_service_usergroups)) {
+        $service_usergroups_formated = array_column($existed_service_usergroups, 'status', 'usergroup_id');
         $usergroups = fn_array_merge(
             $usergroups,
             $service_usergroups_formated
