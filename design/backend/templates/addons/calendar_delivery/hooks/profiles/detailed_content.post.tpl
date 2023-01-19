@@ -35,7 +35,7 @@
                             <option value="{$storage.storage_id}" {if $storage.storage_id == $user_storage.storage_id}selected="_selected"{/if}>{$storage.storage} ({$storage.code})</option>
                             {/foreach}
                         </select>
-                        <a href="{"storages.manage#group`$user_storage.storage_id`"|fn_url}" target="_blank"><i class="icon-external-link"></i></a>
+                        <a href="{"storages.manage&storage_id=`$user_storage.storage_id`#group`$user_storage.storage_id`"|fn_url}" target="_blank"><i class="icon-external-link"></i></a>
                     </td>
                     {include file="addons/calendar_delivery/components/weekdays_table.tpl" name="user_data[delivery_date_by_storage][`$num`][delivery_date]" value=$user_storage['delivery_date'] only_body=true}
                     <td>{include file="buttons/multiple_buttons.tpl" only_delete="Y"}</td>

@@ -1,7 +1,6 @@
 <div class="sidebar-row">
     <h6>{__("search")}</h6>
-    {script src="js/tygh/filter_table.js"}
-    <form action="{""|fn_url}" name="storages_search_form" method="get" class="{$form_meta} storages-search-form addons-search-form">
+    <form action="{""|fn_url}" name="storages_search_form" method="get" class="{$form_meta}">
         {$extra nofilter}
         
         <div class="sidebar-field ">
