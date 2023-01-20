@@ -302,3 +302,11 @@ if (!is_callable('fn_find_promotion_condition')) {
         return $res;
     }
 }
+
+function fn_maintenance_exim_import_price($price, $decimals_separator = false) {
+    if (is_string($price)) {
+        $price = str_replace([' ', ','], ['', '.'], $price);
+    }
+
+    return (float) $price;
+}

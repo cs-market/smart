@@ -58,14 +58,6 @@ function fn_exim_check_usergroup($row, &$processed_data, &$skip_record) {
     }
 }
 
-function fn_maintenance_exim_import_price($price, $decimals_separator = false) {
-    if (is_string($price)) {
-        $price = str_replace([' ', ','], ['', '.'], $price);
-    }
-
-    return (float) $price;
-}
-
 function fn_exim_set_add_product_usergroups($product_id, $data) {
     if (!empty($data)) {
         $old_usergroups = db_get_field("SELECT usergroup_ids FROM ?:products WHERE product_id = ?i", $product_id);
