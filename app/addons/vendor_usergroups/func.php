@@ -80,3 +80,12 @@ function fn_vendor_usergroups_vendor_plan_before_save(&$_this, $result) {
         }
     }
 }
+
+function fn_vendor_usergroups_category_promotion_get_products_before_select(&$params) {
+    if ($usergroup_ids = db_get_field('SELECT usergroup_ids FROM ?:categories WHERE category_id = ?i', $params['cid'])) {
+        $ug_condition = fn_find_array_in_set(explode(',', $usergroup_ids), 'usergroups', true);
+        if ($company_id = db_get_field("SELECT company_id FROM ?:companies AS c LEFT JOIN ?:vendor_plans AS vc ON c.plan_id = vc.plan_id WHERE $ug_condition")) {
+            $params['company_id'] = $company_id;
+        }
+    }
+}

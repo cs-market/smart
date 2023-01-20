@@ -186,7 +186,8 @@ function fn_promotion_motivation_get_promotions($params, &$fields, $sortings, &$
     if (Registry::get('addons.category_promotion.status') == 'A') {
         if (isset($params['product_or_bonus_product'])) {
             $category_ids = db_get_fields('SELECT category_id FROM ?:products_categories WHERE product_id = ?i', $params['product_or_bonus_product']);
-            $condition .=' AND (' . fn_find_array_in_set([$params['product_or_bonus_product']], "products", false) . ' OR ' . fn_find_array_in_set([$params['product_or_bonus_product']], "bonus_products", false) . ' OR ' . fn_find_array_in_set($category_ids, "condition_categories", false) . ')';
+            $category_condition = (!empty($category_ids)) ? $category_condition = ' OR ' . fn_find_array_in_set($category_ids, "condition_categories", false) : '';
+            $condition .=' AND (' . fn_find_array_in_set([$params['product_or_bonus_product']], "products", false) . ' OR ' . fn_find_array_in_set([$params['product_or_bonus_product']], "bonus_products", false) . $category_condition . ')';
         }
     }
 }
