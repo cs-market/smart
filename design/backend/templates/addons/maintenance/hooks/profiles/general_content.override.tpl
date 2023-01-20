@@ -1,5 +1,6 @@
 {* REMOVED HELPDESK CONNECTION *}
 {* ADDED COMPANY PICKER FOR MVE *}
+{hook name="profiles:general_content"}
 {include file="views/profiles/components/profiles_account.tpl"}
 
 {if (($user_type == "V") && $id != $auth.user_id) || $user_type == "C"}
@@ -45,3 +46,4 @@
 {else}
     <input type="hidden" name="user_data[storefront_id]" value="{$user_data.storefront_id|default:0}">
 {/if}
+{/hook}
