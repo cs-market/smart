@@ -2299,6 +2299,42 @@ fn_print_die($orders_wo_points);
     $res[] = db_query('DELETE FROM ?:user_storages WHERE storage_id NOT IN (?a)', array_keys($storages));
     $res[] = db_query('DELETE FROM ?:storages_products WHERE storage_id NOT IN (?a)', array_keys($storages));
     fn_print_die($res);
+} elseif ($mode == 'baltica_reports') {
+    $params = $_REQUEST;
+    $params['period'] = 'C';
+    $condition['company'] = db_quote("?:orders.company_id = ?i", 45);
+    if (!empty($params['period']) && $params['period'] != 'A') {
+        list($params['time_from'], $params['time_to']) = fn_create_periods($params);
+        $condition['timestamp'] = db_quote("(?:orders.timestamp >= ?i AND ?:orders.timestamp <= ?i)", $params['time_from'], $params['time_to']);
+    }
+
+    $users = db_get_fields('SELECT distinct(user_id) FROM ?:orders WHERE ?p', implode(' AND ', $condition));
+    $report_data = [];
+    foreach ($users as $user_id) {
+        if (!$user_id) continue;
+        $user_info = fn_get_user_info($user_id);
+        $user_info['usergroups'] = array_filter($user_info['usergroups'], function($ug) {
+            return $ug['status'] == 'A' && $ug['usergroup_id'] != '548';
+        });
+        $storages = db_get_fields('SELECT distinct(storage) FROM ?:storages LEFT JOIN ?:orders ON ?:orders.storage_id = ?:storages.storage_id WHERE ?p AND user_id = ?i', implode(' AND ', $condition), $user_id);
+        $user_orders = db_get_row('SELECT SUM(?:orders.total) as total, count(?:orders.order_id) as amount FROM ?:orders WHERE ?p AND user_id = ?i', implode(' AND ', $condition), $user_id);
+        $adres = !empty($user_info['s_address']) ? $user_info['s_address'] : $user_info['b_address'];
+        $region = reset(explode(',', $adres));
+        $report[] = [
+            'адрес' => $adres,
+            'регион (из адреса)' => $region,
+            'код клиента (логин)' => $user_info['user_login'],
+            'юзергруппы' => db_get_field('SELECT GROUP_CONCAT(usergroup) FROM ?:usergroup_descriptions WHERE usergroup_id IN (?a)',  array_keys($user_info['usergroups'])),
+            'склады' => implode(', ', $storages),
+            'сумма заказов' => $user_orders['total'],
+            'количество заказов' => $user_orders['amount'],
+        ];
+    }
+
+    $params['filename'] = 'balt_report_' . str_replace('/', '.', $_REQUEST['time_from']) . '-' . str_replace('/', '.', $_REQUEST['time_to']) . '.csv';
+    $export = fn_exim_put_csv($report, $params, '"');
+    fn_get_file('var/files/'.$params['filename']);
+    exit();
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
