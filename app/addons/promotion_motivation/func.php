@@ -235,10 +235,23 @@ function fn_promotion_motivation_get_products_before_select(&$params, $join, &$c
     }
 }
 
+// function fn_promotion_motivation_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
+//     if (!defined('API')) {
+//         foreach ($cart_products as $cart_id => &$product) {
+//             $applied_promotions = !empty($cart['products'][$cart_id]['promotions']) ? array_keys($cart['products'][$cart_id]['promotions']) : [];
+//             list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product['product_id'], 'zone' => 'cart', 'usergroup_ids' => $auth['usergroup_ids'], 'active' => true, 'track' => true, 'exclude_promotion_ids' => $applied_promotions]);
+
+//             if ($promotions) {
+//                 $product['participates_in_promo'] = reset($promotions);
+//             }
+//         }
+//     }
+// }
+
 function fn_promotion_motivation_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
-    if (!defined('API')) {
-        foreach ($cart_products as $cart_id => &$product) {
-            $applied_promotions = !empty($cart['products'][$cart_id]['promotions']) ? array_keys($cart['products'][$cart_id]['promotions']) : [];
+    if (!defined(API)) {
+        $applied_promotions = array_keys($cart['applied_promotions']);
+        foreach ($cart_products as &$product) {
             list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product['product_id'], 'zone' => 'cart', 'usergroup_ids' => $auth['usergroup_ids'], 'active' => true, 'track' => true, 'exclude_promotion_ids' => $applied_promotions]);
 
             if ($promotions) {
