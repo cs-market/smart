@@ -2321,13 +2321,15 @@ fn_print_die($orders_wo_points);
         $adres = !empty($user_info['s_address']) ? $user_info['s_address'] : $user_info['b_address'];
         $region = reset(explode(',', $adres));
         $report[] = [
-            'адрес' => $adres,
-            'регион (из адреса)' => $region,
-            'код клиента (логин)' => $user_info['user_login'],
-            'юзергруппы' => db_get_field('SELECT GROUP_CONCAT(usergroup) FROM ?:usergroup_descriptions WHERE usergroup_id IN (?a)',  array_keys($user_info['usergroups'])),
-            'склады' => implode(', ', $storages),
-            'сумма заказов' => $user_orders['total'],
-            'количество заказов' => $user_orders['amount'],
+            'user_id' => $user_id,
+            'user' => $user_info['firstname'],
+            'address' => $adres,
+            'region' => $region,
+            'login' => $user_info['user_login'],
+            'usergroups' => db_get_field('SELECT GROUP_CONCAT(usergroup) FROM ?:usergroup_descriptions WHERE usergroup_id IN (?a)',  array_keys($user_info['usergroups'])),
+            'storages' => implode(', ', $storages),
+            'orders summ' => $user_orders['total'],
+            'orders count' => $user_orders['amount'],
         ];
     }
 
