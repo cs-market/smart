@@ -46,7 +46,7 @@ function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_produ
                             $amount += $v['amount'];
                         } else {
                             $items_in_package = $v['items_in_package'] ?? $v['qty_step'];
-                            $amount += floor($v['amount']/$items_in_package);
+                            $amount += floor($v['amount']/$items_in_package*100)/100;
                         }
                     }
                 }
@@ -67,7 +67,7 @@ function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_produ
                         $amount += $v['amount'];
                     } else {
                         $items_in_package = $v['items_in_package'] ?? $v['qty_step'];
-                        $amount += floor($v['amount']/$items_in_package);
+                        $amount += floor($v['amount']/$items_in_package*100)/100;
                     }
                 }
             }

@@ -235,6 +235,7 @@ function fn_promotion_motivation_get_products_before_select(&$params, $join, &$c
     }
 }
 
+// при бесплатном бонусном товаре у каждого товара нет инфо о промо
 // function fn_promotion_motivation_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
 //     if (!defined('API')) {
 //         foreach ($cart_products as $cart_id => &$product) {
