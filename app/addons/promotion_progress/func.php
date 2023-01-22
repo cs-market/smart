@@ -56,7 +56,11 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
             $progress_period = fn_find_promotion_condition($promo_original['conditions'], 'progress_period');
             if (strpos($progress_period['value'], 'month') !== false) {
                 $month = str_replace('month_', '', $progress_period['value']);
-                $time_from = fn_parse_date('01/'.$month.'/'.date("Y"));
+                $year = date("Y");
+                if ($month == 1 && date("m") == '12') {
+                    $year +=1;
+                }
+                $time_from = fn_parse_date('01/'.$month.'/'.$year);
                 $time_to = strtotime("+1 month", $time_from) - 1;
             } else {
                 list($time_from, $time_to) = fn_create_periods(['period'=> $progress_period['value']]);
