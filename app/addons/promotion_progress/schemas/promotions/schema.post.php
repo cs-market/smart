@@ -33,9 +33,22 @@ $schema['conditions']['progress_purchased_total_amount'] = array (
     'zones' => array('cart')
 );
 $schema['conditions']['progress_period'] = array (
-    'operators' => array ('in'),
+    'operators' => array ('eq'),
     'type' => 'select',
-    'variants' => [DateTimeHelper::PERIOD_THIS_MONTH => 'this_month', DateTimeHelper::PERIOD_LAST_MONTH => 'previous_month', DateTimeHelper::PERIOD_MONTH_AGO_TILL_NOW => 'last_30_days', DateTimeHelper::PERIOD_THIS_WEEK => 'this_week', DateTimeHelper::PERIOD_LAST_WEEK => 'previous_week', DateTimeHelper::PERIOD_WEEK_AGO_TILL_NOW => 'last_7_days', DateTimeHelper::PERIOD_TODAY => 'today'],
+    'variants' => [
+        DateTimeHelper::PERIOD_THIS_MONTH => 'this_month', 
+        DateTimeHelper::PERIOD_LAST_MONTH => 'previous_month', 
+        DateTimeHelper::PERIOD_MONTH_AGO_TILL_NOW => 'last_30_days', 
+        DateTimeHelper::PERIOD_THIS_WEEK => 'this_week', 
+        DateTimeHelper::PERIOD_LAST_WEEK => 'previous_week', 
+        DateTimeHelper::PERIOD_WEEK_AGO_TILL_NOW => 'last_7_days', 
+        DateTimeHelper::PERIOD_TODAY => 'today',
+    ],
     'zones' => array('cart')
 );
+
+foreach (range(1,12) as $month) {
+    $schema['conditions']['progress_period']['variants']['month_' . $month] = 'month_name_'. $month;
+}
+
 return $schema;

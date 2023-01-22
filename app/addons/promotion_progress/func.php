@@ -54,7 +54,13 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
 
             $promo_original = $promo_original ?? fn_get_promotion_data($promotion_id);
             $progress_period = fn_find_promotion_condition($promo_original['conditions'], 'progress_period');
-            list($time_from, $time_to) = fn_create_periods(['period'=> $progress_period['value']]);
+            if (strpos($progress_period['value'], 'month') !== false) {
+                $month = str_replace('month_', '', $progress_period['value']);
+                $time_from = fn_parse_date('01/'.$month.'/'.date("Y"));
+                $time_to = strtotime("+1 month", $time_from) - 1;
+            } else {
+                list($time_from, $time_to) = fn_create_periods(['period'=> $progress_period['value']]);
+            }
 
             if ($time_from) {
                 $condition['time_from'] = db_quote('o.timestamp >= ?i', $time_from);
