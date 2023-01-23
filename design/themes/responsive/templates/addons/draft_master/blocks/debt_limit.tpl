@@ -1,12 +1,12 @@
-{if $user_info.extra_data.debt_data}
-    {$total_debt = $user_info.extra_data.debt_data|array_column:"debt"|array_sum|cat:__('balance_currency')}
+{if $extra_user_data.debt_data}
+    {$total_debt = $extra_user_data.debt_data|array_column:"debt"|array_sum|cat:__('balance_currency')}
     <table class="ty-table debt-table">
         <tr>
             <td></td>
             <td>{__('fact')}</td>
             <td>{__('debt_limit')}</td>
         </tr>
-        {foreach from=$user_info.extra_data.debt_data item='data' key='company'}
+        {foreach from=$extra_user_data.debt_data item='data' key='company'}
             <tr>
                 <td>
                     {$company}
