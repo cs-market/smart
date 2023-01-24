@@ -11,7 +11,9 @@
 *  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-$schema['recommended'] = 'РекомендованныеТовары';
-$schema['similar'] = 'СопутствующиеТовары';
+$schema['recommended'] = 'Комплектующее';
+$schema['similar'] = 'Аналог';
+$schema['recommended_wrap'] = 'Комплектующие';
+$schema['similar_wrap'] = 'Аналоги';
 
 return $schema;

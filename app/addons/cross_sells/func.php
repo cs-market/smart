@@ -137,8 +137,13 @@ function fn_get_crosssell_types() {
 
 function fn_cross_sells_exim_1c_pre_update_product(&$product, $product_id, $xml_product_data, $cml) {
     foreach (CrossSellTypes::getAll() as $type => $def) {
-        if (isset($xml_product_data->{$cml[$def]})) {
-            $product[$def] = db_get_fields('SELECT product_id FROM ?:products WHERE external_id IN (?a)', (array) $xml_product_data -> {$cml[$def]} -> {$cml['id']});
+        if (isset($xml_product_data->{$cml[$def.'_wrap']})) {
+            $data = [];
+            foreach ($xml_product_data->{$cml[$def.'_wrap']}->{$cml[$def]} as $item) {
+                $data[] = (string) $item->{$cml['id']};
+            }
+
+            $product[$def] = db_get_fields('SELECT product_id FROM ?:products WHERE external_id IN (?a)', $data);
         }
     }
 }
