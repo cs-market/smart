@@ -161,6 +161,12 @@ function fn_monolith_generate_xml($order_id) {
     } else {
         unset($schema['extdata']['scheme']['data']['s']['d'][4]);
     }
+    $payment_type_map = [
+        '48' => 1,
+        '49' => 4,
+        '50' => 5,
+        '19' => 2
+    ];
 
     $CRMOrderOption = [
         [
@@ -168,6 +174,13 @@ function fn_monolith_generate_xml($order_id) {
                 $addon['order_prefix'] . $order_id, 
                 'PrZakaz', 
                 ($order_info['documents_originals']) ? 1 : 0
+            )
+        ], 
+        [
+            'f' => array(
+                $addon['order_prefix'] . $order_id, 
+                'CRMOrdPaymTyp', 
+                $payment_type_map[$order_info['payment_method']['payment_id']]
             )
         ]
     ];
