@@ -128,7 +128,10 @@ class ExRusEximCommerceml extends RusEximCommerceml
             }
         }
 
-        if (empty($prices['qty_prices'])) unset($prices['qty_prices']);
+        if (empty($prices['qty_prices'])) {
+            unset($prices['qty_prices']);
+            if (empty($prices['base_price'])) unset($prices['base_price']);
+        }
 
         return $prices;
     }
