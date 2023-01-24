@@ -36,8 +36,11 @@
                 {include file="common/price.tpl" value=$oi.original_price}
             </td>
             <td class="nowrap" data-th="{__("extra_price")}">
-                {$extra_price=($oi.original_price/$oi.initial_price - 1)*100}
-                {$extra_price|string_format:"%.2f"}%
+                {if $oi.initial_price}
+                    {$extra_price=($oi.original_price/$oi.initial_price - 1)*100}
+                    {$extra_price|string_format:"%.2f"}
+                {else}0{/if}
+                %
             </td>
             {if $order_info.use_discount}
             <td class="nowrap" data-th="{__("discounted_price")}">
