@@ -30,14 +30,14 @@
                 </div>
             </td>
             <td class="nowrap" data-th="{__("base_price")}">
-                {include file="common/price.tpl" value=$oi.initial_price}
+                {include file="common/price.tpl" value=$oi.extra.initial_price}
             </td>
             <td class="nowrap" data-th="{__("price")}">
                 {include file="common/price.tpl" value=$oi.original_price}
             </td>
             <td class="nowrap" data-th="{__("extra_price")}">
-                {if $oi.initial_price|intval && $oi.original_price > $oi.initial_price}
-                    {$extra_price=($oi.original_price/$oi.initial_price - 1)*100}
+                {if $oi.extra.initial_price|intval && $oi.original_price > $oi.extra.initial_price}
+                    {$extra_price=($oi.original_price/$oi.extra.initial_price - 1)*100}
                     {$extra_price|string_format:"%.2f"}%
                 {else}-{/if}
             </td>
