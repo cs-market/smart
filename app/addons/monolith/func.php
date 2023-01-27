@@ -96,41 +96,47 @@ function fn_monolith_generate_xml($order_id) {
         $promotion_products = array_filter($order_info['products'], function($v) {return (isset($v['promotions']));});
         $applied_promotions = [];
         foreach ($promotion_products as $product) {
+            $product_promotions = [];
             foreach($product['promotions'] as $promotion_id => $promotion) {
+                $product_promotions[$promotion_id] = $promotion['bonuses'][0];
+            }
+            $product_promotions = fn_sort_array_by_key($product_promotions, 'discount', SORT_DESC);
+            
+            foreach($product_promotions as $promotion_id => $value) {
                 if (!isset($applied_promotions[$promotion_id])) {
                     $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
                 }
-               
-                foreach ($promotion['bonuses'] as $value) {
-                    list($external_id) = explode('.', $applied_promotions[$promotion_id]['external_id']);
-                    $discount_value = $value['discount'];
-                    $discount_unit = 'руб';
-                    $discount_price = $value['discount_value'];
 
-                    if ($value['discount_bonus'] == 'by_fixed') {
-                        $discount_price = $product['price'];
-                    } elseif (in_array($value['discount_bonus'], ['by_percentage', 'to_percentage'])) {
-                        $discount_value = $value['discount_value'];
-                        $discount_unit = '%';
-                        if ($value['discount_bonus'] == 'to_percentage') {
-                            $discount_value = 100 - $discount_value;
-                        }
-                        $discount_price = fn_format_price($product['base_price'] * (1-$discount_value/100));
+                list($external_id) = explode('.', $applied_promotions[$promotion_id]['external_id']);
+
+                $discount_value = $value['discount'];
+                $discount_unit = 'руб';
+                $discount_price = $value['discount_value'];
+
+                if ($value['discount_bonus'] == 'by_fixed') {
+                    $discount_price = $product['price'];
+                } elseif (in_array($value['discount_bonus'], ['by_percentage', 'to_percentage'])) {
+                    $discount_value = $value['discount_value'];
+                    $discount_unit = '%';
+                    if ($value['discount_bonus'] == 'to_percentage') {
+                        $discount_value = 100 - $discount_value;
                     }
-
-                    $CRMOrderDiscountLine[] = [
-                        'f' => array(
-                            date("Y-m-d\T00:00:00", $order_info['timestamp']),
-                            $addon['order_prefix'] . $order_id,
-                            $external_id,
-                            $applied_promotions[$promotion_id]['name'],
-                            $discount_value,
-                            $discount_unit,
-                            $discount_price,
-                            $product['product_code']
-                        )
-                    ];
+                    $discount_price = fn_format_price($product['base_price'] * (1-$discount_value/100));
                 }
+
+                $CRMOrderDiscountLine[] = [
+                    'f' => array(
+                        date("Y-m-d\T00:00:00", $order_info['timestamp']),
+                        $addon['order_prefix'] . $order_id,
+                        $external_id,
+                        $applied_promotions[$promotion_id]['name'],
+                        $discount_value,
+                        $discount_unit,
+                        $discount_price,
+                        $product['product_code']
+                    )
+                ];
+
                 break;
             }
         }
