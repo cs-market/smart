@@ -128,6 +128,8 @@ if ($type == 'catalog') {
 
     } elseif ($mode == 'success') {
         fn_echo("success");
+    } elseif ($mode == 'import') {
+        fn_echo("success");
     }
 }
 
