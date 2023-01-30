@@ -7502,7 +7502,6 @@ function fn_order_notification(&$order_info, $edp_data = array(), $force_notific
 
     /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
     $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
-    if ($order_info['company_id'] == '12') $notify_user = false;
     $notification_rules = $notification_settings_factory->create([
         UserTypes::CUSTOMER => $notify_user,
         UserTypes::VENDOR   => $notify_vendor,

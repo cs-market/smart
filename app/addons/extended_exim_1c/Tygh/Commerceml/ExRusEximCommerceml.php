@@ -1006,9 +1006,10 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 // }
                 $order_id = $order_info['order_id'];
                 foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
-                    $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);
-                    $xml_products[$product_data['product_id']] = $xml_products[$product_data['product_id']] ?? 0;
-                    $xml_products[$product_data['product_id']] += intval($xml_product->{$cml['amount']});
+                    if ($product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml)) {
+                        $xml_products[$product_data['product_id']] = $xml_products[$product_data['product_id']] ?? 0;
+                        $xml_products[$product_data['product_id']] += intval($xml_product->{$cml['amount']});
+                    }
                 }
                 $order_products = array_filter(fn_array_column($order_info['products'], 'amount', 'product_id'));
 
