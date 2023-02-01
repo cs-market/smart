@@ -1113,6 +1113,8 @@ class ExRusEximCommerceml extends RusEximCommerceml
 
     public function addProductPrice($product_id, $prices)
     {
+        if (!empty($product_id) && !isset($prices['base_price'])) $prices['base_price'] = db_get_field('SELECT price FROM ?:product_prices WHERE product_id = ?i AND usergroup_id = ?i', $product_id, 0);
+
         // Prices updating
         $fake_product_data = array(
             'price' => isset($prices['base_price']) ? $prices['base_price'] : 0,
