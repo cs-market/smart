@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>product_availability</id>
+    <name>Доступность товаров</name>
+    <description>Позволяет управлять доступностью товаров</description>
+    <version>1.0</version>
+    <priority>1000</priority>
+    <position>45</position>
+    <default_language>ru</default_language>
+    <status>active</status>
+    <has_icon>Y</has_icon>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <language_variables>
+        <item lang="ru" id="product_availability">Доступность товаров</item>
+        <item lang="ru" id="show_out_of_stock_product">Показывать отсутствующий в наличии товар</item>
+        <item lang="ru" id="exim_show_out_of_stock">Показывать отсутствующий в наличии товар</item>
+        <item lang="ru" id="buy_in_advance">Ожидает поставки</item>
+        <item lang="ru" id="available_till">Доступен до</item>
+    </language_variables>
+    <queries>
+        <item>ALTER TABLE `?:products` ADD `avail_till` INT UNSIGNED NOT NULL DEFAULT '0' AFTER `avail_since`;</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `avail_till`;</item>
+
+        <item>ALTER TABLE `?:products` ADD `show_out_of_stock_product` VARCHAR(1) NOT NULL DEFAULT 'Y' AFTER `avail_till`;</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `show_out_of_stock_product`;</item>
+
+        <item editions="MULTIVENDOR">ALTER TABLE `?:companies` ADD `tracking` VARCHAR(1) NOT NULL DEFAULT 'B';</item>
+        <item editions="MULTIVENDOR" for="uninstall">ALTER TABLE `?:companies` DROP `tracking`;</item>
+
+        <item editions="MULTIVENDOR">ALTER TABLE `?:companies` ADD `out_of_stock_actions` VARCHAR(1) NOT NULL DEFAULT 'N';</item>
+        <item editions="MULTIVENDOR" for="uninstall">ALTER TABLE `?:companies` DROP `out_of_stock_actions`;</item>
+
+        <item editions="MULTIVENDOR">ALTER TABLE `?:companies` ADD `show_out_of_stock_product` VARCHAR(1) NOT NULL DEFAULT 'Y';</item>
+        <item editions="MULTIVENDOR" for="uninstall">ALTER TABLE `?:companies` DROP `show_out_of_stock_product`;</item>
+    </queries>
+</addon>

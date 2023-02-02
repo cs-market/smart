@@ -33,6 +33,4 @@ if (fn_allowed_for('MULTIVENDOR')) {
     );
 }
 
-$schema['export_fields']['Show out of stock']['db_field'] = 'show_out_of_stock_product';
-
 return $schema;

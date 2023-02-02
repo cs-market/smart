@@ -571,15 +571,6 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
         }
     }
 
-    if (!empty($product_data['avail_till'])) {
-        $product_data['avail_till'] = fn_parse_date($product_data['avail_till']);
-    }
-
-    // check company tracking and set it by necessity
-    if (!$product_id && !isset($product_data['tracking']) && !empty($product_data['company_id'])) {
-        $product_data['tracking'] = db_get_field('SELECT tracking FROM ?:companies WHERE company_id = ?i', $product_data['company_id']);
-    }
-
     if (!empty($product_data['prices']) && !(isset($product_data['prices'][0]) && !$product_data['prices'][0]['usergroup_id'] )) {
         // increase index for api calls
         array_unshift($product_data['prices'], []);
@@ -732,7 +723,7 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
         $condition = str_replace('AND 1 != 1', ' AND 1 != 1', $condition);
     }
 
-    if (AREA == 'A') {
+    if (SiteArea::isAdmin(AREA)) {
         $fields['timestamp'] = "products.timestamp";
         if (isset($params['product_code']) && !empty($params['product_code'])) {
             $condition .= db_quote(" AND products.product_code LIKE ?l", trim($params['product_code']));
@@ -740,16 +731,6 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
     }
 
     if (SiteArea::isStorefront(AREA)) {
-        $condition .= db_quote(' AND IF(products.avail_till, products.avail_till >= ?i, 1)', TIME);
-        // Cut off out of stock products
-        $condition .= db_quote(
-            ' AND (CASE products.show_out_of_stock_product' .
-            "   WHEN ?s THEN (products.amount > 0 OR products.tracking = 'D')" .
-            '   ELSE 1' .
-            ' END)',
-            'N'
-        );
-
         // do not show products for unlogged users
         $condition .= db_quote(' AND products.usergroup_ids != ?s', '');
     }
@@ -811,17 +792,6 @@ function fn_smart_distribution_get_product_data($product_id, $field_list, &$join
             (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
             THEN ?:product_prices.usergroup_id IN (?a) 
             ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_diff($usergroup_ids, [USERGROUP_ALL]), array_diff($usergroup_ids, [USERGROUP_ALL]), USERGROUP_ALL);
-    }
-
-    // Cut off out of stock products
-    if (SiteArea::isStorefront(AREA)) {
-        $condition .= db_quote(
-            ' AND (CASE ?:products.show_out_of_stock_product' .
-            "   WHEN ?s THEN (?:products.amount > 0 OR ?:products.tracking = 'D')" .
-            '   ELSE 1' .
-            ' END)',
-            'N'
-        );
     }
 }
 

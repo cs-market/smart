@@ -23,7 +23,6 @@
         <item lang="en" id="clone_category_clone_products__copy">копировать товары</item>
         <item lang="en" id="clone_category_clone_products__clone">клонировать товары</item>
         <item lang="en" id="clone_category_change_vendor">Изменить вендора категорий/товаров</item>
-        <item lang="en" id="show_out_of_stock_product">Показывать отсутствующий в наличии товар</item>
         <item lang="en" id="measure">Eдиница измерения</item>
         <item lang="en" id="promotion_cond_csv_users">Пользователи из CSV</item>
         <item lang="en" id="get_totals">Посчитать тоталы</item>
@@ -31,8 +30,5 @@
     <queries>
         <item>ALTER TABLE `?:products` ADD `measure` VARCHAR(255) NOT NULL DEFAULT '' AFTER `amount`;</item>
         <item for="uninstall">ALTER TABLE `?:products` DROP `measure`;</item>
-
-        <item>ALTER TABLE `?:companies` ADD `tracking` VARCHAR(1) NOT NULL DEFAULT 'B';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP `tracking`;</item>
     </queries>
 </addon>

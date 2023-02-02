@@ -1,3 +1,10 @@
+<div class="control-group">
+    <label class="control-label" for="elm_date_avail_till_holder">{__("available_till")}:</label>
+    <div class="controls">
+        {include file="common/calendar.tpl" date_id="elm_date_avail_till_holder" date_name="product_data[avail_till]" date_val=$product_data.avail_till|default:"" start_year=$settings.Company.company_start_year}
+    </div>
+</div>
+
 {hook name="products:update_product_out_of_stock_actions"}
 <div class="control-group">
     <label class="control-label" for="elm_out_of_stock_actions">{__("out_of_stock_actions")}:</label>
@@ -14,8 +21,8 @@
     <label class="control-label" for="elm_show_out_of_stock_product">{__("show_out_of_stock_product")}:</label>
     <div class="controls">
         <label class="checkbox">
-            <input type="hidden" name="product_data[show_out_of_stock_product]" value="N" />
-            <input type="checkbox" name="product_data[show_out_of_stock_product]" id="elm_show_out_of_stock_product" value="Y" {if $product_data.show_out_of_stock_product == "Y"}checked="checked"{/if}>
+            <input type="hidden" name="product_data[show_out_of_stock_product]" value="{"YesNo::NO"|enum}" />
+            <input type="checkbox" name="product_data[show_out_of_stock_product]" id="elm_show_out_of_stock_product" value="{"YesNo::YES"|enum}" {if $product_data.show_out_of_stock_product == "YesNo::YES"|enum} checked="checked"{/if}>
         </label>
     </div>
 </div>

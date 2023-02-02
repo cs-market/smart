@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="elm_company_tracking">{__("app_gallery")}:</label>
+        <label class="control-label" for="elm_company_app_gallery">{__("app_gallery")}:</label>
         <div class="controls">
             <input type="text" name="company_data[app_gallery]" id="elm_company_app_gallery" size="32" value="{$company_data.app_gallery}" class="input-large">
         </div>
