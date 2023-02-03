@@ -185,7 +185,7 @@ function fn_monolith_generate_xml($order_id) {
         [
             'f' => array(
                 $addon['order_prefix'] . $order_id, 
-                'CRMOrdPaymTyp', 
+                'PaymType', 
                 $payment_type_map[$order_info['payment_method']['payment_id']]
             )
         ]
