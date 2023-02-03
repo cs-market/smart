@@ -1023,6 +1023,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                     fn_store_shipping_rates($order_id, $cart, $customer_auth);
                     $cart['order_id'] = $order_id;
                     //$cart['order_status'] = $statuses[strval($data_field->{$cml['value']})]['status'];
+                    $extra = array_column($cart['products'], 'extra', 'product_id');
                     $cart['products'] = array();
 
                     foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
@@ -1033,6 +1034,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                                 'amount' => strval($xml_product->{$cml['amount']}),
                                 'price' => strval($xml_product->{$cml['price_per_item']}),
                                 'stored_price' => 'Y',
+                                'extra' => isset($extra[$product_data['product_id']]) ? $extra[$product_data['product_id']] : [],
                             ),
                         );
                         fn_add_product_to_cart($_item, $cart, $customer_auth);
