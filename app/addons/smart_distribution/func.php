@@ -698,9 +698,10 @@ function fn_smart_distribution_update_cart_by_data_post(&$cart, $new_cart_data, 
 
 function fn_diff_original_products($original_products, $products)
 {
-    $diff_product = array_diff_key($original_products, $products);
+    $diff_product = array_diff_key(fn_array_value_to_key($original_products, 'product_id'), fn_array_value_to_key($products, 'product_id'));
 
     if ($diff_product) {
+        $diff_product = fn_array_value_to_key($diff_product, 'item_id');
         array_walk($diff_product, function(&$p) {
             $p['amount'] = $p['change_amount'] ?? 0;
         });
