@@ -2177,7 +2177,6 @@ fn_print_die($orders_wo_points);
             'user_data',
             'user_storages',
             'usergroup_links',
-            'user_storages',
             'reward_point_changes'
         ];
         foreach ($cleanup_db as $field => $table ) {
@@ -2220,29 +2219,71 @@ fn_print_die($orders_wo_points);
             fn_print_r(reset($order_ids));
         }
         $order_data = db_get_hash_single_array('SELECT order_data_id, data FROM ?:order_data WHERE type = ?s AND order_id IN (?a)', array('order_data_id', 'data'), 'G', $order_ids);
+
         foreach($order_data as $id => $data) {
 
             $data = unserialize($data);
-            $data[0]['shippings'] = array_map(function ($shipping) {
-                $shipping['data'] = [];
-                return $shipping;
-            }
-                , $data[0]['shippings']);
-            $data[0]['chosen_shippings'] = array_map(function ($shipping) {
-                $shipping['data'] = [];
-                return $shipping;
-            }
-                , $data[0]['chosen_shippings']);
+            if (count($data) > 1) {
+                db_query('DELETE FROM ?:order_data WHERE order_data_id = ?i', $id);
+            } else {
+                unset(
+                    $data[0]['package_info'],
+                    $data[0]['all_edp_free_shipping'],
+                    $data[0]['all_free_shipping'],
+                    $data[0]['free_shipping'],
+                    $data[0]['shipping_no_required'],
+                    $data[0]['shippings']
+                );
 
-            $data[0]['products'] = array_map(function ($product) {
-                $product['main_pair'] = [];
-                $product['user_data'] = [];
-                return $product;
-            }
-                , $data[0]['products']);
+                $data[0]['chosen_shippings'] = array_map(function ($shipping) {
+                    $shipping['data'] = [];
+                    return $shipping;
+                }
+                    , $data[0]['chosen_shippings']);
 
-            $data = serialize($data);
-            db_query('UPDATE ?:order_data SET data = ?s WHERE order_data_id = ?i', $data, $id);
+                $data[0]['products'] = array_map(function ($product) {
+                    unset(
+                        $product['main_pair'], 
+                        $product['user_data'], 
+                        $product['user_id'], 
+                        $product['timestamp'],
+                        $product['type'],
+                        $product['order_id'],
+                        $product['user_type'],
+                        $product['session_id'],
+                        $product['ip_address'],
+                        $product['storefront_id'],
+                        $product['product_options'],
+                        $product['options_type'],
+                        $product['exceptions_type'],
+                        $product['options_type_raw'],
+                        $product['exceptions_type_raw'],
+                        $product['qty_step_raw'],
+                        $product['modifiers_price'],
+                        $product['is_edp'],
+                        $product['edp_shipping'],
+                        $product['firstname'],
+                        $product['lastname'],
+                        $product['email'],
+                        $product['phone'],
+                        $product['chosen_shipping'],
+                        $product['extra']['usergroup_id'],
+                        $product['extra']['unlimited_download'],
+                        $product['extra']['pay_by_points'],
+                        $product['extra']['product_options'],
+                    );
+
+                    if (empty($product['group_id'])) unset($product['group_id']);
+                    if (empty($product['promotions'])) unset($product['promotions']);
+                    if (empty($product['extra'])) unset($product['extra']);
+                    return $product;
+                }
+                    , $data[0]['products']);
+
+
+                $data = serialize($data);
+                db_query('UPDATE ?:order_data SET data = ?s WHERE order_data_id = ?i', $data, $id);
+            }
         }
         $iteration += 1;
         fn_redirect('tools.cleanup.orders.' . $iteration);
