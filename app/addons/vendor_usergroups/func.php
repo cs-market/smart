@@ -46,6 +46,19 @@ function fn_vendor_usergroups_get_default_usergroups(&$default_usergroups, $lang
     }
 }
 
+function fn_vendor_usergroups_update_product_pre(&$product_data, $product_id, $lang_code, $can_update) {
+    if ($cid = (isset($product_data['company_id'])) ? $product_data['company_id'] : db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id)) {
+        $company = Vendor::model()->find($cid);
+        if (!empty($company) && !empty($company->usergroups)) {
+            if (!$product_id && !$product_data['usergroup_ids']) {
+                $product_data['usergroup_ids'] = $company->usergroups;
+            } elseif (isset($product_data['usergroup_ids'])) {
+                $product_data['usergroup_ids'] = array_intersect($product_data['usergroup_ids'], $company->usergroups);
+            }
+        }
+    }
+}
+
 function fn_vendor_usergroups_update_category_pre(&$category_data, $category_id, $lang_code) {
     if (isset($_REQUEST['preset_id']) && !$category_id) {
         list($presets) = fn_get_import_presets(array(
@@ -66,7 +79,6 @@ function fn_vendor_usergroups_update_category_post($category_data, $category_id,
         db_query("UPDATE ?:vendor_plans SET categories = ?p  WHERE plan_id = ?i", fn_add_to_set('categories', $category_id), $category_data['add_category_to_vendor_plan']);
     }
 }
-
 
 function fn_vendor_usergroups_vendor_plan_before_save(&$_this, $result) {
     if (version_compare(PRODUCT_VERSION, '4.13.1', '<')) {

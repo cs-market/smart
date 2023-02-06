@@ -545,7 +545,7 @@ function fn_smart_distribution_pre_update_order(&$cart, $order_id) {
 // }
 
 // fix qty_discounts update by API for product wo price
-function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $lang_code, &$can_update) {
+function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $lang_code, $can_update) {
     if (!isset($product_data['price'])) {
         $price = db_get_field('SELECT price FROM ?:product_prices WHERE product_id = ?i AND usergroup_id = ?i AND lower_limit = ?i', $product_id, 0, 1);
         $qty_price = 0;
@@ -553,22 +553,6 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
             $qty_price = max(array_column($product_data['prices'], 'price'));
         }
         $product_data['price'] = ($qty_price > $price) ? $qty_price : $price;
-    }
-
-    $cid = (isset($product_data['company_id'])) ? $product_data['company_id'] : db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id);
-
-    if ($cid) {
-        $company = Vendor::model()->find($cid);
-        if (!empty($company) && !empty($company->usergroup_ids)) {
-            if (!$product_id && !$product_data['usergroup_ids']) {
-                $product_data['usergroup_ids'] = $company->usergroup_ids;
-            }
-
-            if (isset($product_data['usergroup_ids'])) {
-                $allowed_ug = array_merge($company->usergroup_ids, [0,1,2]);
-                $product_data['usergroup_ids'] = array_intersect($product_data['usergroup_ids'], $allowed_ug);
-            }
-        }
     }
 
     if (!empty($product_data['prices']) && !(isset($product_data['prices'][0]) && !$product_data['prices'][0]['usergroup_id'] )) {
