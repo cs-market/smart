@@ -701,7 +701,14 @@ function fn_smart_distribution_get_products_pre(&$params, $items_per_page, $lang
     if (isset($params['pshort']) && YesNo::toBool($params['pshort'])) unset($params['pshort']);
     if (isset($params['pfull']) && YesNo::toBool($params['pfull'])) unset($params['pfull']);
 
-    $params['exclude_cid'] = 1056;
+    if (SiteArea::isStorefront(AREA)) {
+        $params['exclude_cid'] = 1056;
+    }
+
+    if (!empty($params['exclude_cid'])) {
+        $params['extend'][] = 'categories';
+        if (!empty($params['custom_extend'])) $params['custom_extend'][] = 'categories';
+    }
 }
 
 function fn_smart_distribution_get_products(&$params, &$fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
