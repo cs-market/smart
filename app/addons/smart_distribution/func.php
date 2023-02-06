@@ -700,9 +700,11 @@ function fn_smart_distribution_get_products_pre(&$params, $items_per_page, $lang
     if (isset($params['pkeywords']) && YesNo::toBool($params['pkeywords'])) unset($params['pkeywords']);
     if (isset($params['pshort']) && YesNo::toBool($params['pshort'])) unset($params['pshort']);
     if (isset($params['pfull']) && YesNo::toBool($params['pfull'])) unset($params['pfull']);
+
+    $params['exclude_cid'] = 1056;
 }
 
-function fn_smart_distribution_get_products($params, &$fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
+function fn_smart_distribution_get_products(&$params, &$fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
     // fix product variations: free space should be into condition
     if (strpos($condition, 'AND 1 != 1')) {
         $condition = str_replace('AND 1 != 1', ' AND 1 != 1', $condition);
@@ -725,6 +727,11 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
 
         $products = db_get_array('SELECT ?:order_details.product_id, SUM(?:order_details.amount) AS amnt FROM ?:order_details LEFT JOIN ?:orders ON ?:order_details.order_id = ?:orders.order_id WHERE ?:orders.user_id = ?i AND ?:order_details.product_id NOT IN (?a) GROUP BY ?:order_details.product_id ORDER BY SUM(?:order_details.amount) DESC', $params['user_id'], $params['current_cart_products']);
         $condition .= db_quote(' AND products.product_id IN (?a)', !empty($products) ? array_column($products, 'product_id') : []);
+    }
+
+    if (!empty($params['exclude_cid'])) {
+        if (!is_array($params['exclude_cid'])) $params['exclude_cid'] = explode(',', $params['exclude_cid']);
+        $condition .= db_quote(" AND ?:categories.category_id NOT IN (?n)", $params['exclude_cid']);
     }
 }
 
