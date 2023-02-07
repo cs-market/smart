@@ -232,7 +232,7 @@ $schema = array(
                                 ),
                                 '5' => array (
                                     '@attributes' => array (
-                                        'name' => 'DiscountUnit',
+                                        'name' => 'DiscountApplyType',
                                         'type' => 'String',
                                     ),
                                 ),

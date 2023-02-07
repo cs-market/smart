@@ -110,14 +110,14 @@ function fn_monolith_generate_xml($order_id) {
                 list($external_id) = explode('.', $applied_promotions[$promotion_id]['external_id']);
 
                 $discount_value = $value['discount'];
-                $discount_unit = 'руб';
+                $discount_unit = 'Amount';
                 $discount_price = $value['discount_value'];
 
                 if ($value['discount_bonus'] == 'by_fixed') {
                     $discount_price = $product['price'];
                 } elseif (in_array($value['discount_bonus'], ['by_percentage', 'to_percentage'])) {
                     $discount_value = $value['discount_value'];
-                    $discount_unit = '%';
+                    $discount_unit = 'Percent';
                     if ($value['discount_bonus'] == 'to_percentage') {
                         $discount_value = 100 - $discount_value;
                     }
