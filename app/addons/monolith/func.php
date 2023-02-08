@@ -129,7 +129,7 @@ function fn_monolith_generate_xml($order_id) {
                         date("Y-m-d\T00:00:00", $order_info['timestamp']),
                         $addon['order_prefix'] . $order_id,
                         $external_id,
-                        $applied_promotions[$promotion_id]['name'],
+                        htmlspecialchars($applied_promotions[$promotion_id]['name']),
                         $discount_value,
                         $discount_unit,
                         $discount_price,
