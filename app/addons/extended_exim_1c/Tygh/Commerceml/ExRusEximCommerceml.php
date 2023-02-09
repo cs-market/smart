@@ -1293,7 +1293,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 foreach ($data_taxes['products'][$product['item_id']] as $product_tax) {
                     $data_product[$cml['taxes_rates']][][$cml['tax_rate']] = array(
                         $cml['name'] => $product_tax['name'],
-                        $cml['rate_t'] => $product_tax['value']
+                        $cml['rate_t'] => (float) $product_tax['value']
                     );
 
                     if ($product_tax['tax_in_total'] == 'false') {
