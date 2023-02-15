@@ -1032,6 +1032,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                         $_item = array (
                             $product_data['product_id'] => array (
                                 'amount' => strval($xml_product->{$cml['amount']}),
+                                'original_amount' => strval($xml_product->{$cml['amount']}),
                                 'price' => strval($xml_product->{$cml['price_per_item']}),
                                 'stored_price' => 'Y',
                                 'extra' => isset($extra[$product_data['product_id']]) ? $extra[$product_data['product_id']] : [],
