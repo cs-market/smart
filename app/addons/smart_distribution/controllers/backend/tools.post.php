@@ -2289,6 +2289,20 @@ fn_print_die($orders_wo_points);
         fn_redirect('tools.cleanup.orders.' . $iteration);
     }
     fn_print_die($res1, 'stop');
+} elseif ($mode == 'remove_images_eclipse') {
+    $products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 2190);
+    foreach ($products as $product_id) {
+        $products_images = fn_get_image_pairs($product_id, 'product', 'M', true, true, DEFAULT_LANGUAGE);
+        if (!empty($products_images)) {
+            fn_delete_image_pair($products_images['pair_id']);
+        }
+
+        $additional_images = fn_get_image_pairs($product_id, 'product', 'A', true, true, DEFAULT_LANGUAGE);
+        foreach ($additional_images as $pair) {
+            fn_delete_image_pair($pair['pair_id']);
+        }
+    }
+    fn_print_die('done', count($products));
 } elseif ($mode == 'managers_addon_migration') {
     $managers = db_get_array('SELECT * FROM ?:vendors_customers');
     $managers = array_map(function($v) {
