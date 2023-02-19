@@ -220,3 +220,31 @@ Category page
         }
     }
 }
+
+.ty-pagination {
+    border: var(--border-color) solid @border-width;
+    .border-radius(100px);
+    padding: 3px 5px;
+    float: left;
+    .clearfix();
+    &__item, {
+        .border-radius(100px);
+        padding: 4px 7px;
+        > * {
+            vertical-align: middle;
+        }
+        &:hover {
+            &, & > * {
+                color: #fff;
+            }
+        }
+    }
+    &__selected {
+        .border-radius(100px);
+        padding: 4px 7px;
+        background-color: lighten(@base, 10%);
+    }
+    &__bottom {
+        border: 0;
+    }
+}

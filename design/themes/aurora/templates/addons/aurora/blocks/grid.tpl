@@ -1,7 +1,8 @@
 {** block-description:grid **}
-
 {if $items}
-    <div id="banner_grid_{$block.snapping_id}" class="banners ty-grid-banners" style="--columns: {$block.properties.number_of_columns|default:3}">
+    {$columns = $block.properties.number_of_columns|default:3}
+    {if $items|count < $columns}{$columns = $items|count}{/if}
+    <div id="banner_grid_{$block.snapping_id}" class="banners ty-grid-banners" style="--grid-columns: {$columns}">
         {foreach from=$items item="banner" key="key"}
             <div class="ty-banner__image-item">
                 {if $banner.type == "G" && $banner.main_pair.image_id}

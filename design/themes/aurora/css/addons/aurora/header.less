@@ -57,6 +57,7 @@ Header
 
 .ty-top-menu {
     .flex-grid();
+    --border-color: darken(@header_bg, 10%);
     // @margin: 6px;
     // padding: 6px 0;
     // .header-grid & {
@@ -75,6 +76,9 @@ Header
     & &__search {
         flex: 1;
         flex-basis: 175px;
+        @media @mobile {
+            page-break-after: always;
+        }
     }
 
     &__catalog {
@@ -112,6 +116,10 @@ Header
         .ty-icon-aurora-account();
     }
     &__cart-content {
+        .ty-dropdown-box__content {
+            right: initial;
+            left: 0;
+        }
         .ty-minicart-title {
             padding-left: 0;
         }
@@ -125,6 +133,13 @@ Header
             i {
                 line-height: 21px;
             }
+        }
+    }
+    & &__my-account {
+        margin-left: auto;
+        .ty-dropdown-box__content {
+            right: 0;
+            left: initial;
         }
     }
     .ty-menu {
@@ -171,13 +186,13 @@ Header
 .ty-search-block {
     & &__input {
         background-color: #fafafa;
-        border: 2px solid lighten(@base, 25%);
+
         color: #343434;
         padding: 9px 15px;
         height: auto;
         .border-radius(@border-radius);
+        .ty-aurora-border();
         &:hover, &:focus {
-            border-color: @base;    
             background-color: #fafafa;
         }
     }

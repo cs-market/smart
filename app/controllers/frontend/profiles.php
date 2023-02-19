@@ -80,11 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $res = fn_update_user($auth['user_id'], $user_data, $auth, !empty($_REQUEST['ship_to_another']), true);
 
         if ($res) {
+            // [csmarket] FROM 4.15.2
             list($user_id, $profile_id) = $res;
 
-            // Cleanup user info stored in cart
-            if (!empty(Tygh::$app['session']['cart']) && !empty(Tygh::$app['session']['cart']['user_data'])) {
-                Tygh::$app['session']['cart']['user_data'] = fn_array_merge(Tygh::$app['session']['cart']['user_data'], $_REQUEST['user_data']);
+            if (
+                !empty(Tygh::$app['session']['cart'])
+                && !isset(Tygh::$app['session']['cart']['payment_id'])
+            ) {
+                Tygh::$app['session']['cart']['user_data'] = $_REQUEST['user_data'];
             }
 
             if (empty(Tygh::$app['session']['cart']['user_data']['profile_id'])) {
