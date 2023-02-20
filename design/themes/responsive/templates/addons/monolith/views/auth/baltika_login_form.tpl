@@ -8,8 +8,7 @@
             <input type="hidden" name="quick_login" value="1" />
         {/if}
 
-        {$redirect_url = ""|fn_url}
-        <input type="hidden" name="return_url" value="{$redirect_url}" />
+        <input type="hidden" name="return_url" value="{'categories.view&category_id=9059'|fn_url}" />
         <input type="hidden" name="redirect_url" value="{$config.current_url}" />
 
         {if $style == "checkout"}
