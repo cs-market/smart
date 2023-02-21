@@ -37,14 +37,14 @@ function fn_product_packages_pre_add_to_cart(&$product_data) {
     }
 }
 
-function fn_product_packages_exim_1c_import_value_fields(&$product, $value_field, $_name_field, $_v_field) {
-    if ($_name_field == 'КоличествоШтукВКоробке') {
-        $product['items_in_package'] = $_v_field;
+function fn_product_packages_exim_1c_import_value_fields(&$product, $value_field, $_name_field, $_v_field, $cml) {    
+    if (in_array($_name_field, $cml['items_in_package'])) {
+        $product['items_in_package'] = (float) $_v_field;
     }
 }
 
 function fn_product_packages_exim_1c_import_features_definition(&$features_import, $feature_name, $_feature, $cml) {
-    if (in_array($feature_name, ['Количество в коробке'])) {
+    if (in_array($feature_name, $cml['items_in_package'])) {
         $features_import['items_in_package']['id'] = strval($_feature -> {$cml['id']});
         $features_import['items_in_package']['name'] = 'items_in_package';
     }

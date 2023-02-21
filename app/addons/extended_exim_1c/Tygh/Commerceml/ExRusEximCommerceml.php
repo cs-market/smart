@@ -1414,6 +1414,17 @@ class ExRusEximCommerceml extends RusEximCommerceml
                     $features_import['product']['id'] = strval($_feature -> {$cml['id']});
                 }
 
+                if (in_array($feature_name, $cml['qty_step'])) {
+                    $features_import['qty_step']['id'] = strval($_feature -> {$cml['id']});
+                    $features_import['qty_step']['name'] = 'qty_step';
+                } elseif (in_array($feature_name, $cml['min_qty'])) {
+                    $features_import['min_qty']['id'] = strval($_feature -> {$cml['id']});
+                    $features_import['min_qty']['name'] = 'min_qty';
+                } elseif (in_array($feature_name, $cml['max_qty'])) {
+                    $features_import['max_qty']['id'] = strval($_feature -> {$cml['id']});
+                    $features_import['max_qty']['name'] = 'max_qty';
+                }
+
                 fn_set_hook('exim_1c_import_features_definition', $features_import, $feature_name, $_feature, $cml);
 
                 if ($deny_or_allow_list == 'do_not_import') {
@@ -1598,13 +1609,13 @@ class ExRusEximCommerceml extends RusEximCommerceml
 
                 fn_set_hook('exim_1c_import_value_fields', $product, $value_field, $_name_field, $_v_field, $cml);
 
-                // TODO move string to add-on settings
-                if (in_array($_name_field, array('КвантЗаказа'))) {
-                    $product['qty_step'] = (float) $_v_field;
-                }
-                if ($_name_field == $cml['avail_till']) $product['avail_till'] = fn_parse_date($_v_field, true);
+                if (in_array($_name_field, $cml['qty_step'])) $product['qty_step'] = (float) $_v_field;
+                if (in_array($_name_field, $cml['min_qty'])) $product['min_qty'] = (float) $_v_field;
+                if (in_array($_name_field, $cml['max_qty'])) $product['max_qty'] = (float) $_v_field;
 
-                if ($_name_field == $cml['tracking']) {
+                if (in_array($_name_field, $cml['avail_till'])) $product['avail_till'] = fn_parse_date($_v_field, true);
+
+                if (in_array($_name_field, $cml['tracking'])) {
                     if ($_v_field == $cml['yes']) {
                         $product['tracking'] = ProductTracking::TRACK_WITH_OPTIONS;
                     } else {
@@ -1723,6 +1734,16 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 $feature_id = strval($_feature -> {$cml['id']});
 
                 fn_set_hook('exim_1c_import_features_values', $product, $_feature, $features_commerceml, $cml);
+
+                if (!empty($features_commerceml['qty_step']['id']) && $features_commerceml['qty_step']['id'] == $_feature -> {$cml['id']}) {
+                    $product['qty_step'] = floatval($_feature -> {$cml['value']});
+                }
+                if (!empty($features_commerceml['min_qty']['id']) && $features_commerceml['min_qty']['id'] == $_feature -> {$cml['id']}) {
+                    $product['min_qty'] = floatval($_feature -> {$cml['value']});
+                }
+                if (!empty($features_commerceml['max_qty']['id']) && $features_commerceml['max_qty']['id'] == $_feature -> {$cml['id']}) {
+                    $product['max_qty'] = floatval($_feature -> {$cml['value']});
+                }
 
                 if (!isset($features_commerceml[$feature_id])) {
                     continue;
