@@ -339,6 +339,23 @@ return [
             'b_firstname' => '479',
         ],
     ],
+    '138' => [
+        'page_id' => 138,
+        'company_id' => 2059,
+        'usergroup_id' => [775],
+        'fields_map' => [
+            'firstname' => '528',
+            'phone' => '529',
+            'email' => '530',
+            'user_login' => '529',
+            'password' => '531',
+            's_phone' => '529',
+            's_address' => '533',
+            's_client_code' => '9999',
+            'b_client_code' => '9999',
+            'b_firstname' => '528',
+        ],
+    ],
     '127' => [
         'page_id' => 127,
         'usergroup_id' => [3552],
