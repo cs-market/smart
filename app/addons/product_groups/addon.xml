@@ -19,6 +19,7 @@
         <item lang="ru" id="product_groups.mandatory_order_split">Выделять в отдельный заказ</item>
         <item lang="ru" id="product_groups_menu_description">Просмотр, добавление и редактирование групп товаров</item>
         <item lang="ru" id="group_id">Группа товаров</item>
+        <item lang="ru" id="separate_zero_products">Выделять бесплатные товары в отдельный заказ</item>
     </language_variables>
     <queries>
         <item>CREATE TABLE `?:product_groups` (
@@ -37,5 +38,8 @@
 
         <item>ALTER TABLE `?:orders` ADD `group_id` mediumint(8) unsigned NOT NULL;</item>
         <item for="uninstall">ALTER TABLE `?:orders` DROP `group_id`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `separate_zero_products` varchar(1) NOT NULL DEFAULT 'N';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `separate_zero_products`;</item>
     </queries>
 </addon>

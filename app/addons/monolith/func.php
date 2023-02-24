@@ -141,22 +141,29 @@ function fn_monolith_generate_xml($order_id) {
             }
         }
 
-        // foreach($order_info['promotions'] as $promotion_id => $promotion) {
-        //     if (in_array($promotion_id, array_keys($applied_promotions))) continue;
+        foreach($order_info['promotions'] as $promotion_id => $promotion) {
+            if (in_array($promotion_id, array_keys($applied_promotions))) continue;
 
-        //     $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
-        //     list($external_id) = explode('.', $applied_promotions[$promotion_id]['external_id']);
-        //     $CRMOrderDiscountLine[] = [
-        //         'f' => array(
-        //             date("Y-m-d\T00:00:00", $order_info['timestamp']),
-        //             $addon['order_prefix'] . $order_id,
-        //             $external_id,
-        //             $applied_promotions[$promotion_id]['name'],
-        //             $order_info['subtotal_discount'],
-        //             'whole_order'
-        //         )
-        //     ];
-        // }
+            $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
+            list($external_id) = explode('.', $applied_promotions[$promotion_id]['external_id']);
+            foreach ($applied_promotions[$promotion_id]['bonuses'] as $bonus) {
+                if (!in_array($bonus['bonus'], ['promotion_step_free_products', 'free_products'])) continue;
+                foreach ($bonus['value'] as $value) {
+                    $CRMOrderDiscountLine[] = [
+                        'f' => array(
+                            date("Y-m-d\T00:00:00", $order_info['timestamp']),
+                            $addon['order_prefix'] . $order_id,
+                            $external_id,
+                            htmlspecialchars($applied_promotions[$promotion_id]['name']),
+                            100,
+                            'Percent',
+                            0,
+                            db_get_field('SELECT product_code FROM ?:products WHERE product_id = ?i', $value['product_id']),
+                        )
+                    ];
+                }
+            }
+        }
     }
 
     if (!empty($CRMOrderDiscountLine)) {

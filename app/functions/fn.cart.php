@@ -1986,7 +1986,8 @@ function fn_extract_cart_content(&$cart, $user_id, $type = 'C', $user_type = 'R'
     }
 
     $cart['change_cart_products'] = true;
-    fn_calculate_cart_content($cart, $auth, 'S', false, 'I', false, $lang_code);
+    // [csmarket] fix from 4.15.2 $apply_cart_promotions
+    fn_calculate_cart_content($cart, $auth, 'S', false, 'I', true, $lang_code);
 }
 
 /**
