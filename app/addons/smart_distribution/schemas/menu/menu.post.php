@@ -18,9 +18,9 @@ if (Registry::get('runtime.company_id')) {
 }
 
 $tickets = Registry::getOrSetCache(
-    'fn_get_storages',
+    'fn_get_tickets',
     ['helpdesk_messages', 'helpdesk_tickets'],
-    'user',
+    'locale_auth',
     static function () {
         list($tickets) = fn_get_tickets(['status' => 'N']);
         return $tickets;
