@@ -18,6 +18,6 @@ fn_register_hooks(
     'get_tickets_params',
     'send_form',
     //'update_ticket_pre',
-    'helpdesk_get_ticket_users_pre',
+    'helpdesk_get_ticket_users_post',
     'sales_reports_dynamic_conditions'
 );

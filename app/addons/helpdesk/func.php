@@ -370,9 +370,11 @@ function fn_get_ticket_users($params) {
             $condition['notification'] = db_quote(' AND u.helpdesk_notification = ?s', $params['notification']);
         }
 
-        fn_set_hook('helpdesk_get_ticket_users_pre', $params, $join, $condition);
+        fn_set_hook('helpdesk_get_ticket_users_pre', $params, $fields, $join, $condition);
 
         $users = db_get_hash_array("SELECT $fields FROM ?:users AS u $join WHERE ?p", 'user_id', implode(' ', $condition));
+
+        fn_set_hook('helpdesk_get_ticket_users_post', $users, $params, $fields, $join, $condition);
     }
 
     return $users;
