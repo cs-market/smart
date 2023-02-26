@@ -17,6 +17,7 @@ fn_register_hooks(
     'delete_user',
     'get_tickets_params',
     'send_form',
-    'update_ticket_pre',
+    //'update_ticket_pre',
+    'helpdesk_get_ticket_users_pre',
     'sales_reports_dynamic_conditions'
 );

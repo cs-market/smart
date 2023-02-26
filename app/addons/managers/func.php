@@ -262,8 +262,15 @@ function fn_managers_delete_user($user_id, $user_data) {
 }
 
 function fn_managers_get_tickets_params(&$params, $condition, $join) {
-    if (ACCOUNT_TYPE == 'vendor' && !UserRoles::is_management_user()) {
-        unset($params['user_id']);
+    if (ACCOUNT_TYPE == 'vendor') {
+        if (!UserRoles::is_management_user()) {
+            unset($params['user_id']);
+        } else {
+            list($manager_users) = fn_get_users(['manager_users' => $params['user_id']], Tygh::$app['session']['auth']);
+            if (!empty($manager_users)) {
+                $params['user_id'] = array_column($manager_users, 'user_id');
+            }
+        }
     }
 }
 
@@ -276,10 +283,13 @@ function fn_managers_send_form(&$page_data, $form_values, $result, $from, $sende
     }
 }
 
-function fn_managers_update_ticket_pre(&$data) {
-    $sender = reset($data['users']);
-    $managers = fn_get_managers(['user_managers' => $sender]);
-    $data['users'] = array_unique(array_merge($data['users'], array_column($managers, 'user_id')));
+function fn_managers_helpdesk_get_ticket_users_pre($params, $join, &$condition) {
+    if ((!isset($params['user_type'])) || in_array(UserTypes::ADMIN, $params['user_type']) || in_array(UserTypes::VENDOR, $params['user_type'])) {
+        $ticket_customer = fn_get_ticket_users(['ticket_id' => $params['ticket_id'], 'user_type' => UserTypes::CUSTOMER]);
+        if ($managers = fn_get_managers(['user_managers' => key($ticket_customer)])) {
+            $condition['ticket'] = '((' . $condition['ticket'] . ')' . db_quote(" OR u.user_id IN (?a))", array_column($managers, 'user_id'));
+        }
+    }
 }
 
 function fn_managers_sales_reports_dynamic_conditions($type, $condition, $users) {
