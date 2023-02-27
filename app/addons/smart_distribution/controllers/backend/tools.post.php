@@ -2432,6 +2432,12 @@ fn_print_die($orders_wo_points);
     $export = fn_exim_put_csv($report, $params, '"');
     fn_get_file('var/files/'.$params['filename']);
     exit();
+} elseif ($mode == 'remove_mv_hd') {
+    $ticket_ids = db_get_fields('SELECT ticket_id FROM ?:helpdesk_tickets WHERE mailbox_id = 12');
+    foreach ($ticket_ids as $value) {
+        fn_delete_ticket($value);
+    }
+    fn_print_die('done', count($ticket_ids));
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
