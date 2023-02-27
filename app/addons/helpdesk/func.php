@@ -269,6 +269,9 @@ function fn_get_ticket($params, $items_per_page = 10) {
             if (SiteArea::isStorefront(AREA)) {
                 $messages = array_filter($ticket['messages'], function($v) {return $v['viewed'] == 'N';});
                 if (!empty($messages)) db_query('UPDATE ?:helpdesk_messages SET `viewed` = ?s WHERE message_id IN (?a)', YesNo::YES, array_keys($messages));
+            } else {
+                $messages = array_filter($ticket['messages'], function($v) {return $v['status'] == 'N';});
+                if (!empty($messages)) db_query('UPDATE ?:helpdesk_messages SET `status` = ?s WHERE message_id IN (?a)', 'O', array_keys($messages));
             }
         }
     }
@@ -358,7 +361,7 @@ function fn_get_ticket_users($params) {
         }
 
         $condition['ticket'] = db_quote('tu.ticket_id IN (?a)', $params['ticket_id']);
-        $fields = "u.email, u.user_id, u.firstname, u.lastname, CONCAT(u.firstname, ' ', u.lastname) AS username";
+        $fields = "u.email, u.user_id, u.firstname, u.lastname, CONCAT(u.firstname, ' ', u.lastname) AS username, u.user_type";
 
         if (!empty($params['user_type'])) {
             if (!is_array($params['user_type'])) {
