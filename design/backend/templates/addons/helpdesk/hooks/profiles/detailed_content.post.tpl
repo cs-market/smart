@@ -1,3 +1,5 @@
+{include file="common/subheader.tpl" title=__("helpdesk")}
+
 <div class="control-group">
     <label class="control-label" for="helpdesk_notification">{__('helpdesk_notification')}:</label>
     <input type="hidden" name="user_data[helpdesk_notification]" value="N">

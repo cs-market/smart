@@ -642,8 +642,9 @@ function fn_helpdesk_get_predefined_statuses($type, &$statuses) {
     if ($type == 'helpdesk') {
         $statuses['helpdesk'] = array(
             'N' => __('new'),
+            'O' => __('open'),
+            'W' => __('waiting'),
             'C' => __('closed'),
-            'W' => __('waiting')
         );
     }
 }
