@@ -2418,6 +2418,7 @@ fn_print_die($orders_wo_points);
         $report[] = [
             'user_id' => $user_id,
             'user' => $user_info['firstname'],
+            'state' => $user_info['s_state'],
             'address' => $adres,
             'region' => $region,
             'login' => $user_info['user_login'],
