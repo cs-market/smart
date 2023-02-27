@@ -641,10 +641,10 @@ function fn_helpdesk_can_user_access_ticket($ticket_id, array $auth) {
 function fn_helpdesk_get_predefined_statuses($type, &$statuses) {
     if ($type == 'helpdesk') {
         $statuses['helpdesk'] = array(
-            'N' => __('new'),
-            'O' => __('open'),
-            'W' => __('waiting'),
-            'C' => __('closed'),
+            'N' => __('helpdesk.new'),
+            'O' => __('helpdesk.open'),
+            'W' => __('helpdesk.at_work'),
+            'C' => __('helpdesk.closed'),
         );
     }
 }
