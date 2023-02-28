@@ -1,4 +1,4 @@
-{$groups = ''|fn_get_product_groups}
+{$groups = []|fn_get_product_groups}
 {if $groups}
 <div class="control-group" id="elm_product_group">
     <label class="control-label" for="product_group">{__("product_groups.product_group")}</label>
