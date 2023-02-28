@@ -264,3 +264,12 @@ function fn_product_groups_get_products($params, $fields, $sortings, &$condition
         $condition .= db_quote(' AND products.group_id = ?i', $params['group_id']);
     }
 }
+
+function fn_product_groups_exim1c_order_xml_pre(&$order_xml, $order_data, $cml) {
+    if (isset($order_data['group_id']) && !empty($order_data['group_id'])) {
+        $order_xml[$cml['value_fields']][][$cml['value_field']] = array(
+            $cml['name'] => $cml['product_group'],
+            $cml['value'] => db_get_field('SELECT `group` FROM ?:product_groups WHERE group_id = ?i', $order_data['group_id'])
+        );
+    }
+}

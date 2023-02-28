@@ -121,5 +121,12 @@ if ($mode == 'sync') {
             fn_echo("success\n");
         }
     }
+    if ($action == 'export_orders') {
+        if ($s_commerceml['exim_1c_all_product_order'] == 'Y') {
+            $exim_commerceml->exportAllProductsToOrders($lang_code);
+        } else {
+            $exim_commerceml->exportDataOrders($lang_code);
+        }
+    }
     fn_print_die('done');
 }

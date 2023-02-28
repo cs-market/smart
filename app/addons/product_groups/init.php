@@ -13,4 +13,5 @@ fn_register_hooks(
     'get_product_fields',
     'pre_get_orders',
     'get_products',
+    'exim1c_order_xml_pre',
 );
