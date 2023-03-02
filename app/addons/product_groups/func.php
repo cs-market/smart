@@ -95,7 +95,7 @@ function fn_product_groups_get_groups_from_products($products) {
     }
 
     $free_products = array_filter($products, function($v) {
-        return !$v['price'];
+        return !$v['price'] && !empty($v['extra']['exclude_from_calculate']);
     });
 
     if (!empty($free_products)) {
