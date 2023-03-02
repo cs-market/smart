@@ -22,7 +22,7 @@ function fn_promotion_progress_pre_promotion_validate($promotion_id, $promotion,
     }
 }
 
-function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, $promo_original = false) {
+function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, $promo_original = null) {
     if ($auth['user_id']) {
         $join = '';
         if ($promo['condition'] == 'progress_total_paid') {
