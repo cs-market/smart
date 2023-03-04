@@ -2439,6 +2439,91 @@ fn_print_die($orders_wo_points);
         fn_delete_ticket($value);
     }
     fn_print_die('done', count($ticket_ids));
+} elseif ($mode == 'correct_reward_points_march') {
+    // Вега_Самара_0,5%_апрель
+    $usergroups[1810] = [15033, 13452, 15034, 13629, 15035, 14038, 13630, 15037, 13631, 15036];
+    $usergroups[2058] = [15038, 13632, 15039, 13633, 15040, 14039, 15041, 13635, 15042, 13636];
+
+    // Вега_Самара_Розничные
+    $promotions[1810][13858] = [20259, 19494, 19493, 19492];
+    // Вега_Самара_Крупнооптовые_клиенты
+    $promotions[1810][13360] = [19503, 19496, 19495];
+
+    // Вега_Тольятти_Розничные клиенты
+    $promotions[2058][14776] = [20261, 19499, 19498, 19497];
+    // Вега_Тольятти_Крупный ОПТ
+    $promotions[2058][13361] = [19503, 19496, 19495];
+
+    $users_wo_usergroups = [];
+    foreach ([1810, 2058] as $company_id) {
+        db_query('DELETE FROM ?:usergroup_links WHERE usergroup_id IN (?a)', $usergroups[$company_id]);
+        $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s', $company_id, 'C');
+        foreach ($users as $user_id) {
+            $usergroups = db_get_fields('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s', $user_id, 'A');
+            if (count($usergroups) < 3) $users_wo_usergroups[] = $user_id;
+            foreach($usergroups as $ug_id) {
+                if (!isset($promotions[$company_id][$ug_id])) continue;
+                foreach ($promotions[$company_id][$ug_id] as $promotion_id) {
+                    $promotion = fn_get_promotion_data($promotion_id);
+                    $progress_condition = fn_find_promotion_condition($promotion['conditions'], 'progress_total_paid');
+                    $val = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, ['user_id' => $user_id], $promotion);
+                    if ($val > $progress_condition['value']) {
+                        foreach($promotion['bonuses'] as $bonus) {
+                            if ($bonus['bonus'] == 'give_usergroup') {
+                                $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
+                                db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
+                                // $user_info = fn_get_user_info($user_id);
+                                // $insert['user_login'] = $user_info['user_login'];
+                                // $insert['firstname'] = $user_info['firstname'];
+                                // $insert['usergroup'] = fn_get_usergroup_name($bonus['value']);
+                                // $insert['total_sales'] = $val;
+                                // $insert['promo'] = $promotion['name'];
+                                // $insert['vendor'] = ($company_id == 1810) ? 'вега' : 'вегаТ';
+                                $result[] = $insert;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    // $params['filename'] = 'grade_usergroups.csv';
+    // $params['force_header'] = true;
+    // $export = fn_exim_put_csv($result, $params, '"');
+    fn_print_die(count($result), $result);
+} elseif ($mode == 'correct_reward_points_march2') {
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $order_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+
+    $promo[19489] = ['00002322', '00000925', '00007230', '00008281', '00015478', '00003838', '00005407', '00015878', '00004129', '00016303', '00006378', '00016917', '00001572', '00010816', '00000196', '00005592', '00007423', '00015858', '00016361', '00016944', '00006410', '00004580', '00006152', '00010572'];
+    $promo[4723] = ['00015207', '00015699', '00014217', '00015261', '00016615', '00005171', '00014458', '00010980', '00000032', '00014279', '00015563', '00002438', '00015124', '00016636', '00016454', '00014933', '00014550', '00006247', '00016170', '00005487', '00005105', '00016604', '00014997', '00009824', '00016760', '00010247', '00016725', '00008486', '00007540', '00016998', '00017009', '00017025', '00015525', '00016624', '00015321', '00011118', '00016575', '00016667', '00016455', '00001026', '00008956', '00016679', '00016802', '00004936', '00016730', '00015103', '00005255', '00015316', '00010975', '00010900', '00014096', '00015294', '00010278', '00005848', '00015192', '00015827', '00003226', '00016833', '00009215', '00013872', '00010788', '00000998', '00016842', '00016900', '00016712', '00011399', '00013912', '00008316', '00010813', '00015956', '00002890', '00009962', '00010407', '00014065', '00016153', '00008737', '00011401', '00016540', '00009896', '00016435', '00015219', '00015656', '00002104', '00015282', '00015935', '00016700', '00015497', '00016421', '00016567', '00016419', '00016684', '00008478', '00015762', '00005104', '00009789', '00003351', '00000695', '00014499', '00014525', '00011177', '00015592', '00016352', '00004288', '00010601', '00016798', '00014552', '00016651', '00005554', '00015413', '00015568', '00005066', '00010785', '00015674', '00015417', '00014593', '00007135', '00007465', '00016179', '00011327', '00016399', '00006467', '00005246', '00003354', '00005791', '00016343', '00005593', '00010461', '00016324', '00010827', '00015221', '00016801', '00016178', '00014503', '00010624', '00008440', '00003395', '00010664', '00014060', '00006288', '00000618', '00010755', '00009805', '00003393', '00010018', '00016442', '00016516', '00002040', '00007481', '00016566', '00005885', '00005306', '00008302', '00007408', '00016536', '00014935', '00010700', '00016510', '00016648', '00016737', '00010839', '00015315', '00015613', '00010280', '00000868', '00013834', '00016140', '00004939', '00010283', '00000881', '00014827', '00007583', '00008108', '00016512', '00008300', '00000880', '00014452', '00010798', '00015266', '00015657', '00013945', '00015927', '00011627', '00014536', '00016308', '00013961', '00005455', '00013957', '00010815', '00015504', '00015096', '00008198', '00015496', '00016778', '00015838', '00014031', '00013960', '00009545', '00013911', '00010789', '00016598', '00016822', '00005120', '00014543', '00010747', '00000569', '00009509', '00016950', '00002103', '00008021', '00016641', '00010585', '00011085', '00006461', '00004763', '00010791', '00015830', '00006054', '00005945', '00003350', '00007749', '00008371', '00015488', '00010023', '00007806', '00011183', '00010756', '00004404', '00009960', '00009832', '00016650', '00016812', '00011349', '00011134', '00011097', '00011312', '00016736', '00015226', '00010039', '00016866', '00015487', '00002537', '00016644', '00016508', '00006920', '00005003', '00009521', '00014490', '00016519', '00010099', '00016878', '00004631', '00015194', '00006337', '00016898', '00009867', '00004911', '00015383', '00011161', '00015690', '00006869', '00015516', '00006749', '00007552', '00016800', '00014540', '00014541', '00010767', '00015387', '00001203', '00005454', '00015679', '00014981', '00015185', '00009504', '00014457', '00016483', '00013953', '00016935', '00008096', '00005549'];
+    foreach($promo as $promo_id => $users) {
+        $promo_id = [$promo_id];
+        foreach ($users as $login) {
+            $user_id = db_get_field('SELECT user_id FROM ?:users WHERE user_login = ?s AND company_id IN (?a)', $login, [1810, 2058]);
+            $wrong_orders = db_get_fields('SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp > ?i AND ?p AND status IN (?a)', $user_id, 1675198800, fn_find_array_in_set($promo_id, '?:orders.promotion_ids'), array_keys($order_statuses));
+            if (!empty($wrong_orders)) {
+                foreach ($wrong_orders as $order_id) {
+                    $order_info = fn_get_order_info($order_id);
+                    $db_points = $order_info['points_info']['reward'];
+                    fn_sd_change_user_points(-$db_points, $user_id, 'Корректировка за ошибочное начисление баллов по акции «Приветственный бонус НОВЫМ клиенам»', CHANGE_DUE_SUBTRACT);
+                    $decrease[] = [
+                        'order_id' => $order_id,
+                        'points to decrease' => $db_points,
+                        'login' => $login,
+                        'firstname' => $order_info['firstname'],
+                    ];
+                }
+            }
+        }
+    }
+    // $params['filename'] = 'points_to_decrease.csv';
+    // $params['force_header'] = true;
+    // $export = fn_exim_put_csv($decrease, $params, '"');
+    fn_print_die($decrease);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
