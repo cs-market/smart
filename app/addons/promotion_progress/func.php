@@ -49,7 +49,7 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
         if (in_array($promo['condition'], ['progress_total_paid', 'progress_order_amount', 'progress_average_paid', 'progress_purchased_unique_sku', 'progress_purchased_total_amount'])) {
 
             $condition['base'] = '1';
-            $condition['is_parent'] = db_quote('parent_order_id = ?i', 0);
+            $condition['is_parent'] = db_quote('is_parent_order = ?s', 'N');
             $condition['user_id'] = db_quote('user_id = ?i', $auth['user_id']);
 
             $promo_original = $promo_original ?? fn_get_promotion_data($promotion_id);

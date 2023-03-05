@@ -32,4 +32,20 @@ class SraOrders extends BaseSraOrders
             'data' => $data
         );
     }
+
+    public function create($params) {
+        if ($user_data = $this->safeGet($params, 'user_data', array())) {
+            $profile_id = $this->safeGet($params, 'profile_id', null);
+
+            $current_user_data = fn_get_user_info($this->auth['user_id'], true, $profile_id);
+            $user_data = fn_array_merge(
+                $current_user_data,
+                $user_data
+            );
+
+            fn_update_user($this->auth['user_id'], $user_data, $this->auth, true, []);
+        }
+
+        return parent::create($params);
+    }
 }

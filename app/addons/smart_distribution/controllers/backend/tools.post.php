@@ -2459,9 +2459,9 @@ fn_print_die($orders_wo_points);
         db_query('DELETE FROM ?:usergroup_links WHERE usergroup_id IN (?a)', $usergroups[$company_id]);
         $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s', $company_id, 'C');
         foreach ($users as $user_id) {
-            $usergroups = db_get_fields('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s', $user_id, 'A');
-            if (count($usergroups) < 3) $users_wo_usergroups[] = $user_id;
-            foreach($usergroups as $ug_id) {
+            $usergroups_ = db_get_fields('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s', $user_id, 'A');
+            if (count($usergroups_) < 3) $users_wo_usergroups[] = $user_id;
+            foreach($usergroups_ as $ug_id) {
                 if (!isset($promotions[$company_id][$ug_id])) continue;
                 foreach ($promotions[$company_id][$ug_id] as $promotion_id) {
                     $promotion = fn_get_promotion_data($promotion_id);
@@ -2588,6 +2588,61 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($corrections, $params, '"');
     fn_print_die('done');
+} elseif ($mode == 'correct_reward_points_march4') {
+    // // Вега_Самара_0,5%_апрель
+    // $usergroups[1810] = [15033, 13452, 15034, 13629, 15035, 14038, 13630, 15037, 13631, 15036];
+    // $usergroups[2058] = [15038, 13632, 15039, 13633, 15040, 14039, 15041, 13635, 15042, 13636];
+
+    // Вега_Самара_Розничные
+    $promotions[1810][13858] = [21800, 21798, 21796, 21794];
+    // Вега_Самара_Крупнооптовые_клиенты
+    $promotions[1810][13360] = [21806, 21804, 21802];
+
+    // Вега_Тольятти_Розничные клиенты
+    $promotions[2058][14776] = [21801, 21799, 21797, 21795];
+    // Вега_Тольятти_Крупный ОПТ
+    $promotions[2058][13361] = [21807, 21805, 21803];
+
+    $user_ids = db_get_fields('SELECT user_id FROM ?:orders WHERE company_id IN (?a) AND timestamp > ?i', [1810, 2058], 1677618000);
+    foreach ([1810, 2058] as $company_id) {
+        $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s AND user_id IN (?a)', $company_id, 'C', $user_ids);
+        foreach ($users as $user_id) {
+            $usergroups_ = db_get_fields('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s', $user_id, 'A');
+
+            foreach($usergroups_ as $ug_id) {
+                if (!isset($promotions[$company_id][$ug_id])) continue;
+                foreach ($promotions[$company_id][$ug_id] as $promotion_id) {
+                    $promotion = fn_get_promotion_data($promotion_id);
+                    $progress_condition = fn_find_promotion_condition($promotion['conditions'], 'progress_total_paid');
+                    $val = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, ['user_id' => $user_id], $promotion);
+                    if ($val > $progress_condition['value']) {
+                        foreach($promotion['bonuses'] as $bonus) {
+                            if ($bonus['bonus'] == 'give_usergroup') {
+                                if (!in_array($bonus['value'], $usergroups_)) {
+                                    $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
+                                    // db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
+                                    $user_info = fn_get_user_info($user_id);
+                                    $insert['user_login'] = $user_info['user_login'];
+                                    $insert['firstname'] = $user_info['firstname'];
+                                    $insert['usergroup'] = fn_get_usergroup_name($bonus['value']);
+                                    $insert['total_sales'] = $val;
+                                    $insert['promo'] = $promotion['name'];
+                                    $insert['vendor'] = ($company_id == 1810) ? 'вега' : 'вегаТ';
+                                    
+                                    $result[] = $insert;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    $params['filename'] = 'grade_usergroups_march.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($result, $params, '"');
+    fn_print_die($result);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)

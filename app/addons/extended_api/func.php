@@ -15,6 +15,10 @@ use Tygh\ExtendedAPI;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+function fn_extended_api_user_init($auth, $user_info, $first_init) {
+    if ($auth['user_id']) fn_extract_cart_content(Tygh::$app['session']['cart'], $auth['user_id'], 'C', 'R');
+}
+
 function fn_init_extended_api() {
     Tygh::$app['api'] = new ExtendedAPI();
 

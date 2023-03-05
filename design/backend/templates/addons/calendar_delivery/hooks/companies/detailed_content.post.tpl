@@ -12,7 +12,7 @@
 <div class="control-group">
     <label for="elm_company_working_time_till" class="control-label cm-regexp" data-ca-regexp="^(([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?)*$" data-ca-message="__('working_time_till_error_message')">{__("calendar_delivery.working_time_till")}:</label>
     <div class="controls">
-        <input class="input-time cm-trim" id="elm_company_working_time_till" size="5" maxlength="5" type="text" name="company_data[working_time_till]" value="{$company_data.working_time_till}" placeholder="00:00" />
+        <input class="input-mini cm-trim" id="elm_company_working_time_till" size="5" maxlength="5" type="text" name="company_data[working_time_till]" value="{$company_data.working_time_till}" placeholder="00:00" />
     </div>
 </div>
 

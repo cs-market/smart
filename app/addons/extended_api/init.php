@@ -6,7 +6,7 @@ use Tygh\Enum\SiteArea;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-fn_register_hooks('update_user_pre');
+fn_register_hooks('user_init', 'update_user_pre');
 
 $stack = Registry::get('init_stack');
 

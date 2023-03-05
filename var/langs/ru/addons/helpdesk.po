@@ -74,7 +74,7 @@ msgstr "Просмотр диалогов с новыми сообщениями
 
 msgctxt "Languages::waiting_tickets"
 msgid "Waiting tickets"
-msgstr "Ожидающие ответа"
+msgstr "В работе"
 
 msgctxt "Languages::waiting_tickets_menu_description"
 msgid "View only waiting tickets"

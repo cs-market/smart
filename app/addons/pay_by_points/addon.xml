@@ -11,6 +11,6 @@
     </compatibility>
 	<queries>
         <item>ALTER TABLE `?:products` ADD `points_eq_price` CHAR(1) NOT NULL DEFAULT 'N' AFTER `is_pbp`</item>
-		<item for="uninstall">ALTER TABLE `products` DROP `points_eq_price`;</item>
+		<item for="uninstall">ALTER TABLE `?:products` DROP `points_eq_price`;</item>
     </queries>
 </addon>
