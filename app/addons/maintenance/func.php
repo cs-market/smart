@@ -12,6 +12,7 @@ use Tygh\Enum\YesNo;
 // use Tygh\BlockManager\Block;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\UserTypes;
+use Tygh\Navigation\LastView\Backend;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -309,4 +310,58 @@ function fn_maintenance_exim_import_price($price, $decimals_separator = false) {
     }
 
     return (float) $price;
+}
+
+function fn_exim_get_last_view_order_ids_condition()
+{
+    $last_view = new Backend(AREA, 'orders', 'index');
+    $view_id = $last_view->getCurrentViewId();
+
+    $last_view_results = $last_view->getViewParams($view_id);
+    
+    $data_function_params = [];
+    if ($last_view_results) {
+        unset(
+            $last_view_results['total_items'],
+            $last_view_results['sort_by'],
+            $last_view_results['sort_order'],
+            $last_view_results['sort_order_rev'],
+            $last_view_results['page'],
+            $last_view_results['items_per_page']
+        );
+        $data_function_params = $last_view_results;
+    }
+
+    $data_function_params['get_conditions'] = true;
+
+    list($fields, $join, $condition) = fn_get_orders($data_function_params, 0, CART_LANGUAGE);
+
+    $order_ids = db_get_fields(
+        'SELECT DISTINCT ?p' .
+        ' FROM ?:orders' .
+        ' ?p' .
+        ' WHERE 1 = 1' .
+        ' ?p',
+        '?:orders.order_id',
+        $join,
+        $condition
+    );
+
+    return [
+        'order_id' => $order_ids
+    ];
+}
+
+function fn_exim_get_last_view_orders_count()
+{ 
+    $last_view = new Backend(AREA, 'orders', 'index');
+    $view_id = $last_view->getCurrentViewId();
+
+    $last_view_results = $last_view->getViewParams($view_id);
+
+    if (!$last_view_results) {
+        return 0;
+    }
+
+    return $last_view_results['total_items'];
 }
