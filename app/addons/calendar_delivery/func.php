@@ -583,6 +583,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                 } else {
                     $res = false;
                 }
+                if (!empty($group['shippings'][$chosen_shipping_id]['service_params']['holidays']) && in_array($group['delivery_date'], $group['shippings'][$chosen_shipping_id]['service_params']['holidays'])) $res = false;
             }
             if (empty($cart['delivery_period'])) unset($cart['delivery_period']);
 
