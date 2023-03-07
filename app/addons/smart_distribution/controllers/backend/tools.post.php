@@ -2538,11 +2538,35 @@ fn_print_die($orders_wo_points);
     
     $usergroups = [13452 => 0.5, 13629 => 1, 13630 => 2, 13631 => 2.5, 14038 => 1.5, 13632 => 0.5, 13633 => 1, 13635 => 2, 13636 => 2.5];
 
-    
     $users = db_get_array('SELECT user_id, usergroup_id FROM ?:usergroup_links WHERE usergroup_id IN (?a) AND status = ?s', array_keys($usergroups), 'A');
+    $users = fn_group_array_by_key($users, 'user_id');
 
-    foreach ($users as $user) {
-        if ($check_orders = db_get_fields('SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp > ?i AND timestamp < ?i AND status IN (?a)', $user['user_id'], 1677618000, 1677943839, array_keys($order_statuses))) {
+    foreach ($users as $user_id => &$value) {
+        $ug = array_column($value, 'usergroup_id');
+        $res = [];
+        foreach ($ug as $ug_id) {
+            $res[$ug_id] = $usergroups[$ug_id];
+        }
+        krsort($res);
+        $value=[];
+        $value['usergroup_id'] = key($res);
+        $value['bonus'] = $res[$value['usergroup_id']];
+    }
+
+    foreach ($users as $user_id => $user) {
+        if ($check_orders = db_get_fields('SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp > ?i AND timestamp < ?i AND status IN (?a) AND group_id NOT IN (?a)', $user_id, 1677618000, 1677943839, array_keys($order_statuses), [17,18])) {
+
+            $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s', $user_id, CHANGE_DUE_ORDER);
+
+            $corrected_order_ids = [];
+
+            foreach ($reward_point_changes as &$change) {
+                $details = unserialize($change['reason']);
+                if (!empty($details['order_id']) && $details['correction'] == 'correct_reward_points_march3') {
+                    $corrected_order_ids[] = $details['order_id'];
+                }
+            }
+
             foreach ($check_orders as $order_id) {
 
                 $order_info = fn_get_order_info($order_id);
@@ -2561,18 +2585,9 @@ fn_print_die($orders_wo_points);
                 if (abs($correction['order_points'] - $correction['correct_points']) > 2) {
                     $total_orders[] = $order_id;
                     if (in_array($correction['status'], array_keys($grant_reward_order_statuses))) {
-                        $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i', $correction['user_id']);
-                        $corrected_order_ids = [];
-                        foreach ($reward_point_changes as &$change) {
-                            $details = unserialize($change['reason']);
-                            if (!empty($details['order_id'])) {
-                                $corrected_order_ids[] = $details['order_id'];
-                            }
-                        }
-
                         $corrected_orders += 1;
                         if (!in_array($correction['order_id'], $corrected_order_ids)) {
-                            $reason = array('order_id' => $correction['order_id'], 'to' => $correction['status']);
+                            $reason = array('order_id' => $correction['order_id'], 'to' => $correction['status'], 'correction' => 'correct_reward_points_march3');
                             fn_change_user_points($correction['correct_points'], $correction['user_id'], serialize($reason), CHANGE_DUE_ORDER, $order_info['timestamp']);
                             $corrections[] = $correction;
                         }
@@ -2583,7 +2598,12 @@ fn_print_die($orders_wo_points);
             }
         }
     }
-    fn_print_die('всего заказов к корректировке: '. count($total_orders), 'из них уже скорректировано: ' . $corrected_orders, 'ожидают статус ' . count($out_of_status) . ' заказов: ' . implode(', ', $out_of_status), 'последняя корректировка (ниже):', $corrections);
+    fn_print_die(
+        'всего заказов к корректировке: '. count($total_orders), 
+        'из них уже скорректировано: ' . $corrected_orders, 
+        'ожидают статус ' . count($out_of_status) . ' заказов: ' . implode(', ', $out_of_status), 
+        'последняя корректировка (ниже):', $corrections
+    );
     $params['filename'] = 'points_to_correct1.csv';
     $params['force_header'] = true;
     $export = fn_exim_put_csv($corrections, $params, '"');
@@ -2604,6 +2624,7 @@ fn_print_die($orders_wo_points);
     $promotions[2058][13361] = [21807, 21805, 21803];
 
     $user_ids = db_get_fields('SELECT user_id FROM ?:orders WHERE company_id IN (?a) AND timestamp > ?i', [1810, 2058], 1677618000);
+
     foreach ([1810, 2058] as $company_id) {
         $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s AND user_id IN (?a)', $company_id, 'C', $user_ids);
         foreach ($users as $user_id) {
@@ -2619,6 +2640,8 @@ fn_print_die($orders_wo_points);
                         foreach($promotion['bonuses'] as $bonus) {
                             if ($bonus['bonus'] == 'give_usergroup') {
                                 if (!in_array($bonus['value'], $usergroups_)) {
+                                    $exist = db_get_field('SELECT user_id FROM ?:usergroup_links WHERE user_id = ?i AND usergroup_id = ?i', $user_id, $bonus['value']);
+                                    if ($exist) continue;
                                     $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
                                     // db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
                                     $user_info = fn_get_user_info($user_id);
@@ -2643,6 +2666,106 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($result, $params, '"');
     fn_print_die($result);
+} elseif ($mode == 'correct_reward_points_march5') {
+    $usergroups = [13858, 13360];
+
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $grant_reward_order_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+
+    $users = db_get_fields('SELECT distinct(user_id) FROM ?:usergroup_links WHERE usergroup_id IN (?a)', $usergroups);
+
+    $user_orders = db_get_hash_multi_array('SELECT order_id, user_id, total, timestamp FROM ?:orders WHERE user_id IN (?a) AND timestamp > ?i AND timestamp < ?i AND group_id NOT IN (?a) AND total > 0 AND is_parent_order = "N" ORDER BY timestamp', array('user_id','order_id'), $users, 1675198800, 1677618000, [17,18]);
+
+    foreach ($user_orders as $user_id => $orders) {
+        $order_ids = array_keys($orders);
+
+        $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s', $user_id, CHANGE_DUE_ORDER);
+
+        $corrected_order_ids = [];
+
+        foreach ($reward_point_changes as &$change) {
+            $details = unserialize($change['reason']);
+            if (!empty($details['order_id']) && $details['correction'] == 'correct_reward_points_march5') {
+                $corrected_order_ids[] = $details['order_id'];
+            }
+        }
+
+        if (!empty($order_ids)) {
+            foreach ($order_ids as $order_id) {
+                $order_info = fn_get_order_info($order_id);
+
+                $correction = [
+                    'user_id' => $order_info['user_id'],
+                    'order_id' => $order_id,
+                    'status' => $order_info['status'],
+                    'login' => db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $order_info['user_id']),
+                    'total' => $order_info['total'],
+                    'correct_points' => round($order_info['total']*0.01),
+                ];
+
+                if (!in_array(array_keys(19484, $order_info['promotions']))) {
+                    $total += 1;
+                    if (in_array($order_info['status'], array_keys($grant_reward_order_statuses))) {
+                        $corrected_orders += 1;
+                        if (!in_array($correction['order_id'], $corrected_order_ids)) {
+                            $reason = array('order_id' => $correction['order_id'], 'to' => $correction['status'], 'correction' => 'correct_reward_points_march5');
+                            fn_change_user_points($correction['correct_points'], $correction['user_id'], serialize($reason), CHANGE_DUE_ORDER, $order_info['timestamp']);
+                            $corrections[] = $correction;
+                        } else {
+                            //fn_print_die($correction, $corrected_order_ids, $correction['correct_points'], $change['amount']);
+                            $before_corrections[] = $correction;
+                        }
+                    } else {
+                        $out_of_status[] = $order_id;
+                    }
+                } else {
+                    fn_print_die('check_here', array_keys($order_info['promotions']));
+                }
+            }
+        }
+    }
+
+    fn_print_die(
+        'всего заказов к корректировке: '. $total, 
+        'из них уже скорректировано: ' . $corrected_orders, 
+        'ожидают статус ' . count($out_of_status) . ' заказов: ' . implode(', ', $out_of_status), 
+        'текущая корректировка (ниже):', 
+        $corrections, 
+        'скорректировано ранее (ниже):', 
+        $before_corrections
+    );
+
+    // $handled_orders = array_column($orders_wo_points, 'order_id');
+    // $orders = db_get_array('SELECT order_id, company_id, user_id, total, status, promotion_ids FROM ?:orders WHERE company_id IN (?a) AND timestamp > 1675198800 AND timestamp < 1677618000 AND order_id NOT IN (?a) AND total > 0 AND is_parent_order = "N"', [1810], $handled_orders);
+
+    $params['filename'] = "reward_points_vega_za_fevral.csv";
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($orders_wo_points, $params, '"');
+    
+    // $params['filename'] = "skipped_orders_za_fevral.csv";
+    // $params['force_header'] = true;
+    // $export = fn_exim_put_csv($orders, $params, '"');
+
+    fn_print_die($orders_wo_points);
+} elseif ($mode == 'baltica_logs') {
+    list($logs, $search) = fn_get_logs(['q_type' => 'users', 'q_action' => 'delete']);
+    $report = [];
+    foreach ($logs as $log) {
+        list($user, $extra) = explode(';', $log['content']['user']);
+        $extra = trim(preg_replace('/\((.+?)\)/i', '', $extra));
+        $report[] = [
+            'user' => $user,
+            'extra' => $extra,
+            'user_id' => $log['content']['id'],
+            'date' => fn_date_format($log['timestamp'], Registry::get('settings.Appearance.date_format'))
+        ];
+    }
+    $params['filename'] = "deleted_users.csv";
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($report, $params, '"');
+    fn_print_die($report);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
