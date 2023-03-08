@@ -2627,11 +2627,13 @@ fn_print_die($orders_wo_points);
 
     foreach ([1810, 2058] as $company_id) {
         $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s AND user_id IN (?a)', $company_id, 'C', $user_ids);
+
         foreach ($users as $user_id) {
             $usergroups_ = db_get_fields('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s', $user_id, 'A');
 
             foreach($usergroups_ as $ug_id) {
                 if (!isset($promotions[$company_id][$ug_id])) continue;
+
                 foreach ($promotions[$company_id][$ug_id] as $promotion_id) {
                     $promotion = fn_get_promotion_data($promotion_id);
                     $progress_condition = fn_find_promotion_condition($promotion['conditions'], 'progress_total_paid');
@@ -2640,10 +2642,8 @@ fn_print_die($orders_wo_points);
                         foreach($promotion['bonuses'] as $bonus) {
                             if ($bonus['bonus'] == 'give_usergroup') {
                                 if (!in_array($bonus['value'], $usergroups_)) {
-                                    $exist = db_get_field('SELECT user_id FROM ?:usergroup_links WHERE user_id = ?i AND usergroup_id = ?i', $user_id, $bonus['value']);
-                                    if ($exist) continue;
                                     $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
-                                    // db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
+                                    db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
                                     $user_info = fn_get_user_info($user_id);
                                     $insert['user_login'] = $user_info['user_login'];
                                     $insert['firstname'] = $user_info['firstname'];
