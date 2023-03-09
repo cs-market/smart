@@ -2456,7 +2456,7 @@ fn_print_die($orders_wo_points);
 
     $users_wo_usergroups = [];
     foreach ([1810, 2058] as $company_id) {
-        db_query('DELETE FROM ?:usergroup_links WHERE usergroup_id IN (?a)', $usergroups[$company_id]);
+        //db_query('DELETE FROM ?:usergroup_links WHERE usergroup_id IN (?a)', $usergroups[$company_id]);
         $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s', $company_id, 'C');
         foreach ($users as $user_id) {
             $usergroups_ = db_get_fields('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s', $user_id, 'A');
@@ -2470,15 +2470,18 @@ fn_print_die($orders_wo_points);
                     if ($val > $progress_condition['value']) {
                         foreach($promotion['bonuses'] as $bonus) {
                             if ($bonus['bonus'] == 'give_usergroup') {
+                                $is_exist = db_get_field('SELECT user_id FROM ?:usergroup_links WHERE user_id = ?i AND usergroup_id = ?i', $user_id, $bonus['value']);
+                                //fn_print_die($is_exist, $user_id, $bonus['value']);
+                                if ($is_exist) continue;
                                 $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
                                 db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
-                                // $user_info = fn_get_user_info($user_id);
-                                // $insert['user_login'] = $user_info['user_login'];
-                                // $insert['firstname'] = $user_info['firstname'];
-                                // $insert['usergroup'] = fn_get_usergroup_name($bonus['value']);
-                                // $insert['total_sales'] = $val;
-                                // $insert['promo'] = $promotion['name'];
-                                // $insert['vendor'] = ($company_id == 1810) ? 'вега' : 'вегаТ';
+                                $user_info = fn_get_user_info($user_id);
+                                $insert['user_login'] = $user_info['user_login'];
+                                $insert['firstname'] = $user_info['firstname'];
+                                $insert['usergroup'] = fn_get_usergroup_name($bonus['value']);
+                                $insert['total_sales'] = $val;
+                                $insert['promo'] = $promotion['name'];
+                                $insert['vendor'] = ($company_id == 1810) ? 'вега' : 'вегаТ';
                                 $result[] = $insert;
                             }
                         }
@@ -2536,7 +2539,7 @@ fn_print_die($orders_wo_points);
     $corrected_orders = 0;
     $total_orders = $out_of_status = [];
     
-    $usergroups = [13452 => 0.5, 13629 => 1, 13630 => 2, 13631 => 2.5, 14038 => 1.5, 13632 => 0.5, 13633 => 1, 13635 => 2, 13636 => 2.5];
+    $usergroups = [13452 => 0.5, 13629 => 1, 13630 => 2, 13631 => 2.5, 14038 => 1.5, 13632 => 0.5, 13633 => 1, 13635 => 2, 13636 => 2.5, 14039 => 1.5];
 
     $users = db_get_array('SELECT user_id, usergroup_id FROM ?:usergroup_links WHERE usergroup_id IN (?a) AND status = ?s', array_keys($usergroups), 'A');
     $users = fn_group_array_by_key($users, 'user_id');
@@ -2749,6 +2752,44 @@ fn_print_die($orders_wo_points);
     // $export = fn_exim_put_csv($orders, $params, '"');
 
     fn_print_die($orders_wo_points);
+} elseif ($mode == 'correct_reward_points_march6') {
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $grand_points_order_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+    $promo[1810] = 4723;
+    $promo[2058] = 5860;
+    foreach ($promo as $company_id => $promotion_id) {
+        $orders = db_get_fields('SELECT order_id FROM ?:orders WHERE FIND_IN_SET(?i, promotion_ids) AND company_id = ?i AND timestamp > 1675198800 AND total > 0 AND is_parent_order = "N"', $promotion_id, $company_id);
+
+        foreach ($orders as $order_id) {
+            $order_info = fn_get_order_info($order_id);
+            if (in_array($order_info['status'], array_keys($grand_points_order_statuses))) {
+                if ($db_points = $order_info['points_info']['reward']) {
+                    $is_corrected = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND reason = ?s', $order_info['user_id'], "Корректировка за ошибочное начисление баллов по акции «Приветственный бонус НОВЫМ клиенам»");
+                    $first_order = db_get_field('SELECT max(order_id) FROM ?:orders WHERE order_id < ?i AND timestamp > ?i AND user_id = ?i AND total > 0 AND is_parent_order = "N" AND status IN (?a)', $order_id, 0, $order_info['user_id'], array_keys($grand_points_order_statuses));
+
+                    if (empty($is_corrected)) {
+                        if ($first_order) {
+                            $corrections[] = [
+                                'user_id' => $order_info['user_id'],
+                                'company_id' => $order_info['company_id'],
+                                'login' => db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $order_info['user_id']),
+                                'order_id' => $order_info['order_id'],
+                                'points' => $db_points,
+                                'earlier_order_id' => $first_order
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+    $params['filename'] = 'points_to_decrease_5860.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($corrections, $params, '"');
+    fn_print_die($corrections);
 } elseif ($mode == 'baltica_logs') {
     list($logs, $search) = fn_get_logs(['q_type' => 'users', 'q_action' => 'delete']);
     $report = [];
