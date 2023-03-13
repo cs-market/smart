@@ -13,9 +13,10 @@ class Features extends BaseFeatures
         $status = Response::STATUS_BAD_REQUEST;
         $data = array();
         $valid_params = true;
-        unset($params['feature_id']);
 
-        unset($params['category_id']);
+        if (!Registry::get('runtime.company_id')) {
+            unset($params['category_id']);
+        }
 
         if (empty($params['feature_type'])) {
             $data['message'] = __('api_required_field', array(
@@ -36,7 +37,7 @@ class Features extends BaseFeatures
                 $data['message'] = __('api_need_store');
                 $valid_params = false;
             }
-        } else {
+        } elseif (Registry::get('runtime.company_id')) {
             $params['company_id'] = Registry::get('runtime.company_id');
         }
 

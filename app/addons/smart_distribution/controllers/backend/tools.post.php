@@ -2678,7 +2678,7 @@ fn_print_die($orders_wo_points);
     });
 
     $users = db_get_fields('SELECT distinct(user_id) FROM ?:usergroup_links WHERE usergroup_id IN (?a)', $usergroups);
-
+    // только февральские заказы
     $user_orders = db_get_hash_multi_array('SELECT order_id, user_id, total, timestamp FROM ?:orders WHERE user_id IN (?a) AND timestamp > ?i AND timestamp < ?i AND group_id NOT IN (?a) AND total > 0 AND is_parent_order = "N" ORDER BY timestamp', array('user_id','order_id'), $users, 1675198800, 1677618000, [17,18]);
 
     foreach ($user_orders as $user_id => $orders) {
@@ -2757,10 +2757,9 @@ fn_print_die($orders_wo_points);
     $grand_points_order_statuses = array_filter($order_statuses, function($v) {
         return $v['params']['grant_reward_points'] == 'Y';
     });
-    $promo[1810] = 4723;
-    $promo[2058] = 5860;
-    foreach ($promo as $company_id => $promotion_id) {
-        $orders = db_get_fields('SELECT order_id FROM ?:orders WHERE FIND_IN_SET(?i, promotion_ids) AND company_id = ?i AND timestamp > 1675198800 AND total > 0 AND is_parent_order = "N"', $promotion_id, $company_id);
+    $promo[1810] = [4723, 19489];
+    foreach ($promo as $company_id => $promotion_ids) {
+        $orders = db_get_fields('SELECT order_id FROM ?:orders WHERE (?p) AND company_id = ?i AND timestamp > ?i AND total > 0 AND is_parent_order = "N" AND company_id = ?i', fn_find_array_in_set($promotion_ids, "promotion_ids"), $company_id, 1675198800, 1810);
 
         foreach ($orders as $order_id) {
             $order_info = fn_get_order_info($order_id);
@@ -2771,25 +2770,110 @@ fn_print_die($orders_wo_points);
 
                     if (empty($is_corrected)) {
                         if ($first_order) {
-                            $corrections[] = [
+                            $promo = array_intersect_key($order_info['promotions'], array_flip($promotion_ids));
+                            $correction = [
                                 'user_id' => $order_info['user_id'],
                                 'company_id' => $order_info['company_id'],
                                 'login' => db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $order_info['user_id']),
                                 'order_id' => $order_info['order_id'],
+                                'month' => date('n', $order_info['timestamp']),
                                 'points' => $db_points,
-                                'earlier_order_id' => $first_order
+                                'earlier_order_id' => $first_order,
+                                'promotion_id' => key($promo),
+                                'promotion' => reset($promo)['name'],
                             ];
+                            if ($correction['month'] == '3') {
+                                $correction['points'] = $db_points -= round($order_info['total'] * 0.01);
+                            }
+                            fn_change_user_points(-$db_points, $order_info['user_id'], 'Корректировка за ошибочное начисление баллов по акции «Приветственный бонус НОВЫМ клиенам»', CHANGE_DUE_SUBTRACT);
+                            $corrections[] = $correction;
                         }
                     }
                 }
             }
         }
-
     }
-    $params['filename'] = 'points_to_decrease_5860.csv';
+    fn_print_r($corrections);
+    $params['filename'] = 'points_to_decrease_march6.csv';
     $params['force_header'] = true;
     $export = fn_exim_put_csv($corrections, $params, '"');
-    fn_print_die($corrections);
+    die();
+} elseif ($mode == 'correct_reward_points_march7') {
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $grand_points_order_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+    $promo = [5860];
+    // $orders = db_get_fields('SELECT order_id FROM ?:orders WHERE (?p) AND timestamp > ?i AND total > 0 AND is_parent_order = "N" AND status IN (?a) AND group_id NOT IN (?a)', fn_find_array_in_set($promo, "promotion_ids"), 1675198800, array_keys($grand_points_order_statuses), [17,18]);
+    // foreach ($orders as $order_id) {
+    //     $order = fn_get_order_info($order_id);
+    //     $is_corrected = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND reason = ?s', $order['user_id'], "Корректировка за ошибочное начисление баллов по акции «Приветственный бонус НОВЫМ клиенам»");
+    //     if ($is_corrected) continue;
+    //     $correction = [
+    //         'order_id' => $order_id,
+    //         'company_id' => $order['company_id'],
+    //         'user_id' => $order['user_id'],
+    //         'order_reward' => $order['points_info']['reward'],
+    //         'calculated_reward' => round($order['total']/10),
+    //         'is_different' => (abs($order['points_info']['reward'] - round($order['total']/10)) > 2) ? 'da' : 'ne',
+    //         'has_first' => db_get_field('SELECT max(order_id) FROM ?:orders WHERE order_id < ?i AND timestamp > ?i AND user_id = ?i AND total > 0 AND is_parent_order = "N" AND status IN (?a)', $order_id, 0, $order['user_id'], array_keys($grand_points_order_statuses)) ? 'da' : 'ne',
+    //     ];
+    //     if ($correction['is_different'] != 'ne') continue;
+    //     if ($correction['has_first'] != 'da') continue;
+    //     $not_corrected_orders[] = $correction;
+    // }
+
+    // $export = $not_corrected_orders;
+    // $params['filename'] = 'not_corrected_orders_march7.csv';
+    // $params['force_header'] = true;
+    // $export = fn_exim_put_csv($export, $params, '"');
+    // fn_print_die($not_corrected_orders);
+
+    // 19490 дает 1%. нефиг ее корректировать
+    $promo_[2058] = [4723, 5860];
+    foreach ($promo_ as $company_id => $promotion_ids) {
+        $orders = db_get_fields('SELECT order_id FROM ?:orders WHERE (?p) AND company_id = ?i AND timestamp > ?i AND total > 0 AND is_parent_order = "N" AND group_id NOT IN (?a)', fn_find_array_in_set($promotion_ids, "promotion_ids"), $company_id, 1675198800, [17,18]);
+
+        foreach ($orders as $order_id) {
+            $order_info = fn_get_order_info($order_id);
+            if (in_array($order_info['status'], array_keys($grand_points_order_statuses))) {
+                if ($db_points = $order_info['points_info']['reward']) {
+
+                    $is_corrected = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND reason = ?s', $order_info['user_id'], "Корректировка за ошибочное начисление баллов по акции «Приветственный бонус НОВЫМ клиенам»");
+                    $first_order = db_get_field('SELECT max(order_id) FROM ?:orders WHERE order_id < ?i AND timestamp > ?i AND user_id = ?i AND total > 0 AND is_parent_order = "N" AND status IN (?a)', $order_id, 0, $order_info['user_id'], array_keys($grand_points_order_statuses));
+
+                    if (empty($is_corrected)) {
+                        if ($first_order) {
+                            $promot = array_intersect_key($order_info['promotions'], array_flip($promotion_ids));
+                            $correction = [
+                                'user_id' => $order_info['user_id'],
+                                'company_id' => $order_info['company_id'],
+                                'login' => db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $order_info['user_id']),
+                                'order_id' => $order_info['order_id'],
+                                'month' => date('n', $order_info['timestamp']),
+                                'order_reward' => $order_info['points_info']['reward'],
+                                'calculated_reward' => round($order_info['total']/100),
+                                'is_different' => (abs($order_info['points_info']['reward'] - round($order_info['total']/100)) > 2) ? 'da' : 'ne',
+                                'diff' => abs($order_info['points_info']['reward'] - round($order_info['total']/100)),
+                                'earlier_order_id' => $first_order,
+                                'promotion_id' => key($promot),
+                                'promotion' => reset($promot)['name'],
+                            ];
+                            if ($correction['is_different'] == 'da') {
+                                $corrections[] = $correction;
+                                fn_change_user_points(-$correction['diff'], $order_info['user_id'], 'Корректировка за ошибочное начисление баллов по акции «Приветственный бонус НОВЫМ клиенам»', CHANGE_DUE_SUBTRACT);
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+    $params['filename'] = 'correct_reward_points_march7.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($corrections, $params, '"');
+    fn_print_die(count($corrections), $corrections);
 } elseif ($mode == 'baltica_logs') {
     list($logs, $search) = fn_get_logs(['q_type' => 'users', 'q_action' => 'delete']);
     $report = [];
