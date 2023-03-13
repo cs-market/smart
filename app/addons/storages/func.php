@@ -105,9 +105,15 @@ function fn_get_storages($params = [], $items_per_page = 0) {
 
     $storages = db_get_hash_array("SELECT ?:storages.* FROM ?:storages $join WHERE 1 ?p ?p", 'storage_id', $condition, $limit);
 
-    if (isset($params['storage_id']) || (isset($params['get_usergroups']) && $params['get_usergroups'] === 'true')) {
+    if (isset($params['storage_id']) || (isset($params['get_usergroups']) && $params['get_usergroups'] == 'true')) {
+        $storages_usergroups = db_get_array('SELECT storage_id, usergroup_id FROM ?:storage_usergroups WHERE storage_id IN (?a)', array_keys($storages));
+
         foreach ($storages as &$storage) {
-            $storage['usergroup_ids'] = db_get_fields('SELECT usergroup_id FROM ?:storage_usergroups WHERE storage_id = ?i', $storage['storage_id']);
+            $storage_usergroups = array_filter($storages_usergroups, function($v) use ($storage) {
+                return ($v['storage_id'] == $storage['storage_id']);
+            });
+
+            $storage['usergroup_ids'] = array_column($storage_usergroups, 'usergroup_id');
         }
     }
 
@@ -419,11 +425,13 @@ function fn_storages_get_cart_product_data($product_id, &$_pdata, $product, $aut
         $storage = $storages[$product['extra']['storage_id']];
         if (!empty($storage['usergroup_ids'])) {
             $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
-        }
 
-        $usergroup_ids = array_filter($usergroup_ids);
-        if ($usergroup_ids) {
-            $_pdata['price'] = db_get_field("SELECT min(IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100)) as price FROM ?:product_prices prices WHERE product_id = ?i AND lower_limit = ?i AND usergroup_id IN (?a)", $product_id, 1, $usergroup_ids);
+            $usergroup_ids = array_filter($usergroup_ids);
+            if ($usergroup_ids) {
+                $_pdata['price'] = db_get_field("SELECT min(IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100)) as price FROM ?:product_prices prices WHERE product_id = ?i AND lower_limit = ?i AND usergroup_id IN (?a)", $product_id, 1, $usergroup_ids);
+            }
+
+            fn_set_hook('storages_get_cart_product_data', $product_id, $_pdata, $product, $auth, $cart, $hash);
         }
 
         // исключить товар без цены

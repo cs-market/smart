@@ -9,6 +9,5 @@ fn_register_hooks(
   'get_product_price_post',
   'delete_product_post',
   'post_delete_user',
-  'add_product_to_cart_get_price',
-  'get_cart_product_data'
+  'storages_get_cart_product_data'
 );

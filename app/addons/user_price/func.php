@@ -51,30 +51,18 @@ function fn_user_price_get_order_items_info_post(&$order, $v, $k)
     }
 }
 
-function fn_user_price_add_product_to_cart_get_price($product_data, $cart, $auth, $update, $_id, $data, $product_id, $amount, &$price, $zero_price_action, $allow_add) {
+function fn_user_price_storages_get_cart_product_data($product_id, &$_pdata, $product, $auth, $cart, $hash) {
     list($user_prices) = fn_get_product_user_price_with_params([
         'product_id' => $product_id,
         'user_ids' => $auth['user_id'],
-        'product' => $data
+        'product' => $product
     ]);
     if (!empty($user_prices)) {
-        $price = $user_prices[0]['price'];
+        $_pdata['price'] = $user_prices[0]['price'];
     }
 }
 
-function fn_user_price_get_cart_product_data($product_id, &$_pdata, $product, $auth, $cart, $hash) {
-//     list($user_prices) = fn_get_product_user_price_with_params([
-//         'product_id' => $product_id,
-//         'user_ids' => $auth['user_id'],
-//         'product' => $product
-//     ]);
-//     if (!empty($user_prices)) {
-//         $_pdata['price'] = $user_prices[0]['price'];
-//     }
-}
-
 function fn_user_price_get_product_price_post($product_id, $amount, $auth, &$price) {
-    // а может это уже и не нужно, если есть два хука выше?
     $user_prices = fn_get_product_user_price($product_id);
     if (!empty($user_prices)) {
         $price = $user_prices[0]['price'];
