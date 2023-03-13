@@ -115,8 +115,9 @@ function fn_push_notifications_get_mobile_table_values($param) {
     return db_get_fields("SELECT DISTINCT(?p) FROM ?:mobile_app_notification_subscriptions WHERE ?p != ''", $param, $param);
 }
 
-function fn_push_notifications_helpdesk_send_message_pre(&$notified, $message, $mailbox) {
-    foreach (array_keys($message['users']) as $user_id) {
-        $notified = fn_mobile_app_notify_user($user_id, $message['subject'], strip_tags(html_entity_decode($message['message'])), '', 1) || $notified;
+function fn_push_notifications_helpdesk_send_message_pre(&$message, $mailbox) {
+    foreach ($message['users'] as $user_id => $user) {
+        $result = fn_mobile_app_notify_user($user_id, $message['subject'], strip_tags(html_entity_decode($message['message'])), '', 1);
+        if ($result) unset($message['users'][$user_id]);
     }
 }

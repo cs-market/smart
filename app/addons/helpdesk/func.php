@@ -532,7 +532,7 @@ function fn_helpdesk_get_mail() {
 
 function fn_helpdesk_send_mail() {
     $mailboxes = fn_get_mailboxes();
-    $messages = db_get_array('SELECT m.*, t.subject, t.mailbox_id, u.user_type FROM ?:helpdesk_messages AS m LEFT JOIN ?:helpdesk_tickets AS t ON t.ticket_id = m.ticket_id LEFT JOIN ?:users AS u ON u.user_id = m.user_id WHERE notified = ?s LIMIT 300', 'N');
+    $messages = db_get_array('SELECT m.*, t.subject, t.mailbox_id, u.user_type FROM ?:helpdesk_messages AS m LEFT JOIN ?:helpdesk_tickets AS t ON t.ticket_id = m.ticket_id LEFT JOIN ?:users AS u ON u.user_id = m.user_id WHERE notified = ?s AND m.timestamp > ?i LIMIT 300', 'N', TIME - (SECONDS_IN_DAY * 7));
     foreach ($messages as &$message) {
         if ($message['user_type'] == 'C') {
             $user_type_condition = db_quote(" AND u.user_type != ?s", 'C');
@@ -574,9 +574,9 @@ function fn_helpdesk_send_mail() {
             );
             $mailer_settings = fn_array_merge(Registry::get('settings.Emails'), $mailbox_email_settings);
             
-            fn_set_hook('helpdesk_send_message_pre', $notified, $message, $mailboxes[$message['mailbox_id']]);
+            fn_set_hook('helpdesk_send_message_pre', $message, $mailboxes[$message['mailbox_id']]);
 
-            if (!$notified) {
+            if (!empty($message['users'])) {
                 $to = array_filter(filter_var_array(array_column($message['users'], 'email'), FILTER_VALIDATE_EMAIL));
                 if (!empty($to)) {
                     $notified = $mailer->send(array(
@@ -590,10 +590,9 @@ function fn_helpdesk_send_mail() {
                             ),
                         'attachments' => $attachements,
                     ), 'A', Registry::get('settings.Appearance.backend_default_language'), $mailer_settings);
-                } else {
-                    $notified = true;
                 }
             }
+            $notified = true;
         } else {
             $notified = true;
         }
