@@ -105,7 +105,7 @@ function fn_get_storages($params = [], $items_per_page = 0) {
 
     $storages = db_get_hash_array("SELECT ?:storages.* FROM ?:storages $join WHERE 1 ?p ?p", 'storage_id', $condition, $limit);
 
-    if (isset($params['storage_id']) || (isset($params['get_usergroups']) && $params['get_usergroups'] == 'true')) {
+    if (isset($params['storage_id']) || (isset($params['get_usergroups']) && $params['get_usergroups'] === 'true')) {
         $storages_usergroups = db_get_array('SELECT storage_id, usergroup_id FROM ?:storage_usergroups WHERE storage_id IN (?a)', array_keys($storages));
 
         foreach ($storages as &$storage) {
@@ -268,7 +268,7 @@ function fn_storages_load_products_extra_data(&$extra_fields, $products, $produc
             'condition' => db_quote(' AND ?:storages_products.storage_id = ?i', $storage['storage_id'])
         ];
 
-        if (!empty($storage['usergroup_ids'])) {
+        if (!empty(array_filter($storage['usergroup_ids']))) {
             $params['auth_usergroup_ids'] = array_intersect($params['auth_usergroup_ids'], $storage['usergroup_ids']);
         }
     }
