@@ -13,4 +13,5 @@ fn_register_hooks(
     'check_permission_manage_profiles',
     ['check_rights_delete_user', 1],
     'get_users',
+    'mailer_create_message_before',
 );

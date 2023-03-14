@@ -121,6 +121,15 @@ function fn_maintenance_get_users($params, $fields, $sortings, &$condition, $joi
     }
 }
 
+function fn_maintenance_mailer_create_message_before($_this, &$message, $area, $lang_code, $transport, $builder) {
+    // DO NOT TRY TO SEND EMAILS TO @example.com
+    if (!empty($message['to'])) {
+        $message['to'] = array_filter($message['to'], function($v) {
+            return strpos($v, '@example.com') === false;
+        });
+    }
+}
+
 /* END HOOKS */
 
 function fn_maintenance_promotion_get_dynamic($promotion_id, $promotion, $condition, &$cart, &$auth = NULL) {
