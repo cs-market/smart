@@ -2,11 +2,11 @@
     display: block;
     height: 20px;
     width: 100%;
-    .border-radius(3px);
+    border: @border-width solid lighten(@base, 10%);
+    .border-radius(@border-radius);
     overflow: hidden;
     background-color: #eee;
     position: relative;
-    border: 1px solid @companion;
     box-sizing: border-box;
     &:before {
         display: block;
@@ -14,7 +14,7 @@
         content: '';
         height: 20px;
         width: var(--progress);
-        background-color: @menu;
+        background-color: lighten(@base, 10%);
     }
     &__progress {
         position: absolute;
@@ -27,7 +27,7 @@
     }
 }
 
-.ty-smart-icon-flag-start {
+.ty-smart-icon-flag-start, .ty-smart-icon-flag-finish {
     .square(20px);
     display: inline-block;
     background-position: center;
@@ -37,10 +37,5 @@
 }
 
 .ty-smart-icon-flag-finish {
-    .square(20px);
-    display: inline-block;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1024' height='1024'%3E %3Cpath fill='%236094ec' d='M393.03 567.92s71.16 36.04 181.57 18.12c7.65-1.24 18.67-3.8 16.09-3.28V425.37a431.67 431.67 0 0 0 101.09-31.46c34.2-15.4 66.33-25.36 95.87-31.45v156.71c-4.09.73 5.3-.2 14.33-1.47 102.48-14.54 182.63 11.42 182.63 11.42V370.76s-87.75-28.63-196.96-9.16V204.9c119.73-24.66 196.95 14.47 196.96 14.48V62.8s-77.22-38.84-196.96-14.44v155.67a402.34 402.34 0 0 0-98.48 30.79c-35.1 16.23-68.13 26.6-98.48 32.8V110.83c-114.15 20.49-197.66-12.58-197.66-12.58V257.4l.7-2.33s83.18 33.2 196.96 12.75V425.2a381.88 381.88 0 0 1-76.57 7.9c-74.8 0-120.39-23.27-120.4-23.27l-.68 158.1zM1024 1023.97h-39.4V572.73c-54.25-19.52-160.73-40.73-295.43 17.93-197.86 86.17-334.84 0-334.84 0V39.17s136.94 88.1 334.84 0 334.83 0 334.83 0v984.8z'/%3E %3C/svg%3E ");
 }

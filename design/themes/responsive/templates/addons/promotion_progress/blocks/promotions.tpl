@@ -1,6 +1,6 @@
 {if $progress_promotions}
     {foreach from=$progress_promotions item='promotion'}
-        <div style="width: 100%;">
+        <div>
             <div>{$promotion.name} {if $promotion.short_description|trim}{include file="common/tooltip.tpl" tooltip=$promotion.short_description}{/if}</div>
             <div>
                 <div class="ty-float-left"><i class="ty-smart-icon-flag-start"></i>{if $promotion.modify_values_to_price}{include file="common/price.tpl" value=0}{else}0{/if}</div>
