@@ -1,0 +1,478 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-File: /addons/sw_telegram.po\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Last-Translator: sweetcode <support@sweetcode.ru>\n"
+"PO-Revision-Date: 2019-12-30 07:45-0400\n"
+
+msgctxt "Addons::name::sw_telegram"
+msgid "[SW] Module sw_telegram"
+msgstr "SW: Уведомления в Telegram"
+
+msgctxt "Addons::description::sw_telegram"
+msgid "[SW] Module sw_telegram description"
+msgstr "Этот модуль позволит вам настроить оповещения о заказах в чат Telegram."
+
+msgctxt "SettingsOptions::sw_telegram::sw_bot_token"
+msgid "[SW] sw_bot_token"
+msgstr "Token to access API"
+
+msgctxt "SettingsTooltips::sw_telegram::sw_bot_token"
+msgid "sw_telegram_get_id tool icon"
+msgstr "После создание робота, вам будет выдан API ключ. Впишите его сюда. Выглядит примерно так: 317211249:AAFAxuqSqFuTQwI7XEkJ8RH7AXKj_GTX61g"
+
+msgctxt "SettingsOptions::sw_telegram::sw_id_chat"
+msgid "[SW] sw_id_chat"
+msgstr "ID чатов через пробел"
+
+msgctxt "SettingsTooltips::sw_telegram::sw_id_chat"
+msgid "sw_id_chat tool icon"
+msgstr "После создание робота и сохранения API Token, напишите роботу что-нибудь. Далее нажмите кнопку получения ID, робот Вам пришлет ваш ID чата. Впишите его в это поле. Если чатов несколько, то через пробел"
+
+msgctxt "SettingsOptions::sw_telegram::information"
+msgid "Information"
+msgstr "Информация"
+
+msgctxt "SettingsOptions::sw_telegram::user_information"
+msgid "user_information"
+msgstr "Настройки для пользователей"
+
+msgctxt "SettingsOptions::sw_telegram::information_products"
+msgid "information_products"
+msgstr "Настройки"
+
+msgctxt "SettingsSections::sw_telegram::settings"
+msgid "id_settings"
+msgstr "Настройки"
+
+msgctxt "SettingsSections::sw_telegram::settings_vendor"
+msgid "settings_vendor"
+msgstr "Настройки продавцов"
+
+msgctxt "SettingsSections::sw_telegram::instruction"
+msgid "id_instruction"
+msgstr "Инструкция"
+
+msgctxt "SettingsSections::sw_telegram::proxy"
+msgid "proxy"
+msgstr "Прокси"
+
+msgctxt "SettingsOptions::sw_telegram::use_proxy"
+msgid "use_proxy"
+msgstr "Использовать прокси-сервер"
+
+msgctxt "SettingsTooltips::sw_telegram::use_proxy"
+msgid "use_proxy ttc"
+msgstr "Функция актуальна, если Ваш хостинг или провайдер блокируют запросы к API Telegram. Рекомендуем рассматривать платные прокси-серверы, так как бесплатные прокси-серверы могут задерживать отправку данных, или перехватывать данные."
+
+msgctxt "SettingsOptions::sw_telegram::proxy_host"
+msgid "proxy_host"
+msgstr "IP прокси"
+
+msgctxt "SettingsOptions::sw_telegram::proxy_port"
+msgid "proxy_port"
+msgstr "Порт прокси"
+
+msgctxt "SettingsOptions::sw_telegram::proxy_user"
+msgid "proxy_user"
+msgstr "User"
+
+msgctxt "SettingsOptions::sw_telegram::proxy_password"
+msgid "proxy_password"
+msgstr "Password"
+
+msgctxt "SettingsOptions::sw_telegram::tg_allow_for_vendor"
+msgid "tg_allow_for_vendor"
+msgstr "Разрешить уведомлять продавцов"
+
+msgctxt "SettingsOptions::sw_telegram::tg_allow_in_tarifs"
+msgid "tg_allow_in_tarifs"
+msgstr "Зависимость от тарифного плана"
+
+msgctxt "SettingsOptions::sw_telegram::tg_call_notification"
+msgid "id_tg_call_notification"
+msgstr "Уведомления в Telegram при заказе в 1 клик и заказе звонка"
+
+msgctxt "SettingsOptions::sw_telegram::tg_order_notification"
+msgid "id_tg_order_notification"
+msgstr "Уведомления в Telegram при успешном оформлении заказа"
+
+msgctxt "SettingsOptions::sw_telegram::tg_rewiev_notification"
+msgid "[SW] tg_rewiev_notification"
+msgstr "Уведомления в Telegram при отправке отзыва"
+
+msgctxt "SettingsOptions::sw_telegram::sw_bot_name"
+msgid "[SW] sw_bot_name"
+msgstr "Имя бота"
+
+msgctxt "SettingsTooltips::sw_telegram::sw_bot_name"
+msgid "tool sw_bot_name"
+msgstr "Будет заполнено автоматически при запросе ID чата."
+
+msgctxt "SettingsOptions::sw_telegram::tg_order_status_notification"
+msgid "tg_order_status_notification"
+msgstr "Уведомления в Telegram при смене статуса заказа"
+
+msgctxt "SettingsTooltips::sw_telegram::tg_order_status_notification"
+msgid "tool tg_order_status_notification"
+msgstr "Пользователю будет предоставлена возможность получать уведомления о статуса заказа в Telegram. Если пользователь зарегистрирован, то не придется каждый раз активировать уведомления. Отменить уведомления можно в личном кабинете пользователя."
+
+msgctxt "SettingsOptions::sw_telegram::tg_users_notification"
+msgid "tg_users_notification"
+msgstr "Уведомления для пользователей"
+
+msgctxt "SettingsTooltips::sw_telegram::tg_users_notification"
+msgid "tg_users_notification tt"
+msgstr "Разрешить пользователям получать уведомления в Telegram при смене статуса заказа"
+
+msgctxt "SettingsOptions::sw_telegram::tg_send_stickers"
+msgid "tg_send_stickers"
+msgstr "Включить стикеры для уведомлений"
+
+msgctxt "SettingsOptions::sw_telegram::tg_review_vendor_notification"
+msgid "tg_review_vendor_notification"
+msgstr "Уведомления по новым отзывам"
+
+msgctxt "SettingsOptions::sw_telegram::tg_call_vendor_notification"
+msgid "tg_call_vendor_notification"
+msgstr "Уведомления с формы купить в 1 клик"
+
+msgctxt "SettingsOptions::sw_telegram::tg_allow_change_order_status"
+msgid "tg_allow_change_order_status"
+msgstr "Разрешить продавцам менять статусы заказов через бота"
+
+msgctxt "SettingsTooltips::sw_telegram::tg_allow_change_order_status"
+msgid "ttc tg_allow_change_order_status"
+msgstr "Команда для смены статуса будет выглядеть так: ORD 1234 (или ORDER 1234). Где 1234 - номер заказа. Далее Бот предложит варианты статусов."
+
+msgctxt "Languages::fn_sw_telegram"
+msgid "token to access_info"
+msgstr "Если возникнут вопросы или предложения по улучшению модуля,<br/> можете обращаться по e-mail <b>support@sweetcode.ru</b>"
+
+msgctxt "Languages::sw_telegram_get_id"
+msgid "sw_telegram_get_id"
+msgstr "Получение ID чата"
+
+msgctxt "Languages::sw_telegram_get_id_chat"
+msgid "_sw_telegram_get_id_chat"
+msgstr "Отправить"
+
+msgctxt "Languages::sw_telegrame_call_order"
+msgid "sw_telegrame_call_order"
+msgstr "<b>Заказ звонка:</b>"
+
+msgctxt "Languages::tg_products_in_order"
+msgid "id_tg_products_in_order"
+msgstr "<b>Товары в заказе</b>"
+
+msgctxt "Languages::tg_order_summ"
+msgid "id_tg_order_summ"
+msgstr "На сумму "
+
+msgctxt "Languages::tg_order_num_text"
+msgid "id_tg_order_num_text"
+msgstr "Поступил заказ № "
+
+msgctxt "Languages::sw_telegram_manage_storefront_instruction"
+msgid "sw_telegram_manage_storefront_instruction"
+msgstr "Инструкция"
+
+msgctxt "Languages::sw_telegram_manage_storefront_instruction_text"
+msgid "sw_telegram_manage_storefront_instruction_text"
+msgstr "<p><strong>1. Создаем Бота в Telegram</strong>. Процесс довольно быстрый и простой.<br>Полная инструкция находится тут <a href="https://tlgrm.ru/docs/bots">https://tlgrm.ru/docs/bots</a>
+</p>
+<p><strong>Если коротко по шагам:</strong><br>Находим бота @<a href="https://telegram.me/botfather">BotFather<br></a>Вводим команду <em>/newbot</em><br>Вам предложат ввести <em>имя робота</em>, введите латинскими буквами имя, например наш <em>SweetCart</em><br>Далее предлагается ввести <em>username</em>, обязательное окончание <em>_bot</em>, например <em>SweetCart_bot</em><br>Все! Бот создан.
+</p>
+<p>Как будет создан Бот. Вы увидите сообщение с API token ключом.<br> Далее переходите в настройки, вводите его там.
+</p>
+<p><strong>2. Найдите своего бота в Telegram.<br></strong> Напишите ему что-нибудь.<br>Дальше вам необходимо нажать на кнопку - получить ID чата.<br>После нажатия, бот пришлет в ваш чат ID.<br>Введите его в настройках. Сохраните.
+</p>
+<p>Готово! Тестируйте заказы :) Приятного пользования.<br>Если будут вопросы или пожелания - обращайтесь по email <a href="mailto:support@sweetcode.ru">support@sweetcode.ru</a><br><br>
+</p><p><strong>3. Создание вебхука.<br></strong> После того, как сохраните Token API, нажмите кнопку Зарегистрировать Webhook. Это позволит пользователям получать уведомления в свой чат. <br>Важно. Если при переходе по кнопке OK получаете ошибку, или страница заблокирована, значит Ваш провайдер блокирует Telegram. Самый быстрый способ обойти блокировку - установить бесплатное расширение для браузера Chrome - Hola Free VPN Proxy Unblocker. <b>Важно!</b> После запроса ID чата - создайте вебхук заново, иначе информация по заказам приходить не будет.
+</p><p><strong>4. Как добавить уведомления в группу.<br></strong> Создайте группу. Добавьте Вашего бота в созданную группу. Напишите в группу что-нибудь.<br>Дальше вам необходимо нажать на кнопку - получить ID чата.<br>После нажатия, бот пришлет в группу ID.<br>Введите его в настройках. Сохраните. ID группы будет со знаком '-', например, -3564785. Именно так и указывайте в настройках.
+</p><p><strong>5. Как добавить уведомления для канала.<br></strong> Создайте канал. Добавьте Вашего бота в созданный канал. В настройках профиля канала найдите ссылку.<br>Например, ссылка будет такой t.me/my_chanel, в поле настроек модуля нужно добавить @my_chanel. Другой вариант, по аналогии с группой, получите ID чата и укажите его в настройках.
+</p>"
+
+msgctxt "Languages::sw_telegrame_your_chat_id"
+msgid "[SW] sw_telegrame_your_chat_id"
+msgstr ":) привет, ваш ID чата "
+
+msgctxt "Languages::sw_telegrame_get_new_post_disqus"
+msgid "[SW] sw_telegrame_get_new_post_disqus"
+msgstr "Получен новый отзыв или вопрос:"
+
+msgctxt "Languages::sw_telegrame_rating_value_stars"
+msgid "[SW] sw_telegrame_rating_value_stars"
+msgstr "Количество звезд: "
+
+msgctxt "Languages::sw_telegram.confirm_noty"
+msgid "[SW] sw_telegram.confirm_noty"
+msgstr "Получать уведомления о статусе заказа в Telegram"
+
+msgctxt "Languages::sw_telegram.confirm_noty_ttc"
+msgid "[SW] sw_telegram.confirm_noty tt"
+msgstr "Вы будете переадресованы на сервис обхода блокировки Telegram. Через секунду откроется приложение Telegram, где в чате нажмите кнопку START"
+
+msgctxt "Languages::sw_telegram.reg_webhook"
+msgid "[SW] sw_telegram.reg_webhook"
+msgstr "Зарегистрировать Webhook"
+
+msgctxt "Languages::ttc_sw_telegram.reg_webhook"
+msgid "[SW] ttc sw_telegram.reg_webhook"
+msgstr "Нажмите кнопку один раз, как только сохраните все данные по API. Чтобы зарегистрировать webhook"
+
+msgctxt "Languages::sw_telegram.chat_id"
+msgid "[SW] sw_telegram.chat_id"
+msgstr "ID чата пользователя"
+
+msgctxt "Languages::sw_telegram.notify_telegram"
+msgid "[SW] sw_telegram.notify_telegram"
+msgstr "Уведомить пользователя в Telegram"
+
+msgctxt "Languages::sw_telegram.notify_message"
+msgid "[SW] sw_telegram.notify_message"
+msgstr "[name], приветствуем Вас! Вашему заказу №[order_id] был присвоен статус: <b>[status]</b>"
+
+msgctxt "Languages::sw_telegram.webhook_del"
+msgid "[SW] sw_telegram.webhook_del"
+msgstr "Webhook был автоматически удален. Запросите ID чата еще раз."
+
+msgctxt "Languages::sw_telegram.noty_user_info"
+msgid "[SW] sw_telegram.noty_user_info"
+msgstr "Получать информацию по заказу"
+
+msgctxt "Languages::sw_telegram.noty_user_info_yet"
+msgid "[SW] sw_telegram.noty_user_info_yet"
+msgstr "Теперь Вы будете получать информацию по заказам"
+
+msgctxt "Languages::sw_telegram.noty_user_unsubscr"
+msgid "[SW] sw_telegram.noty_user_unsubscr"
+msgstr "Вы отписаны от оповещений"
+
+msgctxt "Languages::sw_telegram.noty_user_ok_sbscr"
+msgid "[SW] sw_telegram.noty_user_ok_sbscr"
+msgstr "Мы нашли Ваш аккаунт. Теперь Вы будете получать информацию по всем заказам. Чтобы отказаться от подписки, отправьте боту сообщение - STOP"
+
+msgctxt "Languages::sw_telegram.noty_user_subscr_order"
+msgid "[SW] sw_telegram.noty_user_subscr_order"
+msgstr "Вы подписаны на уведомления по заказу: №"
+
+msgctxt "Languages::sw_telegram.noty_user_information_text"
+msgid "[SW] sw_telegram.noty_user_information_text"
+msgstr "Приветствуем Вас!\r\n
+Список команд, которые можно отправлять боту:\r\n
+/stop - остановить уведомления\r\n
+/subscribe - подписаться на уведомления\r\n
+/last_order - информация по последнему заказу"
+
+msgctxt "Languages::sw_telegram.hostinh_block"
+msgid "[SW] sw_telegram.hostinh_block"
+msgstr "Ваш хостинг или провайдер блокирует API Telegram."
+
+msgctxt "Languages::sw_telegram.notify_telegram_user_settings"
+msgid "[SW] sw_telegram.notify_telegram_user_settings"
+msgstr "Уведомления в Telegram"
+
+msgctxt "Languages::sw_telegram.confirm_noty_text_info"
+msgid "[SW] sw_telegram.confirm_noty_text_info"
+msgstr "После того, как откроется окно, нажмите кнопку START, и Вы будете подписаны на уведомления по заказам. Отписаться можно в Вашем личном кабинете"
+
+msgctxt "Languages::sw_telegram.keyboard_last_status"
+msgid "[SW] sw_telegram.keyboard_last_status"
+msgstr "Статус последнего заказа"
+
+msgctxt "Languages::sw_telegram.keyboard_subscr"
+msgid "[SW] sw_telegram.keyboard_subscr"
+msgstr "Подписаться"
+
+msgctxt "Languages::sw_telegram.keyboard_unsubscr"
+msgid "[SW] sw_telegram.keyboard_unsubscr"
+msgstr "Отписаться"
+
+msgctxt "Languages::sw_telegram.keyboard_no_found"
+msgid "[SW] sw_telegram.keyboard_no_found"
+msgstr "Команда не найдена"
+
+msgctxt "Languages::sw_telegram.chat_is_empty"
+msgid "[SW] sw_telegram.chat_is_empty"
+msgstr "ID чата не найден, напишите Вашему боту любой текст"
+
+msgctxt "Languages::sw_telegram.order_no_found"
+msgid "[SW] sw_telegram.order_no_found"
+msgstr "Не найдено ни одного заказа по Вашим данным"
+
+msgctxt "Languages::sw_telegram.noty_user_no_account"
+msgid "[SW] sw_telegram.noty_user_no_account"
+msgstr "К сожалению, Ваш аккаунт не найден."
+
+msgctxt "Languages::sw_telegram.noty_vendors"
+msgid "[SW] sw_telegram.noty_vendors"
+msgstr "Разрешить уведомления для продавцов в Telegram"
+
+msgctxt "Languages::sw_telegram.confirm_noty_vendor"
+msgid "[SW] sw_telegram.confirm_noty_vendor"
+msgstr "Получать уведомления по заказам"
+
+msgctxt "Languages::sw_telegram_get_id_chat_tooltip"
+msgid "[SW] sw_telegram.sw_telegram_get_id_chat_tooltip"
+msgstr "Если при отправке кнопка START не появляется в чате, закройте приложение Telegram и нажмите кнопку еще раз. После нажатия на кнопку, перезагрузите данную страницу, ID чата должен прописаться автоматически"
+
+msgctxt "Languages::sw_telegram.vendor_message_order_pre"
+msgid "[SW] sw_telegram.vendor_message_order_pre"
+msgstr "[firstname], приветствуем Вас! На сайте "
+
+msgctxt "Languages::sw_telegram.notify_message_vendor"
+msgid "[SW] sw_telegram.notify_message_vendor"
+msgstr "[name]. Вашему заказу №[order_id] был присвоен статус: <b>[status]</b>"
+
+msgctxt "Languages::sw_telegram.user_message_order_pre"
+msgid "[SW] sw_telegram.user_message_order_pre"
+msgstr "[name], приветствуем Вас! На сайте "
+
+msgctxt "Languages::sw_telegram.user_order_pre_num"
+msgid "[SW] sw_telegram.user_order_pre_num"
+msgstr "Размещен заказ № "
+
+msgctxt "Languages::sw_telegram.dear_user"
+msgid "[SW] sw_telegram.dear_user"
+msgstr "Дорогой пользователь"
+
+msgctxt "SettingsOptions::sw_telegram::review"
+msgid "[SW] review"
+msgstr "Обратная связь"
+
+msgctxt "SettingsSections::sw_telegram::general"
+msgid "General settings"
+msgstr "Общие настройки"
+
+msgctxt "SettingsSections::sw_telegram::review_tab"
+msgid "review_tab"
+msgstr "Обратная связь"
+
+msgctxt "Languages::sw.add_review_text"
+msgid "[SW] sw.add_review_text"
+msgstr "Мы очень рады, что Вы используете наш модуль для решения своих задач. Наша поддержка всегда готова помочь и принимает запросы круглосуточно <a href="mailto:support@sweetcode.ru">support@sweetcode.ru</a>.<br/> <br/>Поделитесь с нами впечатлением от использования модуля на Маркетплейсе CS-Cart.<br/><br/>А еще, дарим Вам бессрочный промо-код на скидку 10%, на все наши модули <span class='sw-sale'>SWEET10</span>"
+
+msgctxt "Languages::sw.add_review_btn"
+msgid "SW: sw.add_review_btn"
+msgstr "Оставить отзыв на CS-Cart Marketplace"
+
+msgctxt "Languages::sw.add_review_title"
+msgid "SW: sw.add_review_title"
+msgstr "Сообщение в поддержку"
+
+msgctxt "Languages::sw.add_review_hint"
+msgid "SW: sw.add_review_hint"
+msgstr "Данное сообщение поступит в быстрой форме в нашу поддержку. Вы можете написать тут Ваши пожелания по модулю, о проблемах в модуле или любой другой вопрос."
+
+msgctxt "Languages::sw.res_email_admin"
+msgid "SW: res_email_admin"
+msgstr "Уведомление поступит на E-mail:"
+
+msgctxt "Languages::sw_telegram.chat_id_ttc"
+msgid "SW: sw_telegram.chat_id_ttc"
+msgstr "Можно указать несколько чатов через запятую"
+
+msgctxt "Languages::sw_telegram.how_status"
+msgid "SW: sw_telegram.how_status"
+msgstr "Пожалуйста, выберите новый статус заказа #[order_id]"
+
+msgctxt "Languages::sw_telegram.order_not_found"
+msgid "SW: sw_telegram.order_not_found"
+msgstr "Заказ не найден"
+
+msgctxt "Languages::sw_telegram.use"
+msgid "SW: sw_telegram.use"
+msgstr "Доступные команды - "
+
+msgctxt "Languages::sw_telegram.command_change_status"
+msgid "SW: sw_telegram.command_change_status"
+msgstr "Для смены статуса заказа или получения информации по заказу используйте команду: заказ 1234 (Еще варианты: Заказ 1234, ORD 1234, ORDER 1234). Где 1234 - номер заказа. В ответ Бот предложит варианты статусов."
+
+msgctxt "Languages::sw_telegram.command_change_status_title"
+msgid "SW: sw_telegram.command_change_status_title"
+msgstr "Информация по заказу и управление статусами заказа:"
+
+msgctxt "Languages::sw_telegram.command_change_status_text"
+msgid "SW: sw_telegram.command_change_status_text"
+msgstr "В настройках профиля администраторов, которые должны иметь возможность управлять статусами заказов через бота, заполните ID чата."
+
+msgctxt "Languages::sw_telegram.zipcode"
+msgid "SW: sw_telegram.zipcode"
+msgstr "Индекс"
+
+msgctxt "Languages::sw_telegram.webhook_text"
+msgid "SW: sw_telegram.webhook_text"
+msgstr "Нажимайте кнопку каждый раз, когда вносите новые ID чатов в настройки модуля"
+
+msgctxt "SettingsSections::sw_telegram::additional_addons"
+msgid "additional_addons"
+msgstr "Совместимость с модулями"
+
+msgctxt "SettingsOptions::sw_telegram::ab__hoi_mask_id"
+msgid "ab__hoi_mask_id"
+msgstr "Использовать подменный номер заказа [AB: Скрытие номера заказа]"
+
+msgctxt "Languages::sw_telegram.manage_list"
+msgid "SW: sw_telegram.manage_list"
+msgstr "Подписчики Telegram"
+
+msgctxt "Languages::sw_telegram.confirm_noty_short"
+msgid "SW: sw_telegram.confirm_noty_short"
+msgstr "Подписан на уведомления"
+
+msgctxt "Languages::sw_telegram.date_add"
+msgid "SW: sw_telegram.date_add"
+msgstr "Дата подписки"
+
+msgctxt "Languages::sw_telegram.comm_stop"
+msgid "SW: sw_telegram.comm_stop"
+msgstr "Остановить уведомления"
+
+msgctxt "Languages::sw_telegram.comm_subscribe"
+msgid "SW: sw_telegram.comm_subscribe"
+msgstr "Подписаться на уведомления"
+
+msgctxt "Languages::sw_telegram.comm_id"
+msgid "SW: sw_telegram.comm_id"
+msgstr "Ваш ID"
+
+msgctxt "Languages::sw_telegram.comm_last_order"
+msgid "SW: sw_telegram.comm_last_order"
+msgstr "Информация по последнему заказу"
+
+msgctxt "Languages::sw_telegram.comm_choose"
+msgid "SW: sw_telegram.comm_choose"
+msgstr "Выберите команду"
+
+msgctxt "Languages::sw_telegram.comm_change_status"
+msgid "SW: sw_telegram.comm_change_status"
+msgstr "Изменить статус заказа"
+
+msgctxt "Languages::sw_telegram.can_register"
+msgid "SW: sw_telegram.can_register"
+msgstr "Вы можете зарегистрироваться на нашем сайте"
+
+msgctxt "Languages::sw_telegram.manage_list_menu_description"
+msgid "SW: sw_telegram.manage_list_menu_description"
+msgstr "Список подписчиков Telegram"
+
+msgctxt "Languages::sw_telegram.add_user_noty"
+msgid "SW: sw_telegram.add_user_noty"
+msgstr "Подключить уведомления в Telegram"
+
+msgctxt "SettingsOptions::sw_telegram::tg_action_profile"
+msgid "tg_action_profile"
+msgstr "Разрешить пользователю подписываться из настроек профиля"
+
+msgctxt "SettingsOptions::sw_telegram::tg_action_menu"
+msgid "tg_action_menu"
+msgstr "Отобразить пункт подписки на уведомления в меню профиля пользователя"
+

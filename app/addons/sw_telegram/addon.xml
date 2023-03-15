@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<addon scheme="3.0" edition_type="ULT:NONE,MVE:ROOT">
+	<id>sw_telegram</id>
+	<version>4.8</version>
+	<priority>2023</priority>
+	<position>0</position>
+	<has_icon>Y</has_icon>
+	<default_language>en</default_language>
+	<status>active</status>
+	<authors>
+		<author>
+			<name>SWEETCODE</name>
+			<email>support@sweetcode.ru</email>
+			<url>https://sweetcart.ru</url>
+			<phone>8 (800) 222-30-74</phone>
+		</author>
+	</authors>
+	<supplier>SWEETCODE</supplier>
+	<supplier_link>https://sweetcart.ru</supplier_link>
+	<compatibility>
+		<conflicts/>
+		<dependencies/>
+		<core_version>
+			<min>4.2.0</min>
+		</core_version>
+	</compatibility>
+	<settings layout="separate" edition_type="ROOT,ULT:VENDOR">
+		<sections>
+			<section id="settings">
+				<items>
+					<item id="information">
+						<type>header</type>
+					</item>
+					<item id="sw_bot_token">
+						<type>input</type>
+					</item>
+					<item id="sw_bot_name">
+						<type>input</type>
+					</item>
+					<item id="settings">
+						<type>template</type>
+						<default_value>settings.tpl</default_value>
+					</item>
+					<item id="sw_id_chat">
+						<type>textarea</type>
+					</item>
+					<item id="tg_call_notification">
+						<type>checkbox</type>
+						<default_value>Y</default_value>
+					</item>
+					<item id="tg_order_notification">
+						<type>checkbox</type>
+						<default_value>Y</default_value>
+					</item>
+					<item id="tg_rewiev_notification">
+						<type>checkbox</type>
+						<default_value>Y</default_value>
+					</item>
+					<item id="tg_send_stickers">
+						<type>checkbox</type>
+						<default_value>Y</default_value>
+					</item>
+					<item id="user_information">
+						<type>header</type>
+					</item>
+					<item id="tg_order_status_notification">
+						<type>checkbox</type>
+						<default_value>Y</default_value>
+					</item>
+					<item id="tg_action_profile">
+						<type>checkbox</type>
+						<default_value>Y</default_value>
+					</item>
+					<item id="tg_action_menu">
+						<type>checkbox</type>
+						<default_value>Y</default_value>
+					</item>
+				</items>
+			</section>
+			<section id="settings_vendor" edition_type="ULT:NONE,MVE:ROOT">
+				<items>
+					<item id="tg_allow_for_vendor">
+						<type>checkbox</type>
+						<default_value>N</default_value>
+					</item>
+					<item id="tg_allow_in_tarifs">
+						<type>checkbox</type>
+						<default_value>N</default_value>
+					</item>
+					<item id="tg_review_vendor_notification">
+						<type>checkbox</type>
+						<default_value>N</default_value>
+					</item>
+					<item id="tg_call_vendor_notification">
+						<type>checkbox</type>
+						<default_value>N</default_value>
+					</item>
+					<item id="tg_allow_change_order_status">
+						<type>checkbox</type>
+						<default_value>N</default_value>
+					</item>
+				</items>
+			</section>
+			<section id="proxy">
+				<items>
+					<item id="use_proxy">
+						<type>checkbox</type>
+						<default_value>N</default_value>
+					</item>
+					<item id="proxy_host">
+						<type>input</type>
+					</item>
+					<item id="proxy_port">
+						<type>input</type>
+					</item>
+					<item id="proxy_user">
+						<type>input</type>
+					</item>
+					<item id="proxy_password">
+						<type>input</type>
+					</item>
+				</items>
+			</section>
+			<section id="instruction">
+				<items>
+					<item id="instruction">
+						<type>template</type>
+						<default_value>instruction.tpl</default_value>
+					</item>
+				</items>
+			</section>
+			<section id="additional_addons">
+				<items>
+					<item id="ab__hoi_mask_id">
+						<type>checkbox</type>
+						<default_value>N</default_value>
+					</item>
+				</items>
+			</section>
+		</sections>
+	</settings>
+	<functions>
+		<item for="install">fn_sw_telegram_for_install</item>
+	</functions>
+	<marketplace_product_id>1736</marketplace_product_id>
+</addon>

@@ -1,0 +1,473 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Language-Team: Greek\n"
+"Language: el_GR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: el\n"
+"X-Crowdin-File: /addons/sw_telegram.po\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Last-Translator: sweetcode <support@sweetcode.ru>\n"
+"PO-Revision-Date: 2019-12-30 07:45-0400\n"
+
+msgctxt "Addons::name::sw_telegram"
+msgid "[SW] Module sw_telegram"
+msgstr "SW: Ειδοποιήσεις σε Telegram"
+
+msgctxt "Addons::description::sw_telegram"
+msgid "[SW] Module sw_telegram description"
+msgstr "Αυτή η ενότητα θα σας επιτρέψει να ρυθμίσετε ειδοποιήσεις σχετικά με τις παραγγελίες στο chat Telegram."
+
+msgctxt "SettingsOptions::sw_telegram::sw_bot_token"
+msgid "[SW] sw_bot_token"
+msgstr "Token to access API"
+
+msgctxt "SettingsTooltips::sw_telegram::sw_bot_token"
+msgid "sw_telegram_get_id tool icon"
+msgstr "Μετά τη δημιουργία ρομπότ που θα έχει εκδοθεί το κλειδί API. Γράψτε το εδώ. Μοιάζει κάπως έτσι: 317211249:AAFAxuqSqFuTQwI7XEkJ8RH7AXKj_GTX61g"
+
+msgctxt "SettingsOptions::sw_telegram::sw_id_chat"
+msgid "[SW] sw_id_chat"
+msgstr "ID chats μέσα από το κενό"
+
+msgctxt "SettingsTooltips::sw_telegram::sw_id_chat"
+msgid "sw_id_chat tool icon"
+msgstr "Μετά τη δημιουργία του ρομπότ και να αποθηκεύσετε το API Token, στείλτε ένα ρομπότ κάτι. Στη συνέχεια, κάντε κλικ στο κουμπί περισσότερες ID, ρομπότ, να Σας στείλει το ID άμεσων μηνυμάτων. Εισάγετε σε αυτό το πεδίο. Αν συνομιλίες πολλαπλά, μέσα από το κενό"
+
+msgctxt "SettingsOptions::sw_telegram::information"
+msgid "Information"
+msgstr "Πληροφορίες"
+msgctxt "SettingsOptions::sw_telegram::user_information"
+msgid "user_information"
+msgstr "Ρυθμίσεις χρηστών"
+msgctxt "SettingsOptions::sw_telegram::information_products"
+msgid "information_products"
+msgstr "Ρυθμίσεις"
+
+msgctxt "SettingsSections::sw_telegram::settings"
+msgid "id_settings"
+msgstr "Ρυθμίσεις"
+
+msgctxt "SettingsSections::sw_telegram::settings_vendor"
+msgid "settings_vendor"
+msgstr "Ρυθμίσεις προμηθευτές"
+
+msgctxt "SettingsSections::sw_telegram::instruction"
+msgid "id_instruction"
+msgstr "Οδηγίες"
+
+msgctxt "SettingsSections::sw_telegram::proxy"
+msgid "proxy"
+msgstr "Πληρεξούσιοι"
+
+msgctxt "SettingsOptions::sw_telegram::use_proxy"
+msgid "use_proxy"
+msgstr "Χρησιμοποιήστε διακομιστή μεσολάβησης"
+
+msgctxt "SettingsTooltips::sw_telegram::use_proxy"
+msgid "use_proxy ttc"
+msgstr "Η συνάρτηση είναι σχετική εάν η φιλοξενία ή ο πάροχός σας αποκλείει αιτήματα στο Telegram API. Συνιστούμε να εξετάσετε τους πληρεξούσιους επί πληρωμή, καθώς οι δωρεάν διακομιστές μεσολάβησης μπορεί να καθυστερήσουν την αποστολή δεδομένων ή την υποκλοπή δεδομένων."
+
+msgctxt "SettingsOptions::sw_telegram::proxy_host"
+msgid "proxy_host"
+msgstr "Host"
+
+msgctxt "SettingsOptions::sw_telegram::proxy_port"
+msgid "proxy_port"
+msgstr "Port"
+
+msgctxt "SettingsOptions::sw_telegram::proxy_user"
+msgid "proxy_user"
+msgstr "User"
+
+msgctxt "SettingsOptions::sw_telegram::proxy_password"
+msgid "proxy_password"
+msgstr "Password"
+
+msgctxt "SettingsOptions::sw_telegram::tg_allow_for_vendor"
+msgid "tg_allow_for_vendor"
+msgstr "Να επιτρέπονται ειδοποιήσεις προμηθευτών"
+
+msgctxt "SettingsOptions::sw_telegram::tg_allow_in_tarifs"
+msgid "tg_allow_in_tarifs"
+msgstr "Σχέδιο δασμολογικής εξάρτησης"
+
+msgctxt "SettingsOptions::sw_telegram::tg_call_notification"
+msgid "id_tg_call_notification"
+msgstr "Ειδοποιήσεις σε Telegram κατά την παραγγελία σε 1 κλικ και διαταγή κλήσης"
+
+msgctxt "SettingsOptions::sw_telegram::tg_order_notification"
+msgid "id_tg_order_notification"
+msgstr "Ειδοποιήσεις σε Telegram με επιτυχία τη διαδικασία παραγγελίας"
+
+msgctxt "SettingsOptions::sw_telegram::tg_rewiev_notification"
+msgid "[SW] tg_rewiev_notification"
+msgstr "Ειδοποιήσεις σε Telegram όταν στέλνετε σχόλια"
+
+msgctxt "SettingsOptions::sw_telegram::sw_bot_name"
+msgid "[SW] sw_bot_name"
+msgstr "Όνομα χρήστη bot"
+
+msgctxt "SettingsTooltips::sw_telegram::sw_bot_name"
+msgid "tool sw_bot_name"
+msgstr "Θα συμπληρωθεί αυτόματα όταν ζητάτε ένα αναγνωριστικό συνομιλίας."
+
+msgctxt "SettingsOptions::sw_telegram::tg_order_status_notification"
+msgid "tg_order_status_notification"
+msgstr "Ειδοποίηση τηλεγραφήματος κατά την αλλαγή της κατάστασης παραγγελίας"
+
+msgctxt "SettingsTooltips::sw_telegram::tg_order_status_notification"
+msgid "tool tg_order_status_notification"
+msgstr "Ο χρήστης θα έχει τη δυνατότητα να λαμβάνει ειδοποιήσεις σχετικά με την κατάσταση της παραγγελίας στο Τηλεγράφημα. Εάν ο χρήστης είναι εγγεγραμμένος, τότε δεν χρειάζεται να ενεργοποιείτε τις ειδοποιήσεις κάθε φορά. Μπορείτε να ακυρώσετε τις ειδοποιήσεις στον λογαριασμό χρήστη σας."
+
+msgctxt "SettingsOptions::sw_telegram::tg_users_notification"
+msgid "tg_users_notification"
+msgstr "Ειδοποιήσεις χρηστών"
+
+msgctxt "SettingsTooltips::sw_telegram::tg_users_notification"
+msgid "tg_users_notification tt"
+msgstr "Να επιτρέπεται στους χρήστες να λαμβάνουν ειδοποιήσεις στο Τηλεγράφημα όταν αλλάζουν την κατάσταση της παραγγελίας"
+
+msgctxt "SettingsOptions::sw_telegram::tg_send_stickers"
+msgid "tg_send_stickers"
+msgstr "Ενεργοποίηση αυτοκόλλητων ειδοποιήσεων"
+
+msgctxt "SettingsOptions::sw_telegram::tg_review_vendor_notification"
+msgid "tg_review_vendor_notification"
+msgstr "Ειδοποιήσεις νέων αναθεωρήσεων"
+
+msgctxt "SettingsOptions::sw_telegram::tg_call_vendor_notification"
+msgid "tg_call_vendor_notification"
+msgstr "Οι ειδοποιήσεις από τη φόρμα αγοράζουν με 1 κλικ"
+
+msgctxt "SettingsOptions::sw_telegram::tg_allow_change_order_status"
+msgid "tg_allow_change_order_status"
+msgstr "Επιτρέψτε στους πωλητές να αλλάξουν τις καταστάσεις παραγγελιών μέσω του bot"
+
+msgctxt "SettingsTooltips::sw_telegram::tg_allow_change_order_status"
+msgid "ttc tg_allow_change_order_status"
+msgstr "Η εντολή αλλαγής της κατάστασης θα έχει την εξής μορφή: ORD 1234 (ή ORDER 1234). Όπου 1234 είναι ο αριθμός παραγγελίας. Στη συνέχεια, το Bot θα προσφέρει επιλογές για καταστάσεις."
+msgctxt "Languages::fn_sw_telegram"
+msgid "token to access_info"
+msgstr "Εάν έχετε οποιεσδήποτε ερωτήσεις ή προτάσεις για τη βελτίωση της ενότητας <br/> μπορείτε να επικοινωνήσετε μαζί μας μέσω e-mail <b>support@sweetcode.ru</b>"
+
+msgctxt "Languages::sw_telegram_get_id"
+msgid "sw_telegram_get_id"
+msgstr "Λήψη του αναγνωριστικού της συνομιλίας"
+
+msgctxt "Languages::sw_telegram_get_id_chat"
+msgid "_sw_telegram_get_id_chat"
+msgstr "Στείλετε"
+
+msgctxt "Languages::sw_telegrame_call_order"
+msgid "sw_telegrame_call_order"
+msgstr "Ζητήστε επιστροφή κλήσης:"
+
+msgctxt "Languages::tg_products_in_order"
+msgid "id_tg_products_in_order"
+msgstr "Τα αντικείμενα της παραγγελίας "
+
+msgctxt "Languages::tg_order_summ"
+msgid "id_tg_order_summ"
+msgstr "Στο ποσό των "
+
+msgctxt "Languages::tg_order_num_text"
+msgid "id_tg_order_num_text"
+msgstr "Καταχωρήθηκε παραγγελία № "
+
+msgctxt "Languages::sw_telegram_manage_storefront_instruction"
+msgid "sw_telegram_manage_storefront_instruction"
+msgstr "Εγχειρίδιο"
+
+msgctxt "Languages::sw_telegram_manage_storefront_instruction_text"
+msgid "sw_telegram_manage_storefront_instruction_text"
+msgstr "<p> <strong> 1. Create Bot in Telegram </strong>. The process is quite quick and simple. <br> The complete instructions are here <a href="https://tlgrm.ru/docs/bots"> https://tlgrm.ru/docs/bots </a>
+</p>
+<p> <strong> In short, steps: </strong> <br> Find the bot @ <a href="https://telegram.me/botfather"> BotFather <br> </a> Enter the <em> / newbot </em> <br> You will be prompted to enter <em> name of the robot </em>, enter the name in Latin letters, for example, our <em> SweetCart </em> <br> Next, you are prompted to enter <em> username </ em >, mandatory ending <em> _bot </em>, for example <em> SweetCart_bot </em> <br> That's it! The bot is created.
+</p>
+<p> How the Bot will be created. You will see a message with the token API key. <br> Next, go to settings, enter it there.
+</p>
+<p> <strong> 2. Find your bot in Telegram. <br> </strong> Write something to him. <br> Next you need to click on the button - get the chat ID. <br> After clicking, the bot will send the ID to your chat. <br> Enter it in the settings. Save.
+</p>
+<p> Done! Test orders :) Enjoy using. <br> If you have questions or suggestions, please contact us by email <a href="mailto:support@sweetcode.ru"> support@sweetcode.ru </a> <br> <br>
+</p><p> <strong> 3. Creating a webhook. <br> </strong> After saving the Token API, click the Register Webhook button. This will allow users to receive notifications in their chat. <br> Important. If you get an error when clicking the OK button, or the page is blocked, then your provider is blocking Telegram. The fastest way to bypass the lock is to install the free extension for the Chrome browser - Hola Free VPN Proxy Unblocker. <b> Important! </b> After requesting the chat ID, create a webhook again, otherwise the order information will not come.
+</p><p> <strong> 4. Add notifications to a group. <br> </strong> Create a group. Add your bot to the created group. Write something to the group. <br> Next you need to click on the button - get the chat ID. <br> After clicking, the bot will send the ID to the group. <br> Enter it in the settings. Save. The group ID will be marked with a '-', for example, -3564785. That's exactly what you specify in the settings.</p><p><strong>5. Πώς να προσθέσετε ειδοποιήσεις για ένα κανάλι.<br > < / strong > Δημιουργήστε ένα κανάλι. Προσθέστε το bot σας στο δημιουργημένο κανάλι. Στις ρυθμίσεις προφίλ καναλιού, βρείτε τον σύνδεσμο.<br>για παράδειγμα, ο σύνδεσμος θα είναι έτσι t.me/my_channel, στο πεδίο Ρυθμίσεις Μονάδας, πρέπει να προσθέσετε @my_chanel. Μια άλλη επιλογή, παρόμοια με την ομάδα, είναι να λάβετε το αναγνωριστικό συνομιλίας και να το καθορίσετε στις ρυθμίσεις
+</p>"
+
+msgctxt "Languages::sw_telegrame_your_chat_id"
+msgid "[SW] sw_telegrame_your_chat_id"
+msgstr ":) γεια, η συνομιλία ταυτότητάς σας "
+
+msgctxt "Languages::sw_telegrame_get_new_post_disqus"
+msgid "[SW] sw_telegrame_get_new_post_disqus"
+msgstr "Λάβατε νέα κριτική ή ερώτηση:"
+
+msgctxt "Languages::sw_telegrame_rating_value_stars"
+msgid "[SW] sw_telegrame_rating_value_stars"
+msgstr "Αριθμός αστεριών: "
+
+msgctxt "Languages::sw_telegram.confirm_noty"
+msgid "[SW] sw_telegram.confirm_noty"
+msgstr "Λάβετε ειδοποίηση για την κατάσταση παραγγελίας στο Telegram"
+
+msgctxt "Languages::sw_telegram.confirm_noty_ttc"
+msgid "[SW] sw_telegram.confirm_noty tt"
+msgstr "Θα ανακατευθυνθείτε στην υπηρεσία παράκαμψης μπλοκ Telegram. Μετά από ένα δευτερόλεπτο, ανοίγει η εφαρμογή Telegram, όπου στη συνομιλία κάντε κλικ στο κουμπί START"
+
+msgctxt "Languages::sw_telegram.reg_webhook"
+msgid "[SW] sw_telegram.reg_webhook"
+msgstr "Εγγραφή στο Webhook"
+
+msgctxt "Languages::ttc_sw_telegram.reg_webhook"
+msgid "[SW] ttc sw_telegram.reg_webhook"
+msgstr "Κάντε κλικ στο κουμπί μία φορά μόλις αποθηκεύσετε όλα τα δεδομένα API. Για να εγγραφείτε webhook"
+
+msgctxt "Languages::sw_telegram.chat_id"
+msgid "[SW] sw_telegram.chat_id"
+msgstr "Αναγνωριστικό συνομιλίας χρήστη"
+
+msgctxt "Languages::sw_telegram.notify_telegram"
+msgid "[SW] sw_telegram.notify_telegram"
+msgstr "Ειδοποίηση χρήστη στο Telegram"
+
+msgctxt "Languages::sw_telegram.notify_message"
+msgid "[SW] sw_telegram.notify_message"
+msgstr "[name], καλώς ήρθατε! Στην παραγγελία σας # [order_id] εκχωρήθηκε η κατάσταση: <b> [status] </b>"
+
+msgctxt "Languages::sw_telegram.webhook_del"
+msgid "[SW] sw_telegram.webhook_del"
+msgstr "Το Webhook διαγράφηκε αυτόματα. Ζητήστε ξανά αναγνωριστικό συνομιλίας."
+
+msgctxt "Languages::sw_telegram.noty_user_info"
+msgid "[SW] sw_telegram.noty_user_info"
+msgstr "Λάβετε πληροφορίες παραγγελίας"
+
+msgctxt "Languages::sw_telegram.noty_user_info_yet"
+msgid "[SW] sw_telegram.noty_user_info_yet"
+msgstr "Τώρα θα λάβετε πληροφορίες για παραγγελίες"
+
+msgctxt "Languages::sw_telegram.noty_user_unsubscr"
+msgid "[SW] sw_telegram.noty_user_unsubscr"
+msgstr "Καταργήσατε την εγγραφή σας από ειδοποιήσεις"
+
+msgctxt "Languages::sw_telegram.noty_user_ok_sbscr"
+msgid "[SW] sw_telegram.noty_user_ok_sbscr"
+msgstr "Βρήκαμε τον λογαριασμό σας. Τώρα θα λάβετε πληροφορίες για όλες τις παραγγελίες. Για κατάργηση εγγραφής, στείλτε ένα μήνυμα στο bot - STOP"
+
+msgctxt "Languages::sw_telegram.noty_user_subscr_order"
+msgid "[SW] sw_telegram.noty_user_subscr_order"
+msgstr "Έχετε εγγραφεί στις ειδοποιήσεις παραγγελίας: Όχι."
+
+msgctxt "Languages::sw_telegram.noty_user_information_text"
+msgid "[SW] sw_telegram.noty_user_information_text"
+msgstr "Χαίρετε!\r\n
+Λίστα εντολών που μπορούν να σταλούν στο bot:\r\n
+/stop - Σταμάτα τις ειδοποιήσεις\r\n
+/subscribe - εγγραφείτε σε ειδοποιήσεις\r\n
+/last_order - πληροφορίες για την τελευταία παραγγελία"
+
+msgctxt "Languages::sw_telegram.hostinh_block"
+msgid "[SW] sw_telegram.hostinh_block"
+msgstr "Η φιλοξενία ή ο πάροχός σας αποκλείει το API Telegram."
+
+msgctxt "Languages::sw_telegram.notify_telegram_user_settings"
+msgid "[SW] sw_telegram.notify_telegram_user_settings"
+msgstr "Ειδοποιήσεις τηλεγραφήματος"
+
+msgctxt "Languages::sw_telegram.confirm_noty_text_info"
+msgid "[SW] sw_telegram.confirm_noty_text_info"
+msgstr "Αφού ανοίξει το παράθυρο, πατήστε το κουμπί ΕΚΚΙΝΗΣΗ και θα εγγραφείτε για να παραγγείλετε ειδοποιήσεις. Μπορείτε να διαγραφείτε στον προσωπικό σας λογαριασμό"
+
+msgctxt "Languages::sw_telegram.keyboard_last_status"
+msgid "[SW] sw_telegram.keyboard_last_status"
+msgstr "Κατάσταση τελευταίας παραγγελίας"
+
+msgctxt "Languages::sw_telegram.keyboard_subscr"
+msgid "[SW] sw_telegram.keyboard_subscr"
+msgstr "Εγγραφείτε"
+
+msgctxt "Languages::sw_telegram.keyboard_unsubscr"
+msgid "[SW] sw_telegram.keyboard_unsubscr"
+msgstr "Κατάργηση εγγραφής"
+
+msgctxt "Languages::sw_telegram.keyboard_no_found"
+msgid "[SW] sw_telegram.keyboard_no_found"
+msgstr "Η ομάδα δεν βρέθηκε"
+
+msgctxt "Languages::sw_telegram.chat_is_empty"
+msgid "[SW] sw_telegram.chat_is_empty"
+msgstr "Το αναγνωριστικό συνομιλίας δεν βρέθηκε, γράψτε οποιοδήποτε κείμενο στο bot σας"
+
+msgctxt "Languages::sw_telegram.order_no_found"
+msgid "[SW] sw_telegram.order_no_found"
+msgstr "Δεν βρέθηκε παραγγελία για τα δεδομένα σας"
+
+msgctxt "Languages::sw_telegram.noty_user_no_account"
+msgid "[SW] sw_telegram.noty_user_no_account"
+msgstr "Λυπούμαστε, ο λογαριασμός σας δεν βρέθηκε."
+
+msgctxt "Languages::sw_telegram.noty_vendors"
+msgid "[SW] sw_telegram.noty_vendors"
+msgstr "Να επιτρέπονται ειδοποιήσεις για πωλητές στο Telegram"
+
+msgctxt "Languages::sw_telegram.confirm_noty_vendor"
+msgid "[SW] sw_telegram.confirm_noty_vendor"
+msgstr "Λάβετε ειδοποιήσεις παραγγελίας"
+
+msgctxt "Languages::sw_telegram_get_id_chat_tooltip"
+msgid "[SW] sw_telegram.sw_telegram_get_id_chat_tooltip"
+msgstr "Εάν το κουμπί START δεν εμφανίζεται στη συνομιλία κατά την αποστολή, κλείστε την εφαρμογή Telegram και πατήστε ξανά το κουμπί. Αφού κάνετε κλικ στο κουμπί, φορτώστε ξανά αυτήν τη σελίδα, το αναγνωριστικό συνομιλίας θα πρέπει να καταχωρείται αυτόματα"
+
+msgctxt "Languages::sw_telegram.vendor_message_order_pre"
+msgid "[SW] sw_telegram.vendor_message_order_pre"
+msgstr "[firstname], Σας καλωσορίζουμε! Στην ιστοσελίδα "
+
+msgctxt "Languages::sw_telegram.notify_message_vendor"
+msgid "[SW] sw_telegram.notify_message_vendor"
+msgstr "[name]. Η παραγγελία σας №[order_id] εκχωρημένη κατάσταση: <b>[status]</b>"
+
+msgctxt "Languages::sw_telegram.user_message_order_pre"
+msgid "[SW] sw_telegram.user_message_order_pre"
+msgstr "[name], σας καλωσορίζουμε! Στην ιστοσελίδα "
+
+msgctxt "Languages::sw_telegram.user_order_pre_num"
+msgid "[SW] sw_telegram.user_order_pre_num"
+msgstr "Η παραγγελία έγινε № "
+
+msgctxt "Languages::sw_telegram.dear_user"
+msgid "[SW] sw_telegram.dear_user"
+msgstr "Αγαπητέ χρήστη"
+
+msgctxt "SettingsOptions::sw_telegram::review"
+msgid "[SW] review"
+msgstr "Ανατροφοδότηση"
+
+msgctxt "SettingsSections::sw_telegram::general"
+msgid "General settings"
+msgstr "Γενικές ρυθμίσεις"
+
+msgctxt "SettingsSections::sw_telegram::review_tab"
+msgid "review_tab"
+msgstr "Ανατροφοδότηση"
+
+msgctxt "Languages::sw.add_review_text"
+msgid "[SW] sw.add_review_text"
+msgstr "Είμαστε πολύ ευτυχείς που χρησιμοποιείτε την ενότητα μας για να λύσετε τα προβλήματά σας. Η υποστήριξή μας είναι πάντα έτοιμη να βοηθήσει και δέχεται αιτήματα όλο το εικοσιτετράωρο <a href="mailto:support@sweetcode.ru"> support@sweetcode.ru </a>.<br/><br/>μοιραστείτε μαζί μας την εντύπωση σας από τη χρήση της μονάδας στο Marketplace CS-Cart. <br/><br/> και επίσης, σας δίνουμε έναν απεριόριστο κωδικό προσφοράς για έκπτωση 10% σε όλες τις ενότητες μας <span class='sw-sale'>SWEET10</span>"
+
+msgctxt "Languages::sw.add_review_btn"
+msgid "[SW] sw.add_review_btn"
+msgstr "Δώστε ανατροφοδότηση σχετικά με το CS-Cart Marketplace"
+
+msgctxt "Languages::sw.add_review_title"
+msgid "[SW] sw.add_review_title"
+msgstr "Μήνυμα υποστήριξης"
+
+msgctxt "Languages::sw.add_review_hint"
+msgid "[SW] sw.add_review_hint"
+msgstr "Αυτό το μήνυμα θα σταλεί σε γρήγορη μορφή στην υποστήριξή μας. Μπορείτε να γράψετε εδώ τις επιθυμίες σας για την ενότητα, σχετικά με προβλήματα στην ενότητα ή οποιαδήποτε άλλη ερώτηση."
+
+msgctxt "Languages::sw.res_email_admin"
+msgid "SW: res_email_admin"
+msgstr "Η ειδοποίηση θα σταλεί στο:"
+
+msgctxt "Languages::sw_telegram.chat_id_ttc"
+msgid "SW: sw_telegram.chat_id_ttc"
+msgstr "Μπορείτε να καθορίσετε πολλαπλές συνομιλίες που χωρίζονται με κόμματα"
+
+msgctxt "Languages::sw_telegram.how_status"
+msgid "SW: sw_telegram.how_status"
+msgstr "Επιλέξτε την κατάσταση νέας παραγγελίας #[order_id]"
+
+msgctxt "Languages::sw_telegram.order_not_found"
+msgid "SW: sw_telegram.order_not_found"
+msgstr "Η παραγγελία δεν βρέθηκε"
+
+msgctxt "Languages::sw_telegram.use"
+msgid "SW: sw_telegram.use"
+msgstr "Διαθέσιμες εντολές - "
+
+msgctxt "Languages::sw_telegram.command_change_status"
+msgid "SW: sw_telegram.command_change_status"
+msgstr "Για να αλλάξετε την κατάσταση της παραγγελίας ή να λάβετε πληροφορίες σχετικά με την παραγγελία, χρησιμοποιήστε την εντολή: ORD 1234 (ή ORDER 1234). Όπου 1234 είναι ο αριθμός παραγγελίας. Σε απάντηση, το Bot θα προσφέρει επιλογές για καταστάσεις."
+
+msgctxt "Languages::sw_telegram.command_change_status_title"
+msgid "SW: sw_telegram.command_change_status_title"
+msgstr "Πληροφορίες Παραγγελίας και διαχείριση κατάστασης παραγγελίας:"
+
+msgctxt "Languages::sw_telegram.command_change_status_text"
+msgid "SW: sw_telegram.command_change_status_text"
+msgstr "Στις ρυθμίσεις προφίλ των διαχειριστών που θα πρέπει να μπορούν να διαχειρίζονται τις καταστάσεις παραγγελιών μέσω του bot, συμπληρώστε το αναγνωριστικό συνομιλίας."
+
+msgctxt "Languages::sw_telegram.zipcode"
+msgid "SW: sw_telegram.zipcode"
+msgstr "Ταχυδρομικός Κώδικας"
+
+msgctxt "Languages::sw_telegram.webhook_text"
+msgid "SW: sw_telegram.webhook_text"
+msgstr "Πατήστε το κουμπί κάθε φορά που προσθέτετε νέα αναγνωριστικά συνομιλίας στις ρυθμίσεις της μονάδας"
+
+msgctxt "SettingsSections::sw_telegram::additional_addons"
+msgid "additional_addons"
+msgstr "Συμβατότητα με πρόσθετα"
+
+msgctxt "SettingsOptions::sw_telegram::ab__hoi_mask_id"
+msgid "ab__hoi_mask_id"
+msgstr "Χρησιμοποιήστε έναν αριθμό παραγγελίας αντικατάστασης [AB: Hiding the order number]"
+
+msgctxt "Languages::sw_telegram.manage_list"
+msgid "SW: sw_telegram.manage_list"
+msgstr "Συνδρομητές Telegram"
+
+msgctxt "Languages::sw_telegram.confirm_noty_short"
+msgid "SW: sw_telegram.confirm_noty_short"
+msgstr "Εγγραφή σε ειδοποιήσεις"
+
+msgctxt "Languages::sw_telegram.date_add"
+msgid "SW: sw_telegram.date_add"
+msgstr "Ημερομηνία εγγραφής"
+
+msgctxt "Languages::sw_telegram.comm_stop"
+msgid "SW: sw_telegram.comm_stop"
+msgstr "Διακοπή Ειδοποιήσεων"
+
+msgctxt "Languages::sw_telegram.comm_subscribe"
+msgid "SW: sw_telegram.comm_subscribe"
+msgstr "Εγγραφείτε στις ειδοποιήσεις"
+
+msgctxt "Languages::sw_telegram.comm_id"
+msgid "SW: sw_telegram.comm_id"
+msgstr "Η ταυτότητά σας"
+
+msgctxt "Languages::sw_telegram.comm_last_order"
+msgid "SW: sw_telegram.comm_last_order"
+msgstr "Πληροφορίες για την τελευταία παραγγελία"
+
+msgctxt "Languages::sw_telegram.comm_choose"
+msgid "SW: sw_telegram.comm_choose"
+msgstr "Επιλέξτε την εντολή"
+
+msgctxt "Languages::sw_telegram.comm_change_status"
+msgid "SW: sw_telegram.comm_change_status"
+msgstr "Αλλαγή κατάστασης παραγγελίας"
+
+msgctxt "Languages::sw_telegram.can_register"
+msgid "SW: sw_telegram.can_register"
+msgstr "Μπορείτε να εγγραφείτε στην ιστοσελίδα μας"
+
+msgctxt "Languages::sw_telegram.manage_list_menu_description"
+msgid "SW: sw_telegram.manage_list_menu_description"
+msgstr "Λίστα συνδρομητών Τηλεγράφημα"
+
+msgctxt "Languages::sw_telegram.add_user_noty"
+msgid "SW: sw_telegram.add_user_noty"
+msgstr "Ενεργοποίηση ειδοποιήσεων στο Τηλεγράφημα"
+
+msgctxt "SettingsOptions::sw_telegram::tg_action_profile"
+msgid "tg_action_profile"
+msgstr "Επιτρέψτε στο χρήστη να εγγραφεί από τις ρυθμίσεις προφίλ"
+
+msgctxt "SettingsOptions::sw_telegram::tg_action_menu"
+msgid "tg_action_menu"
+msgstr "Εμφάνιση του στοιχείου συνδρομές ειδοποιήσεων στο μενού Προφίλ χρήστη"
