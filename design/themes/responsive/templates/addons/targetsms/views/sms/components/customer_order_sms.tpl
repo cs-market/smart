@@ -1,1 +1,0 @@
-{__("addons.targetsms.dear")} {$order.firstname} {$order.lastname}, {__("addons.targetsms.your_order")} #{$order_id} {__("addons.targetsms.sms_for_the_sum")} {include file="common/price.tpl" value=$total} {__("addons.targetsms.is")} {$order_status_name}

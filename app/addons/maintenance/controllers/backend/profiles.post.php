@@ -3,6 +3,8 @@
 use Tygh\Registry;
 use Tygh\Enum\UserTypes;
 
+if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return;
 }

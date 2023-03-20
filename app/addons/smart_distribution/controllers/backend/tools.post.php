@@ -2002,32 +2002,27 @@ fn_print_die($orders_wo_points);
     $res = db_query('DELETE FROM ?:user_profiles WHERE profile_id IN (?a)', $profile_ids);
     fn_print_die($res);
 } elseif ($mode == 'export_rp') {
-    $company_ids = ['1810', '2058'];
-    foreach ($company_ids as $company_id) {
-        list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
-        $user_ids = array_column($users, 'user_id');
-        $data = [];
-        if ($company_id == 1810) {
-            $from = '01/02/2022';
-        } else {
-            $from = '01/06/2022';
-        }
+    $company_id = $action;
+    if (empty($company_id)) fn_print_die('action??');
+    list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
+    $user_ids = array_column($users, 'user_id');
+    $data = [];
+    $from = '01/02/2023';
+    foreach ($user_ids as $user_id) {
+        $user_info = fn_get_user_info($user_id);
+        list($orders, ) = fn_get_orders(array('user_id' => $user_id, 'time_from' => $from, 'period' => 'C', 'company_id' => $company_id, 'status' => array('H')));
 
-        foreach ($user_ids as $user_id) {
-            $user_info = fn_get_user_info($user_id);
-            list($orders, ) = fn_get_orders(array('user_id' => $user_id, 'time_from' => $from, 'period' => 'C', 'company_id' => $company_id, 'status' => array('H')));
-            if (empty($orders)) continue;
-            $data[] = array(
-                'user_id' => $user_id,
-                'code' => $user_info['fields'][39],
-                'current_points' => fn_get_user_additional_data(POINTS, $user_id) ?? 0,
-                'sum_orders_total' => array_sum(array_column($orders, 'total')),
-                'used_points' => abs(db_get_field("SELECT sum(amount) FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s", $user_id, CHANGE_DUE_ORDER_PLACE)),
-            );
-        }
-        $opts = array('delimiter' => ';', 'filename' => 'points_'.$company_id.'.csv');
-        $res = fn_exim_put_csv($data, $opts, '"');
+        if (empty($orders)) continue;
+        $data[] = array(
+            'user_id' => $user_id,
+            'code' => $user_info['fields'][39],
+            'current_points' => fn_get_user_additional_data(POINTS, $user_id) ?? 0,
+            'sum_orders_total' => array_sum(array_column($orders, 'total')),
+            'used_points' => abs(db_get_field("SELECT sum(amount) FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s", $user_id, CHANGE_DUE_ORDER_PLACE)),
+        );
     }
+    $opts = array('delimiter' => ';', 'filename' => 'points_'.$company_id.'.csv');
+    $res = fn_exim_put_csv($data, $opts, '"');
     fn_print_die('done');
 } elseif ($mode == 'export_id') {
     list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => 45), $auth);
@@ -2871,6 +2866,42 @@ fn_print_die($orders_wo_points);
         }
     }
     $params['filename'] = 'correct_reward_points_march7.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($corrections, $params, '"');
+    fn_print_die(count($corrections), $corrections);
+} elseif ($mode == 'correct_reward_points_march8') {
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $grand_points_order_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+
+    $orders = db_get_fields('SELECT order_id FROM ?:orders WHERE (?p) AND timestamp > ?i AND total > 0 AND is_parent_order = "N" AND group_id NOT IN (?a)', fn_find_array_in_set([19484], "promotion_ids"), 1675198800, [17,18]);
+    foreach ($orders as $order_id) {
+        $order_info = fn_get_order_info($order_id);
+        if (in_array($order_info['status'], array_keys($grand_points_order_statuses))) {
+            if ($db_points = $order_info['points_info']['reward']) {
+                $correction = [
+                    'user_id' => $order_info['user_id'],
+                    'company_id' => $order_info['company_id'],
+                    'login' => db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $order_info['user_id']),
+                    'order_id' => $order_info['order_id'],
+                    'order_reward' => $db_points,
+                    'calculated_reward' => round($order_info['total']/100),
+                    'is_different' => (abs($db_points - round($order_info['total']/100)) > 2) ? 'da' : 'ne',
+                    'diff' => abs($db_points - round($order_info['total']/100)),
+                    // '10' => 'ne',
+                    // '1' => 'ne',
+                ];
+
+                if ($correction['is_different'] == 'da') {
+                    $corrections[] = $correction;
+                    // $reason = array('order_id' => $correction['order_id'], 'to' => $order_info['status'], 'correction' => 'correct_reward_points_march8');
+                    fn_change_user_points(-$correction['order_reward'], $correction['user_id'], 'Корректировка за ошибочное начисление баллов по акции «Приветственный бонус НОВЫМ клиенам»', CHANGE_DUE_SUBTRACT, $order_info['timestamp']);
+                }
+            }
+        }
+    }
+    $params['filename'] = 'correct_reward_points_march8.csv';
     $params['force_header'] = true;
     $export = fn_exim_put_csv($corrections, $params, '"');
     fn_print_die(count($corrections), $corrections);
