@@ -2905,6 +2905,46 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($corrections, $params, '"');
     fn_print_die(count($corrections), $corrections);
+} elseif ($mode == 'correct_reward_points_march9') {
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $grand_points_order_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+
+    $orders = db_get_fields('SELECT order_id FROM ?:orders WHERE (?p) AND timestamp > ?i AND total > 0 AND is_parent_order = "N" AND group_id NOT IN (?a)', fn_find_array_in_set([19484], "promotion_ids"), 1675198800, [17,18]);
+    foreach ($orders as $order_id) {
+        $order_info = fn_get_order_info($order_id);
+        if (in_array($order_info['status'], array_keys($grand_points_order_statuses))) {
+            if ($db_points = $order_info['points_info']['reward']) {
+                $correction = [
+                    'user_id' => $order_info['user_id'],
+                    'company_id' => $order_info['company_id'],
+                    'login' => db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $order_info['user_id']),
+                    'order_id' => $order_info['order_id'],
+                    'order_reward' => $db_points,
+                    'calculated_reward' => round($order_info['total']/100),
+                    'is_different' => (abs($db_points - round($order_info['total']/100)) > 2) ? 'da' : 'ne',
+                    'diff' => abs($db_points - round($order_info['total']/100)),
+                ];
+
+                if ($correction['is_different'] == 'da') {
+                    $changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND amount = ?i AND reason = ?s ORDER BY change_id DESC', $order_info['user_id'], -$correction['order_reward'], 'Корректировка за ошибочное начисление баллов по акции «Приветственный бонус НОВЫМ клиенам»');
+
+                    if (count($changes) > 1) {
+                        $wrong_correction = array_shift($changes);
+                        $corrections[] = $correction;
+                        $current_value = (int) fn_get_user_additional_data(POINTS, $wrong_correction['user_id']);
+                        fn_save_user_additional_data(POINTS, $current_value - $wrong_correction['amount'], $wrong_correction['user_id']);
+                        db_query("DELETE FROM ?:reward_point_changes WHERE change_id = ?i", $wrong_correction['change_id']);
+                    }
+                }
+            }
+        }
+    }
+    $params['filename'] = 'correct_reward_points_march9.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($corrections, $params, '"');
+    fn_print_die(count($corrections), $corrections);
 } elseif ($mode == 'baltica_logs') {
     list($logs, $search) = fn_get_logs(['q_type' => 'users', 'q_action' => 'delete']);
     $report = [];
