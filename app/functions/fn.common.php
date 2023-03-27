@@ -742,7 +742,7 @@ function fn_generate_pagination($params, $area = AREA)
         'total_pages' => $total_pages,
         'total_items' => $params['total_items'],
         'items_per_page' => $params['items_per_page'],
-        'per_page_range' => array(10, 25, 50, 100, 250),
+        'per_page_range' => array(10, 25, 50),
         'range_from' => (($params['page'] - 1) * $params['items_per_page']) + 1,
         'range_to' => (($params['page'] * $params['items_per_page']) > $params['total_items']) ? $params['total_items'] : $params['page'] * $params['items_per_page'],
     );
