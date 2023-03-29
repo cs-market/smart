@@ -180,7 +180,7 @@ function fn_product_groups_split_cart($cart, $only_mandatory_order_split = false
                     foreach ($group_products as $cart_id => $product) {
                         if ($product['group_id'] == $group_id) {
                             $proto['products'][$cart_id] = $product;
-                            unset($group_data['products'][$cart_id]);
+                            unset($group_products[$cart_id]);
                         }
                     }
                     fn_product_groups_get_package_info($proto);
