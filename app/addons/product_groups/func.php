@@ -189,6 +189,7 @@ function fn_product_groups_split_cart($cart, $only_mandatory_order_split = false
             }
 
             if (!empty($group_products)) {
+                $group_data['products'] = $group_products;
                 fn_product_groups_get_package_info($group_data);
                 $p_groups[] = $group_data;
             }
