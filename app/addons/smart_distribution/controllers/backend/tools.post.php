@@ -2374,6 +2374,11 @@ fn_print_die($orders_wo_points);
     $user_ids = db_get_fields("SELECT user_id FROM ?:user_session_products WHERE type = 'C' GROUP BY user_id HAVING count(product_id) > 80");
     $res = db_query("DELETE FROM ?:user_session_products WHERE type = 'C' AND user_id IN (?a)", $user_ids);
     fn_print_die($res);
+} elseif ($mode == 'cleanup_old_promotions') {
+    $prev_month = date_create('last day of previous month 23:59:59');
+    $promotion_ids = db_get_fields('SELECT promotion_id FROM ?:promotions WHERE ((to_date != 0 AND to_date <= ?i) OR status != ?s) AND company_id = ?i', $prev_month->getTimestamp(), 'A', 45);
+    fn_delete_promotions($promotion_ids);
+    fn_print_die($promotion_ids);
 } elseif ($mode == 'remove_zero_prices') {
     $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = 2186');
     $res[] = db_query('DELETE FROM ?:product_prices WHERE price = 0 AND usergroup_id != 0 AND product_id IN (?a)', $product_ids);
