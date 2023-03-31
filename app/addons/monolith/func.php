@@ -11,10 +11,26 @@ function fn_monolith_generate_xml($order_id) {
     $allowed_companies = explode(',', $addon['company_ids']);
 
     $order_info = fn_get_order_info($order_id);
+
     if (!in_array($order_info['company_id'], $allowed_companies)) {
         return false;
     }
 
+    if (isset($order_info['points_info']['in_use']['points'])) {
+        $d_products = [];
+        foreach ($order_info['product_groups'] as $group_id => $group) {
+            foreach ($group['products'] as $product) {
+                $available_discount = $product['price'] - $product['min_price'];
+                $d_products[$product['item_id']] = ($available_discount > 0) ? $available_discount * $product['amount'] : 0;
+            }
+        }
+        $coeff = $order_info['points_info']['in_use']['points'] / array_sum($d_products);
+        foreach ($order_info['products'] as &$product) {
+            $product['points_in_use'] = fn_format_price($d_products[$product['item_id']] * $coeff);
+        }
+        unset($product);
+    }
+fn_print_die($order_info['products']);
     $monolith_order = &$schema['extdata']['scheme']['data']['o'];
     $monolith_order['d'][] = array(
         '@attributes' => array('name' => 'CRMOrderParam'),
@@ -69,6 +85,9 @@ function fn_monolith_generate_xml($order_id) {
             } elseif($bonus['discount_bonus'] == 'to_percentage') {
                 $price = fn_format_price($p['base_price'] * ($bonus['discount_value']/100));
             }
+        }
+        if (isset($p['points_in_use'])) {
+            $price -= fn_format_price($p['points_in_use'] / $p['amount']);
         }
 
         $iterator += 1;
@@ -163,6 +182,23 @@ function fn_monolith_generate_xml($order_id) {
                     ];
                 }
             }
+        }
+    }
+    if (isset($order_info['points_info']['in_use']['points'])) {
+        foreach ($order_info['products'] as $product) {
+            if (empty($product['points_in_use'])) continue;
+            $CRMOrderDiscountLine[] = [
+                'f' => array(
+                    date("Y-m-d\T00:00:00", $order_info['timestamp']),
+                    $addon['order_prefix'] . $order_id,
+                    'Baltika_loyalty',
+                    'Baltika_loyalty',
+                    fn_format_price($product['points_in_use'] / $product['amount']),
+                    'Amount',
+                    fn_format_price($product['price'] - $product['points_in_use'] / $product['amount']),
+                    $product['product_code'],
+                )
+            ];
         }
     }
 
