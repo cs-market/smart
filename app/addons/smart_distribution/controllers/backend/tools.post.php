@@ -2009,7 +2009,13 @@ fn_print_die($orders_wo_points);
     $params['period'] = 'C';
     $params['status'] = ['H'];
 
-    list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
+    $rp_condition = '';
+    if (!empty($params['period']) && $params['period'] != 'A') {
+        list($time_from, $time_to) = fn_create_periods($params);
+        $rp_condition = db_quote("AND timestamp >= ?i AND timestamp <= ?i", $time_from, $time_to);
+    }
+
+    list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $params['company_id']), $auth);
     $user_ids = array_column($users, 'user_id');
 
     $data = [];
@@ -2024,7 +2030,8 @@ fn_print_die($orders_wo_points);
             'code' => $user_info['fields'][39],
             'current_points' => fn_get_user_additional_data(POINTS, $user_id) ?? 0,
             'sum_orders_total' => array_sum(array_column($orders, 'total')),
-            'used_points' => abs(db_get_field("SELECT sum(amount) FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s", $user_id, CHANGE_DUE_ORDER_PLACE)),
+
+            'used_points' => abs(db_get_field("SELECT sum(amount) FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s ?p", $user_id, CHANGE_DUE_ORDER_PLACE, $rp_condition)),
         );
     }
     $opts = array('delimiter' => ';', 'filename' => 'points_'.$action.'.csv');
