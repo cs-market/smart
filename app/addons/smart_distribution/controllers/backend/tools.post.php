@@ -2001,16 +2001,22 @@ fn_print_die($orders_wo_points);
     $profile_ids = array_column($profiles, 'profile_id');
     $res = db_query('DELETE FROM ?:user_profiles WHERE profile_id IN (?a)', $profile_ids);
     fn_print_die($res);
-} elseif ($mode == 'export_rp') {
-    $company_id = $action;
-    if (empty($company_id)) fn_print_die('action??');
+} elseif ($mode == 'export_reward_points') {
+    $params = $_REQUEST;
+
+    if (empty($action)) fn_print_die('action??');
+    $params['company_id'] = $action;
+    $params['period'] = 'C';
+    $params['status'] = ['H'];
+
     list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
     $user_ids = array_column($users, 'user_id');
+
     $data = [];
-    $from = '01/02/2023';
     foreach ($user_ids as $user_id) {
         $user_info = fn_get_user_info($user_id);
-        list($orders, ) = fn_get_orders(array('user_id' => $user_id, 'time_from' => $from, 'period' => 'C', 'company_id' => $company_id, 'status' => array('H')));
+        $params['user_id'] = $user_id;
+        list($orders, ) = fn_get_orders($params);
 
         if (empty($orders)) continue;
         $data[] = array(
@@ -2021,9 +2027,10 @@ fn_print_die($orders_wo_points);
             'used_points' => abs(db_get_field("SELECT sum(amount) FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s", $user_id, CHANGE_DUE_ORDER_PLACE)),
         );
     }
-    $opts = array('delimiter' => ';', 'filename' => 'points_'.$company_id.'.csv');
+    $opts = array('delimiter' => ';', 'filename' => 'points_'.$action.'.csv');
     $res = fn_exim_put_csv($data, $opts, '"');
-    fn_print_die('done');
+    fn_get_file('var/files/'.$opts['filename']);
+    exit();
 } elseif ($mode == 'export_id') {
     list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => 45), $auth);
 
