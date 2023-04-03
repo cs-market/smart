@@ -6,7 +6,7 @@
 
     <div class="ty-control-group">
         <label for="email" class="ty-control-group__title cm-required cm-trim">{__("email")}</label>
-        <input type="text" id="email" name="user_data[email]" size="32" maxlength="128" value="{$user_data.email}" class="ty-input-text cm-focus" />
+        <input type="text" id="email" name="user_data[email]" size="32" maxlength="128" value="{$user_data.email}" class="ty-input-text cm-focus" disabled="_disabled"/>
     </div>
 
     <div class="ty-control-group">
