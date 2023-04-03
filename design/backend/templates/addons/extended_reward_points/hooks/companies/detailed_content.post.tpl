@@ -16,4 +16,11 @@
             <input class="input-mini cm-trim cm-value-integer" id="elm_company_max_rp_discount" size="6" maxlength="3" type="text" name="company_data[max_rp_discount]" value="{$company_data.max_rp_discount}"/>
         </div>
     </div>
+
+    <div class="control-group">
+        <label class="control-label" for="elm_company_reward_points_ttl">{__("extended_reward_points.reward_points_ttl")}:</label>
+        <div class="controls">
+            <input class="input-mini cm-trim cm-value-integer" id="elm_company_reward_points_ttl" size="6" maxlength="3" type="text" name="company_data[reward_points_ttl]" value="{$company_data.reward_points_ttl}"/>
+        </div>
+    </div>
 </div>

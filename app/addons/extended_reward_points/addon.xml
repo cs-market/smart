@@ -24,13 +24,18 @@
         <item lang="ru" id="extended_reward_points.partial_payment">Частичная оплата товара баллами</item>
         <item lang="ru" id="extended_reward_points.max_rp_discount">Ограничить частичную оплату в объеме от заказа</item>
         <item lang="ru" id="extended_reward_points.min_prices">Минимальные цены товара</item>
+        <item lang="ru" id="extended_reward_points.exim_cleanup_reward_points">Предварительно очистить бонусные баллы</item>
+        <item lang="ru" id="extended_reward_points.reward_points_ttl">Время жизни начисленных бонусных баллов</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `reward_points_mechanics` CHAR(1) NOT NULL DEFAULT 'A';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP reward_points_mechanics;</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `reward_points_mechanics`;</item>
 
         <item>ALTER TABLE `?:companies` ADD `max_rp_discount` TINYINT UNSIGNED NOT NULL DEFAULT '100';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP max_rp_discount;</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `max_rp_discount`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `reward_points_ttl` SMALLINT UNSIGNED NOT NULL DEFAULT '0';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `reward_points_ttl`;</item>
 
         <item>ALTER TABLE `?:products` ADD `earned_points_eq_price` CHAR(1) NOT NULL DEFAULT 'N'</item>
         <item for="uninstall">ALTER TABLE `?:products` DROP `earned_points_eq_price`;</item>
@@ -44,5 +49,22 @@
           KEY `product_id` (`product_id`)
         )</item>
         <item for="uninstall">DROP TABLE `?:product_min_prices`;</item>
+
+        <item>DROP TABLE IF EXISTS `?:reward_point_details`;</item>
+        <item>CREATE TABLE `?:reward_point_details` (
+          `user_id` mediumint unsigned NOT NULL DEFAULT '0',
+          `earn_order_id` decimal(12,2) NOT NULL DEFAULT '0.00',
+          `amount` mediumint unsigned NOT NULL DEFAULT '0',
+          `ttl` mediumint unsigned NOT NULL DEFAULT '0',
+          `is_repaid` char(1) NOT NULL DEFAULT 'N',
+          `repaid_order_ids` varchar(255) NOT NULL DEFAULT '',
+          `details` TEXT,
+          UNIQUE KEY `uniq` (`user_id`,`earn_order_id`),
+          KEY `user_id` (`user_id`),
+          KEY `ttl` (`ttl`),
+          KEY `is_repaid` (`is_repaid`),
+          KEY `repaid_order_ids` (`repaid_order_ids`)
+        )</item>
+        <item for="uninstall">DROP TABLE `?:reward_point_details`;</item>
     </queries>
 </addon>

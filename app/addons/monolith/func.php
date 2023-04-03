@@ -24,13 +24,20 @@ function fn_monolith_generate_xml($order_id) {
                 $d_products[$product['item_id']] = ($available_discount > 0) ? $available_discount * $product['amount'] : 0;
             }
         }
+        arsort($d_products);
+
         $coeff = $order_info['points_info']['in_use']['points'] / array_sum($d_products);
         foreach ($order_info['products'] as &$product) {
-            $product['points_in_use'] = fn_format_price($d_products[$product['item_id']] * $coeff);
+            $product['points_in_use'] = round($d_products[$product['item_id']] * $coeff);
         }
         unset($product);
+
+        $spread_points = array_sum(array_column($order_info['products'], 'points_in_use'));
+        if ($rounding_error = $order_info['points_info']['in_use']['points'] - $spread_points) {
+            $order_info['products'][key($d_products)]['points_in_use'] += $rounding_error;
+        }
     }
-fn_print_die($order_info['products']);
+
     $monolith_order = &$schema['extdata']['scheme']['data']['o'];
     $monolith_order['d'][] = array(
         '@attributes' => array('name' => 'CRMOrderParam'),
@@ -193,9 +200,9 @@ fn_print_die($order_info['products']);
                     $addon['order_prefix'] . $order_id,
                     'Baltika_loyalty',
                     'Baltika_loyalty',
-                    fn_format_price($product['points_in_use'] / $product['amount']),
+                    '',
                     'Amount',
-                    fn_format_price($product['price'] - $product['points_in_use'] / $product['amount']),
+                    $product['points_in_use'],
                     $product['product_code'],
                 )
             ];

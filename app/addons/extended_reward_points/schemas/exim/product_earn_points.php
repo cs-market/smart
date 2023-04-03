@@ -2,6 +2,8 @@
 
 use Tygh\Registry;
 
+include_once(Registry::get('config.dir.addons') . 'extended_reward_points/schemas/exim/product_earn_points.functions.php');
+
 $schema = array(
     'section' => 'products',
     'name' => __('earn_points'),
@@ -14,14 +16,13 @@ $schema = array(
     ),
     'references' => array(
         'reward_points' => array(
-            'reference_fields' => array('object_id' => '#key', 'object_type' => 'P'),
-            'join_type' => 'LEFT',
+            'reference_fields' => array('object_id' => '#key', 'object_type' => 'P', 'usergroup_id' => '$usergroup_id'),
+            'join_type' => 'INNER',
         ),
     ),
-    'update_only' => true,
     'options' => array(
         'remove_reward_points' => array(
-            'title' => 'exim_cleanup_reward_points',
+            'title' => 'extended_reward_points.exim_cleanup_reward_points',
             'type' => 'checkbox',
             'import_only' => true
         ),
@@ -43,7 +44,6 @@ $schema = array(
             'db_field' => 'usergroup_id',
             'table' => 'reward_points',
             'required' => true,
-            'key_component' => true,
             'convert_put' => array('fn_exim_put_usergroup', '#this', '#lang_code'),
         ),
         'Amount' => array(
@@ -52,8 +52,18 @@ $schema = array(
             'required' => true
         ),
         'Vendor' => array(
-            'db_field' => 'company_id',
-            'required' => true,
+            // 'db_field' => 'company_id',
+            // 'table' => 'reward_points',
+            // 'required' => true,
+            // 'convert_put' => array('fn_get_company_id_by_name', '#this'),
+            'linked' => false,
+        ),
+    ),
+    'import_process_data' => array(
+        'exim_cleanup_reward_points' => array(
+            'function' => 'fn_extended_reward_points_exim_cleanup_reward_points',
+            'args' => array('$primary_object_id', '@remove_reward_points'),
+            'import_only' => true,
         ),
     ),
 );
