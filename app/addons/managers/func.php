@@ -284,12 +284,15 @@ function fn_managers_send_form(&$page_data, $form_values, $result, $from, $sende
 }
 
 function fn_managers_helpdesk_get_ticket_users_post(&$users, $params, $fields, $join, $condition) {
-    if ((!isset($params['user_type'])) || in_array(UserTypes::ADMIN, $params['user_type']) || in_array(UserTypes::VENDOR, $params['user_type'])) {
-        $ticket_customer = fn_get_ticket_users(['ticket_id' => $params['ticket_id'], 'user_type' => UserTypes::CUSTOMER]);
-        if ($managers = fn_get_managers(['user_managers' => key($ticket_customer)])) {
-            $condition['ticket'] = db_quote("u.user_id IN (?a)", array_column($managers, 'user_id'));
-            $extra_users = db_get_hash_array("SELECT $fields FROM ?:users AS u $join WHERE ?p", 'user_id', implode(' ', $condition));
-            $users = fn_array_merge($users, $extra_users);
+    if (!empty($users)) {
+        $ticket_customer = array_filter($users, function($u) {
+            return $u['user_type'] == 'C';
+        });
+        if (!empty($ticket_customer)) {
+            if ($managers = fn_get_managers(['user_managers' => key($ticket_customer)])) {
+                $managers = fn_array_value_to_key($managers, 'user_id');
+                $users = fn_array_merge($users, $managers);
+            }
         }
     }
 }

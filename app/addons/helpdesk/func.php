@@ -153,10 +153,12 @@ function fn_get_tickets($params = array(), $items_per_page = 10) {
         $join['helpdesk_messages'] = db_quote(" LEFT JOIN ?:helpdesk_messages AS m on t.ticket_id = m.ticket_id");
         $order = ' ORDER BY updated DESC ';
     }
-
     if (!empty($params['status'])) {
-        $days_threshold = Registry::get('addons.helpdesk.days_threshold') ? Registry::get('addons.helpdesk.days_threshold') : 0;
-        $condition['status'] = db_quote(" AND ( m.status = ?s OR (m.status = 'W' AND m.timestamp < ?i))", $params['status'], (TIME - SECONDS_IN_DAY * $days_threshold));
+        $extra = '';
+        if ($params['status'] == 'N') {
+            $extra = db_quote(' OR (m.status = ?s AND m.timestamp < ?i)', 'W', (TIME - SECONDS_IN_DAY * Registry::ifGet('addons.helpdesk.days_threshold', 0)));
+        }
+        $condition['status'] = db_quote(" AND ( m.status = ?s ?p)", $params['status'], $extra);
     }
 
     if (!empty($params['user_id'])) {
@@ -361,23 +363,33 @@ function fn_get_ticket_users($params) {
         }
 
         $condition['ticket'] = db_quote('tu.ticket_id IN (?a)', $params['ticket_id']);
-        $fields = "u.email, u.user_id, u.firstname, u.lastname, CONCAT(u.firstname, ' ', u.lastname) AS username, u.user_type";
+        $fields = [
+            'email' => 'u.email',
+            'user_id' => 'u.user_id',
+            'firstname' => 'u.firstname',
+            'lastname' => 'u.lastname',
+            'user_type' => 'u.user_type',
+        ];
 
-        if (!empty($params['user_type'])) {
-            if (!is_array($params['user_type'])) {
-                $params['user_type'] = explode(',', $params['user_type']);
-            }
-            $condition['ticket'] .= db_quote(" AND u.user_type IN (?a)", $params['user_type']);
-        }
         if (!empty($params['notification'])) {
             $condition['notification'] = db_quote(' AND u.helpdesk_notification = ?s', $params['notification']);
         }
 
         fn_set_hook('helpdesk_get_ticket_users_pre', $params, $fields, $join, $condition);
 
-        $users = db_get_hash_array("SELECT $fields FROM ?:users AS u $join WHERE ?p", 'user_id', implode(' ', $condition));
+        $users = db_get_hash_array("SELECT " . implode(', ', $fields) . " FROM ?:users AS u $join WHERE ?p", 'user_id', implode(' ', $condition));
 
         fn_set_hook('helpdesk_get_ticket_users_post', $users, $params, $fields, $join, $condition);
+
+        if (!empty($params['user_type'])) {
+            $user_type = $params['user_type'];
+            if (!is_array($params['user_type'])) {
+                $user_type = explode(',', $params['user_type']);
+            }
+            $users = array_filter($users, function($u) use ($user_type) {
+                return in_array($u['user_type'], $user_type);
+            });
+        }
     }
 
     return $users;

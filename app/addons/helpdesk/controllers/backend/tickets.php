@@ -1,7 +1,6 @@
 <?php
 
 use Tygh\Registry;
-use Tygh\Bootstrap;
 use Tygh\Storage;
 use Tygh\Enum\YesNo;
 
@@ -136,18 +135,18 @@ if ($mode == 'manage') {
     list($message) = fn_get_messages($params);
     Tygh::$app['view']->assign('message', array_shift($message));
 } elseif ($mode == 'move_message') {
-        $params = $_REQUEST;
+    $params = $_REQUEST;
 
-        list($messages, ) = fn_get_messages(array('message_id' => $params['message_id']));
-        $message = array_shift($messages);
+    list($messages, ) = fn_get_messages(array('message_id' => $params['message_id']));
+    $message = array_shift($messages);
 
-        if (isset($message['files'])) foreach ($message['files'] as $file) {
-            list($filesize, $filename) = Storage::instance('helpdesk_files')->put($params['ticket_id'] . '/' . $message['message_id'] . '/' . $file['filename'], array(
-                'file' => Storage::instance('helpdesk_files')->getAbsolutePath($message['ticket_id'] . '/' . $params['message_id'] . '/' . $file['filename'])
-            ));
-        }
+    if (isset($message['files'])) foreach ($message['files'] as $file) {
+        list($filesize, $filename) = Storage::instance('helpdesk_files')->put($params['ticket_id'] . '/' . $message['message_id'] . '/' . $file['filename'], array(
+            'file' => Storage::instance('helpdesk_files')->getAbsolutePath($message['ticket_id'] . '/' . $params['message_id'] . '/' . $file['filename'])
+        ));
+    }
 
-        db_query('UPDATE ?:helpdesk_messages SET `ticket_id` = ?i WHERE message_id = ?i', $params['ticket_id'], $params['message_id']);
+    db_query('UPDATE ?:helpdesk_messages SET `ticket_id` = ?i WHERE message_id = ?i', $params['ticket_id'], $params['message_id']);
     return array(CONTROLLER_STATUS_REDIRECT, "tickets.view&amp;ticket_id=".$params['ticket_id']);
 } elseif ($mode == 'delete') {
     if (isset($_REQUEST['spam'])) {

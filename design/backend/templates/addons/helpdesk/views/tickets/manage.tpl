@@ -25,8 +25,8 @@
                 <td>
                     <ul class="helpdesk-users nowrap">
                     {foreach from=$ticket.users item=user}
-                        <li>
-                            <a class="user-image" href="{"profiles.update&amp;user_id=`$user.user_id`"|fn_url}">{$user.username|trim|default:"---"}</a>
+                        <li {if $user.user_type != 'C'}class="hidden"{/if}>
+                            <a class="user-image" href="{"profiles.update&amp;user_id=`$user.user_id`"|fn_url}">{"`$user.firstname` `$user.lastname`"|trim|default:"---"}</a>
                         </li>
                     {/foreach}
                     </ul>
@@ -35,7 +35,7 @@
                 <td class="center">{if $ticket.updated}{"j/m/Y G:i"|date:$ticket.updated}{else}-{/if}</td>
                 <td class="nowrap">
                     {capture name="tools_list"}
-                        <li>{btn type="list" text=__("update") href="tickets.update?ticket_id=`$ticket.ticket_id`"}</li>
+                        <li>{btn type="list" text=__("edit") href="tickets.update?ticket_id=`$ticket.ticket_id`"}</li>
                         <li>{btn type="list" text=__("close_ticket") href="tickets.close?ticket_id=`$ticket.ticket_id`&redirect_url=`$current_redirect_url`"}</li>
                         {if $allow_save}
                         <li class="divider"></li>
