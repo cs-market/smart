@@ -2453,6 +2453,24 @@ fn_print_die($orders_wo_points);
         fn_delete_ticket($value);
     }
     fn_print_die('done', count($ticket_ids));
+} elseif ($mode == 'remove_old_tickets') {
+    $tickets = db_get_array('SELECT ticket_id, message_id, max(timestamp) as timestamp FROM ?:helpdesk_messages GROUP BY ticket_id ');
+    $tickets = array_filter($tickets, function($t) {
+        return $t['timestamp'] < 1672520400;
+    });
+    if ($ticket_ids = db_get_fields('SELECT ticket_id FROM ?:helpdesk_tickets WHERE ticket_id IN (?a) AND subject != ?s', array_column($tickets, 'ticket_id'), 'Служба поддержки')) {
+        foreach ($ticket_ids as $value) {
+            fn_delete_ticket($value);
+        }
+    }
+    $tickets = db_get_array('SELECT ticket_id, message_id, max(timestamp) as timestamp FROM ?:helpdesk_messages GROUP BY ticket_id ');
+    $tickets = array_column($tickets, 'ticket_id');
+    $tickets = db_get_fields('SELECT ticket_id FROM ?:helpdesk_tickets WHERE ticket_id NOT IN (?a)', $tickets);
+    foreach ($tickets as $value) {
+        fn_delete_ticket($value);
+    }
+
+    fn_print_die('done', count($ticket_ids));
 } elseif ($mode == 'correct_reward_points_march') {
     // Вега_Самара_0,5%_апрель
     $usergroups[1810] = [15033, 13452, 15034, 13629, 15035, 14038, 13630, 15037, 13631, 15036];

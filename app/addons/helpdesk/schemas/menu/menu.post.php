@@ -4,7 +4,7 @@ use Tygh\Registry;
 
 $schema['central']['helpdesk']['items']['tickets'] = array(
     'href' => 'tickets.manage?status=',
-    'position' => 300,
+    'position' => 600,
     'attrs' => array(
         'class'=>'is-addon'
     ),

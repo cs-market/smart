@@ -115,7 +115,7 @@ class UserProfiles extends AEntity
 
             foreach ($user_profiles as &$profile) {
                 $profile['profile_data'] = db_get_row("SELECT * FROM ?:user_profiles WHERE user_id = ?i AND profile_id = ?i", $id, $profile['profile_id']);
-                $profile['profile_name'] = $profile['profile_name'] . "(".$profile['profile_data']['s_address'].")" ;
+                $profile['profile_name'] = $profile['profile_data']['s_address'];
                 $profile['s_address'] = $profile['profile_data']['s_address'];
 
                 $prof_cond = $profile['profile_id'] ? db_quote("OR (object_id = ?i AND object_type = 'P')", $profile['profile_id']) : '';
