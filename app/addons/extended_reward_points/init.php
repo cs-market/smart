@@ -9,5 +9,6 @@ fn_register_hooks(
     'pre_get_cart_product_data',
     'get_cart_product_data',
     'calculate_cart_taxes_pre',
-    'check_add_to_cart_post'
+    'check_add_to_cart_post',
+    'reward_points_calculate_item',
 );

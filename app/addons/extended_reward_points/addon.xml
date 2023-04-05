@@ -26,6 +26,10 @@
         <item lang="ru" id="extended_reward_points.min_prices">Минимальные цены товара</item>
         <item lang="ru" id="extended_reward_points.exim_cleanup_reward_points">Предварительно очистить бонусные баллы</item>
         <item lang="ru" id="extended_reward_points.reward_points_ttl">Время жизни начисленных бонусных баллов</item>
+        <item lang="ru" id="extended_reward_points.points_amount_reduced">Число баллов, которое вы ввели, больше, чем можно использовать в этом заказе.</item>
+        <item lang="ru" id="extended_reward_points.reward">Будет начисленно в заказе</item>
+        <item lang="ru" id="extended_reward_points.points_in_use">Будет списано в заказе</item>
+        <item lang="ru" id="extended_reward_points.points_in_use_рште">Введите баллы для списания</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `reward_points_mechanics` CHAR(1) NOT NULL DEFAULT 'A';</item>

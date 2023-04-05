@@ -141,3 +141,7 @@ function fn_get_available_points($cart)
         0
     );
 }
+
+function fn_extended_reward_points_reward_points_calculate_item($cart_products, $cart, $k, $v, &$reward_coef) {
+    $reward_coef = 1;
+}

@@ -158,8 +158,8 @@ function fn_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_products, &$sh
     }
 
     foreach ((array) $cart_products as $k => $v) {
-
-        fn_set_hook('reward_points_calculate_item', $cart_products, $cart, $k, $v);
+        // [cs-market]
+        fn_set_hook('reward_points_calculate_item', $cart_products, $cart, $k, $v, $price_coef);
 
         if (!isset($v['exclude_from_calculate'])) {
             if (isset($cart['products'][$k]['extra']['points_info'])) {
@@ -232,8 +232,8 @@ function fn_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_products, &$sh
     }
 
     foreach ((array) $cart_products as $k => $v) {
-
-        fn_set_hook('reward_points_calculate_item', $cart_products, $cart, $k, $v);
+        // [cs-market]
+        fn_set_hook('reward_points_calculate_item', $cart_products, $cart, $k, $v, $reward_coef);
 
         if (!isset($v['exclude_from_calculate'])) {
             if (isset($cart_products[$k]['points_info']['reward'])) {
