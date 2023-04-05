@@ -29,7 +29,9 @@
         <item lang="ru" id="extended_reward_points.points_amount_reduced">Число баллов, которое вы ввели, больше, чем можно использовать в этом заказе.</item>
         <item lang="ru" id="extended_reward_points.reward">Будет начисленно в заказе</item>
         <item lang="ru" id="extended_reward_points.points_in_use">Будет списано в заказе</item>
-        <item lang="ru" id="extended_reward_points.points_in_use_рште">Введите баллы для списания</item>
+        <item lang="ru" id="extended_reward_points.points_to_use_hint">Введите баллы для списания</item>
+        <item lang="ru" id="extended_reward_points.points_to_use_header">Чтобы оплатить часть заказа баллами, введите количество:</item>
+        
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `reward_points_mechanics` CHAR(1) NOT NULL DEFAULT 'A';</item>

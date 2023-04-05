@@ -50,7 +50,7 @@
         <form class="cm-ajax" name="point_payment_form" action="{""|fn_url}" method="post">
         <input type="hidden" name="redirect_mode" value="{$location}" />
         <input type="hidden" name="result_ids" value="checkout_totals,checkout_steps,litecheckout_form" />
-
+        <span>{__('extended_reward_points.points_to_use_header')}:</span>
         <div class="ty-discount-coupon__control-group ty-input-append ty-inline-block">
             <input type="text" class="ty-input-text ty-valign cm-hint" name="points_to_use" size="40" value="{__("extended_reward_points.points_to_use_hint")}" />
             {include file="buttons/go.tpl" but_name="checkout.point_payment" alt=__("apply") but_text=__("apply")}
