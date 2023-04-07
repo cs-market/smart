@@ -29,22 +29,17 @@ function fn_wishlist_get_gift_certificate_info(&$_certificate, &$certificate, &$
     }
 }
 
+// [csmarket] fixes from 4.16.2
 function fn_wishlist_user_init(&$auth, &$user_info, &$first_init)
 {
-    if ($first_init == true) {
-        $user_id = $auth['user_id'];
-        $user_type = 'R';
-        if (empty($user_id) && fn_get_session_data('cu_id')) {
-            $user_id = fn_get_session_data('cu_id');
-            $user_type = 'U';
-        }
-
-        fn_extract_cart_content(Tygh::$app['session']['wishlist'], $user_id, 'W', $user_type);
-
-        return true;
+    $user_id = $auth['user_id'];
+    $user_type = 'R';
+    if (empty($user_id) && fn_get_session_data('cu_id')) {
+        $user_id = fn_get_session_data('cu_id');
+        $user_type = 'U';
     }
 
-    return false;
+    fn_extract_cart_content(Tygh::$app['session']['wishlist'], $user_id, 'W', $user_type);
 }
 
 function fn_wishlist_init_user_session_data(&$sess_data, &$user_id)
@@ -120,6 +115,7 @@ function fn_wishlist_get_additional_information(&$product, &$products_data)
     }
 }
 
+// [cs-market] changes from 4.16.2
 /**
  * Gets wishlist items count
  *
@@ -127,13 +123,24 @@ function fn_wishlist_get_additional_information(&$product, &$products_data)
  */
 function fn_wishlist_get_count()
 {
-    $wishlist = array();
+    $wishlist = [];
     $result = 0;
 
     if (!empty(Tygh::$app['session']['wishlist'])) {
         $wishlist = & Tygh::$app['session']['wishlist'];
-        $result = !empty($wishlist['products']) ? count($wishlist['products']) : 0;
     }
+
+    if (
+        !empty(Tygh::$app['session']['auth']['user_id'])
+        && !empty($wishlist['products'])
+    ) {
+        $wishlist['products'] = fn_wishlist_get_wishlist_from_db(
+            $wishlist['products'],
+            Tygh::$app['session']['auth']['user_id']
+        );
+    }
+
+    $result = !empty($wishlist['products']) ? count($wishlist['products']) : 0;
 
     /**
      * Changes wishlist items count
@@ -144,6 +151,39 @@ function fn_wishlist_get_count()
     fn_set_hook('wishlist_get_count_post', $wishlist, $result);
 
     return empty($result) ? -1 : $result;
+}
+
+/**
+ * Retrieves the users wishlist from the database.
+ *
+ * @param array<int, array<string, string|array<int, string>|array<string, array<int, string>>>> $products Wishlist products from the user session
+ * @param int                                                                                    $user_id  User ID
+ *
+ * @return array<int, array<string, string|array<int, string>|array<string, array<int, string>>>>
+ */
+function fn_wishlist_get_wishlist_from_db($products, $user_id)
+{
+    $condition = fn_user_session_products_condition([
+        'user_id'             => $user_id,
+        'type'                => "W",
+        'user_type'           => "R",
+        'get_session_user_id' => false,
+        'get_session_id'      => false,
+    ]);
+
+    $wishlist_from_db = db_get_fields(
+        'SELECT item_id FROM ?:user_session_products WHERE 1=1 AND ?p',
+        $condition
+    );
+
+    foreach ($wishlist_from_db as $item_key => $product_key) {
+        if (isset($products[$product_key])) {
+            $wishlist_from_db[$product_key] = $products[$product_key];
+        }
+        unset($wishlist_from_db[$item_key]);
+    }
+
+    return $wishlist_from_db;
 }
 
 /**

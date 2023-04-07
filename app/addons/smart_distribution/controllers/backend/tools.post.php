@@ -2999,6 +2999,13 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($report, $params, '"');
     fn_print_die($report);
+} elseif ($mode == 'extract_session') {
+    if ($s_id = $_REQUEST['session_id']) {
+        $val = db_get_field('SELECT data FROM ?:sessions WHERE session_id = ?s', $s_id);
+        $session = Tygh::$app['session']->decode($val);
+        fn_print_die($session);
+    }
+    fn_print_die();
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
