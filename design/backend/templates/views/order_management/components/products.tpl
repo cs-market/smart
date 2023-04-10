@@ -48,7 +48,8 @@
     <td class="left order-management-price">
     {if !$cp.exclude_from_calculate}
         {if $cp.stored_price == "Y"}
-            {math equation="price - modifier" price=$cp.original_price modifier=$cp.modifiers_price|default:0 assign="original_price"}
+            {$tmp = $cp.original_price|default:0}
+            {math equation="price - modifier" price=$tmp modifier=$cp.modifiers_price|default:0 assign="original_price"}
         {else}
             {assign var="original_price" value=$cp.original_price}
         {/if}
