@@ -532,6 +532,7 @@ function fn_smart_distribution_pre_update_order(&$cart, $order_id) {
         );
     }
     $product_ids = fn_sd_add_product_to_wishlist($product_data, $wishlist, $auth);
+    fn_save_cart_content($wishlist, $auth['user_id'], 'W');
 
     //  original products
     if (isset($cart['original_products'])) {
