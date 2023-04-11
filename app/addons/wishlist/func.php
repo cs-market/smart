@@ -29,17 +29,29 @@ function fn_wishlist_get_gift_certificate_info(&$_certificate, &$certificate, &$
     }
 }
 
-// [csmarket] fixes from 4.16.2
+// [csmarket] fixes from 4.16.2 and support mobile app
 function fn_wishlist_user_init(&$auth, &$user_info, &$first_init)
 {
-    $user_id = $auth['user_id'];
-    $user_type = 'R';
-    if (empty($user_id) && fn_get_session_data('cu_id')) {
-        $user_id = fn_get_session_data('cu_id');
-        $user_type = 'U';
+    if (defined('API')) {
+        $wishlist = & Tygh::$app['session']['wishlist'];
+        if (
+            !empty(Tygh::$app['session']['auth']['user_id'])
+            && !empty($wishlist['products'])
+        ) {
+            $wishlist['products'] = fn_wishlist_get_wishlist_from_db(
+                $wishlist['products'],
+                Tygh::$app['session']['auth']['user_id']
+            );
+        }
+    } else {
+        $user_id = $auth['user_id'];
+        $user_type = 'R';
+        if (empty($user_id) && fn_get_session_data('cu_id')) {
+            $user_id = fn_get_session_data('cu_id');
+            $user_type = 'U';
+        }
+        fn_extract_cart_content(Tygh::$app['session']['wishlist'], $user_id, 'W', $user_type);
     }
-
-    fn_extract_cart_content(Tygh::$app['session']['wishlist'], $user_id, 'W', $user_type);
 }
 
 function fn_wishlist_init_user_session_data(&$sess_data, &$user_id)
