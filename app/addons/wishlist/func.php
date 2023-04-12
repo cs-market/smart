@@ -54,6 +54,7 @@ function fn_wishlist_user_init(&$auth, &$user_info, &$first_init)
     }
 }
 
+// [csmarket] fixes from 4.16.2
 function fn_wishlist_init_user_session_data(&$sess_data, &$user_id)
 {
     $is_acting_on_behalf_of_user = !empty($sess_data['auth']['act_as_user'])
@@ -65,7 +66,13 @@ function fn_wishlist_init_user_session_data(&$sess_data, &$user_id)
                 'products' => array()
             );
         }
+
         fn_extract_cart_content($sess_data['wishlist'], $user_id, 'W');
+
+        if ($is_acting_on_behalf_of_user) {
+            Tygh::$app['session']['wishlist'] = (isset($sess_data['wishlist'])) ? $sess_data['wishlist'] : [];
+        }
+
         fn_save_cart_content(Tygh::$app['session']['wishlist'], $user_id, 'W');
     }
 
