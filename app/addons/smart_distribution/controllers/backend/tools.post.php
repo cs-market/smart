@@ -3006,6 +3006,9 @@ fn_print_die($orders_wo_points);
         fn_print_die($session);
     }
     fn_print_die();
+} elseif ($mode == 'remove_storages') {
+    $empty_storages = db_get_fields('SELECT storage_id FROM ?:storages WHERE company_id = 0');
+    fn_delete_storages($empty_storages);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
