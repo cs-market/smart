@@ -86,6 +86,26 @@ select {
     }
 }
 
+.flex-grid(@margin: 6px) {
+    &[class*="span"] {
+        display: flex;
+        align-items: center;
+        width: calc(~"100% + "2*@margin);
+        flex-wrap: wrap;
+        margin: 0 -@margin !important;
+    }
+    > div {
+        flex: 0 1 auto;
+        margin: @margin;
+        &:first-child {
+            flex-basis: 210px;
+        }
+    }
+    .ty-flex-right {
+        margin-left: auto;
+    }
+}
+
 .ty-tile-button() {
     .border-radius(@border-radius);
     .transition(@transition);
@@ -341,6 +361,14 @@ select {
         border-color: @base;
         .ty-account-info__buttons {
             background-color: transparent;
+        }
+        .ty-dropdown-align-left & {
+            left: 0;
+            right: auto;
+        }
+        .ty-dropdown-align-right & {
+            right: 0;
+            left: auto;
         }
     }
     &__content &__item:not(.ty-account-info__name) {

@@ -14,6 +14,7 @@
                     <span class="ty-minicart-title empty-cart ty-hand">{__("cart_is_empty")}</span>
                     <i class="ty-icon-down-micro"></i>
                 {/if}
+                <span class="ty-minicart-title__counter">{$smarty.session.cart.products|count}</span>
             {/hook}
         </a>
         </div>
@@ -38,7 +39,7 @@
                                                     <div class="ty-cart-items__list-item-desc">
                                                         <a href="{"products.view?product_id=`$product.product_id`"|fn_url}">{$product.product|default:fn_get_product_name($product.product_id) nofilter}</a>
                                                     <p>
-                                                        <span>{$product.amount}</span><span>&nbsp;x&nbsp;</span>{include file="common/price.tpl" value=$product.display_price span_id="price_`$key`_`$dropdown_id`" class="none"}
+                                                        <span>{$product.amount}</span>&nbsp;{if $runtime.shop_id == 2}{__('items')}{else}<span>x&nbsp;</span>{include file="common/price.tpl" value=$product.display_price span_id="price_`$key`_`$dropdown_id`" class="none"}{/if}
                                                     </p>
                                                     </div>
                                                     {if $block.properties.display_delete_icons == "Y"}

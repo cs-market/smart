@@ -1,4 +1,4 @@
-<div class="ty-sort-dropdown">
+<div class="ty-sort-dropdown ty-dropdown-align-left">
     {capture name='category_sortings'}
         {foreach from=$sorting key="option" item="value"}
             {if $search.sort_by == $option}
@@ -23,10 +23,11 @@
             {/foreach}
         {/foreach}
     {/capture}
-    <div id="sw_elm_sort_fields" class="ty-dropdown-box__title {if $smarty.capture.category_sortings|trim} cm-combination {/if}"><a><span>{__("sort_by_`$search.sort_by`_`$search.sort_order`")}</span><i class="ty-sort-dropdown__icon ty-icon-down-micro"></i></a></div>
+    <div id="sw_elm_sort_fields" class="ty-dropdown-box__title {if $smarty.capture.category_sortings|trim} cm-combination {/if}"><a><span>{__("sorting")}</span><i class="ty-sort-dropdown__icon ty-icon-down-micro"></i></a></div>
+
     {if $smarty.capture.category_sortings|trim}
-    <ul id="elm_sort_fields" class="ty-sort-dropdown__content ty-dropdown-box__content cm-popup-box hidden">
-        {$smarty.capture.category_sortings nofilter}
-    </ul>
+        <ul id="elm_sort_fields" class="ty-sort-dropdown__content ty-dropdown-box__content cm-popup-box hidden">
+            {$smarty.capture.category_sortings nofilter}
+        </ul>
     {/if}
 </div>

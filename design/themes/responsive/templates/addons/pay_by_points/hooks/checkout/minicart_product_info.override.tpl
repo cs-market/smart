@@ -1,3 +1,4 @@
+{if $product.extra.pay_by_points.use_bonus_pay}
 {hook name="checkout:minicart_product_info"}
 {if $block.properties.products_links_type == "thumb"}
     <div class="ty-cart-items__list-item-image">
@@ -18,3 +19,4 @@
     </div>
 {/if}
 {/hook}
+{/if}

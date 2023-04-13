@@ -1,8 +1,10 @@
 {if $cart.chosen_shipping.$group_key == $shipping.shipping_id && $shipping.module == 'calendar_delivery'}
 <div class="litecheckout__container">
+    <div class="litecheckout__item">&nbsp;</div>
     <div class="litecheckout__item">
-        <p>{__("delivery_date")}&nbsp;</p>
-
+        <h2 class="litecheckout__step-title">{__("delivery_date")}</h2>
+    </div>
+    <div class="litecheckout__item">
         {$min_date = "+{$shipping.service_params.nearest_delivery_day}"}
         {$default = "+{$shipping.service_params.nearest_delivery_day} day"|strtotime}
 

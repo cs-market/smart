@@ -21,20 +21,22 @@
 {/if}
 
 {if !(($category_data.selected_views|count == 1) || ($category_data.selected_views|count == 0 && ""|fn_get_products_views:true|count <= 1)) && !$hide_layouts}
-<div class="ty-sort-container__views-icons">
-{foreach from=$layouts key="layout" item="item"}
-{if ($category_data.selected_views.$layout) || (!$category_data.selected_views && $item.active)}
-    {if $layout == $selected_layout}
-        {$sort_order = $search.sort_order_rev}
-    {else}
-        {$sort_order = $search.sort_order}
-    {/if}
-<a class="ty-sort-container__views-a {$ajax_class} {if $layout == $selected_layout}active{/if}" data-ca-target-id="{$pagination_id}" href="{"`$curl`&sort_by=`$search.sort_by`&sort_order=`$sort_order`&layout=`$layout`"|fn_url}" rel="nofollow">
-    <i class="ty-icon-{$layout|replace:"_":"-"}"></i>
-</a>
-{/if}
-{/foreach}
-</div>
+    <div class="ty-sort-container__views-icons">
+    {foreach from=$layouts key="layout" item="item"}
+        {if ($category_data.selected_views.$layout) || (!$category_data.selected_views && $item.active)}
+            {if $layout == $selected_layout}
+                {$sort_order = $search.sort_order_rev}
+            {else}
+                {$sort_order = $search.sort_order}
+            {/if}
+            {if $auth.company_id == 45 && $layout != $selected_layout}
+            <a class="ty-sort-container__views-a {$ajax_class} {if $layout == $selected_layout}active{/if}" data-ca-target-id="{$pagination_id}" href="{"`$curl`&sort_by=`$search.sort_by`&sort_order=`$sort_order`&layout=`$layout`"|fn_url}" rel="nofollow">
+                <i class="ty-icon-{$layout|replace:"_":"-"}"></i>
+            </a>
+            {/if}
+        {/if}
+    {/foreach}
+    </div>
 {/if}
 {if $auth.company_id == 45}
     {$avail_sorting = ['product-asc' => 'Y', 'product-desc' => 'Y']}

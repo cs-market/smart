@@ -21,31 +21,6 @@ Header
     //     flex-wrap: wrap;
     // }
 }
-.tygh-top-panel, .tygh-header {
-    --button-background: lighten(@base, 30%);
-}
-
-.flex-grid {
-    @margin: 6px;
-
-    &[class*="span"] {
-        display: flex;
-        align-items: center;
-        width: calc(~"100% + "2*@margin);
-        flex-wrap: wrap;
-        margin: 0 -@margin !important;
-    }
-    > div {
-        flex: 0 1 auto;
-        margin: @margin;
-        &:first-child {
-            flex-basis: 210px;
-        }
-    }
-    .ty-flex-right {
-        margin-left: auto;
-    }
-}
 
 .top-logo-grid {
     padding-top: 0;
@@ -119,9 +94,35 @@ Header
         .ty-icon-aurora-account();
     }
     &__cart-content {
-        .ty-dropdown-box__content {
-            right: initial;
-            left: 0;
+        // .ty-dropdown-box__content {
+        //     right: initial;
+        //     left: 0;
+        // }
+        a {
+            position: relative;
+            .ty-minicart-title__counter {
+                left: 14px;
+                top: -14px;
+                .border-radius(100px);
+                // background-color: @decorative;
+                // border: 2px solid @discount_label;
+                // color: #fff !important;
+                background-color: #fff;
+                border: 2px solid @decorative;
+                //color: #fff !important;
+                min-width: 18px;
+                height: 18px;
+                padding: 0 4px;
+                text-align: center;
+                position: absolute;
+                display: none;
+                font-size: 10px;
+                box-sizing: border-box;
+                opacity: .9;
+                @media @mobile {
+                    display: block;
+                }
+            }
         }
         .ty-minicart-title {
             padding-left: 0;

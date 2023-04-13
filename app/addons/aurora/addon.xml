@@ -17,6 +17,7 @@
         <item lang="ru" id="app_gallery">App gallery</item>
         <item lang="ru" id="block_mobile_app_links">Ссылки мобильного приложения</item>
         <item lang="ru" id="mobile_app_links">Ссылки мобильного приложения</item>
+        <item lang="ru" id="sorting">Сортировка</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `app_store` VARCHAR(255) NOT NULL DEFAULT '';</item>
