@@ -3009,6 +3009,59 @@ fn_print_die($orders_wo_points);
 } elseif ($mode == 'remove_storages') {
     $empty_storages = db_get_fields('SELECT storage_id FROM ?:storages WHERE company_id = 0');
     fn_delete_storages($empty_storages);
+} elseif ($mode == 'correct_reward_points_april') {
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $grant_reward_points_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+
+    $params= [
+        'period' => 'M',
+        'time_from' => '01/04/2023',
+        'time_to' => '12/04/2023',
+        'usergroup_id' => "15038",
+        //'status' => array_keys($grant_reward_points_statuses),
+    ];
+
+    list($orders, ) = fn_get_orders($params);
+
+    foreach ($orders as $order) {
+        $order_id = $order['order_id'];
+        $order_info = fn_get_order_info($order_id);
+        if (empty($order_info['points_info']['reward'])) {
+            if (in_array($order_info['status'], array_keys($grant_reward_points_statuses))) {
+                if (empty($order_info['total'] + 0)) continue;
+                $correction = [
+                    'user_id' => $order_info['user_id'],
+                    'order_id' => $order_id,
+                    'status' => $order_info['status'],
+                    'login' => db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $order_info['user_id']),
+                    'total' => $order_info['total'],
+                    'correct_points' => round($order_info['total']*0.005),
+                ];
+
+                $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s', $order_info['user_id'], CHANGE_DUE_ORDER);
+
+                $is_corrected = false;
+                foreach ($reward_point_changes as $change) {
+                    $details = unserialize($change['reason']);
+                    if (!empty($details['order_id']) && $details['order_id'] == $order_id && $details['correction'] == 'correct_reward_points_april') {
+                        $is_corrected = true;
+                        break;
+                    }
+                }
+                if (!$is_corrected) {
+                    $reason = array('order_id' => $correction['order_id'], 'to' => $correction['status'], 'correction' => 'correct_reward_points_april');
+                    fn_change_user_points($correction['correct_points'], $correction['user_id'], serialize($reason), CHANGE_DUE_ORDER, $order_info['timestamp']);
+                    $corrections[] = $correction;
+                }
+            } else {
+                $out_of_status[] = $order_id;
+            }
+        }
+    }
+
+    fn_print_die('вне статуса: ' . count($out_of_status), 'а именно: ' . implode(', ', $out_of_status), 'корректировка ниже:', $corrections);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
