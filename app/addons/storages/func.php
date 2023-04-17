@@ -617,7 +617,7 @@ function fn_storages_get_user_price($params, $join, &$condition) {
         $storage_id = $storage['storage_id'];
     }
     if (!empty($storage_id)) {
-        $condition .= db_quote(' AND p.storage_id = ?i ', $storage_id);
+        $condition .= db_quote(' AND (p.storage_id = ?i OR p.storage_id = 0)', $storage_id);
     }
 }
 
