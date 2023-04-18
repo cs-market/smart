@@ -166,11 +166,9 @@ function fn_exim_sd_set_product_categories(
                     }
                 } elseif (fn_allowed_for('MULTIVENDOR')) {
                     $company = Company::model()->find($company_id);
-                    $plan_categories = ($company->categories) ? explode(',', $company->categories) : array();
-                    if ($plan_categories) {
-                        $category_condition = db_quote(' AND ?:categories.category_id IN (?a)', $plan_categories);
-                    }
 
+                    $plan_categories = ($company->categories) ? explode(',', $company->categories) : array();
+                    $category_condition = db_quote(' AND ?:categories.category_id IN (?a)', $plan_categories);
                 }
 
                 reset($cat);
