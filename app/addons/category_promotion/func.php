@@ -203,16 +203,58 @@ function fn_cleanup_promotion_condition(&$conditions_group, $allowed_conditions)
 }
 
 function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth, $params) {
-    $promo_params = array(
-        'get_hidden' => true,
-        'active' => true,
-        'product_ids' => array($product['product_id']),
-    );
-    list($promotions, ) = fn_get_promotions($promo_params);
-    if (!empty($promotions)) {
-        $promotion = reset($promotions);
-        $product['promo'] = $promotion;
-        $stickers['promotion'] = (!empty($promotion['sticker_ids'])) ? $promotion['sticker_ids'] : Registry::get('addons.category_promotion.promotion_sticker_id');
+    if (!empty($params['get_for_one_product'])) {
+        $promo_params = array(
+            'get_hidden' => true,
+            'active' => true,
+            'product_ids' => array($product['product_id']),
+        );
+
+        list($promotions, ) = fn_get_promotions($promo_params);
+        if (!empty($promotions)) {
+            $promotion = reset($promotions);
+            $product['promo'] = $promotion;
+            $stickers['promotion'] = (!empty($promotion['sticker_ids'])) ? $promotion['sticker_ids'] : Registry::get('addons.category_promotion.promotion_sticker_id');
+        }
+    }
+}
+
+function fn_category_promotion_gather_additional_products_data_post($product_ids, $params, $products, $auth, $lang_code) {
+    if (Registry::get('addons.product_stickers.status') == 'A') {
+        if (empty($params['get_for_one_product'])) {
+            $promo_params = array(
+                'get_hidden' => true,
+                'active' => true,
+                'product_ids' => $product_ids,
+            );
+            list($promotions, ) = fn_get_promotions($promo_params);
+            if (!empty($promotions)) {
+                foreach($promotions as $promotion) {
+                    if (!empty($promotion['products'])) {
+                        foreach(explode(',', $promotion['products']) as $product_id) {
+                            if (!in_array($product_id, $product_ids)) continue;
+                            if (!empty($products[$product_id]['promo'])) continue;
+
+                            $products[$product_id]['promo'] = $promotion;
+                            $sticker_id = (!empty($promotion['sticker_ids'])) ? $promotion['sticker_ids'] : Registry::get('addons.category_promotion.promotion_sticker_id');
+
+                            $_params = array();
+                            $_params['sticker_id'] = (!empty($promotion['sticker_ids'])) ? $promotion['sticker_ids'] : Registry::get('addons.category_promotion.promotion_sticker_id');
+                            $_params['get_stickers_for'] = $params['get_stickers_for'];
+                            $_params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
+                            $_params['product'] = $products[$product_id];
+                            if ($res = fn_get_stickers($_params)) {
+                                if (empty($products[$product_id]['stickers'])) {
+                                    $products[$product_id]['stickers'] = $res;
+                                } else {
+                                    $products[$product_id]['stickers'] = array_merge($products[$product_id]['stickers'], $res);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
