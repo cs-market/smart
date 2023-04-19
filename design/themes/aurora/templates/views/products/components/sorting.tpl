@@ -38,9 +38,6 @@
     {/foreach}
     </div>
 {/if}
-{if $auth.company_id == 45}
-    {$avail_sorting = ['product-asc' => 'Y', 'product-desc' => 'Y']}
-{/if}
 {if $avail_sorting}
     {include file="common/sorting.tpl"}
 {/if}
