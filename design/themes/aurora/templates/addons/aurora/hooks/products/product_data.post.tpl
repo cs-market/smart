@@ -131,3 +131,134 @@
     {assign var="capture_name" value="form_open_`$obj_id`"}
     {$smarty.capture.$capture_name nofilter}
 {/if}
+
+{capture name="add_to_cart_`$obj_id`"}
+{if $show_add_to_cart}
+<div class="cm-reload-{$obj_prefix}{$obj_id} {$add_to_cart_class}" id="add_to_cart_update_{$obj_prefix}{$obj_id}">
+<input type="hidden" name="appearance[show_add_to_cart]" value="{$show_add_to_cart}" />
+<input type="hidden" name="appearance[show_list_buttons]" value="{$show_list_buttons}" />
+<input type="hidden" name="appearance[but_role]" value="{$but_role}" />
+<input type="hidden" name="appearance[quick_view]" value="{$quick_view}" />
+
+{strip}
+{capture name="buttons_product"}
+    {hook name="products:add_to_cart"}
+        {if $product.has_options && !$show_product_options && !$details_page}
+            {if $but_role == "text"}
+                {$opt_but_role="text"}
+            {else}
+                {$opt_but_role="action"}
+            {/if}
+
+            {include file="buttons/button.tpl" but_id="button_cart_`$obj_prefix``$obj_id`" but_text=__("select_options") but_href="products.view?product_id=`$product.product_id`" but_role=$opt_but_role but_name="" but_meta="ty-btn__primary ty-btn__big"}
+        {else}
+            {hook name="products:add_to_cart_but_id"}
+                {$_but_id="button_cart_`$obj_prefix``$obj_id`"}
+            {/hook}
+
+            {if $extra_button}{$extra_button nofilter}&nbsp;{/if}
+            {include file="buttons/add_to_cart.tpl" but_id=$_but_id but_name="dispatch[checkout.add..`$obj_id`]" but_role=$but_role block_width=$block_width obj_id=$obj_id product=$product but_meta=$add_to_cart_meta}
+
+            {assign var="cart_button_exists" value=true}
+        {/if}
+    {/hook}
+{/capture}
+{hook name="products:buttons_block"}
+    {if (
+            $product.zero_price_action != "R"
+            || $product.price != 0
+        )
+        && (
+            $settings.General.inventory_tracking == "YesNo::NO"|enum
+            || $settings.General.allow_negative_amount == "Y"
+            || (
+                $product_amount > 0
+                && $product_amount >= $product.min_qty
+            )
+            || $product.tracking == "ProductTracking::DO_NOT_TRACK"|enum
+            || $product.is_edp == "Y"
+            || $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum
+        )
+        || (
+            $product.has_options
+            && !$show_product_options
+        )}
+
+        {if $smarty.capture.buttons_product|trim != '&nbsp;'}
+            {if $product.avail_since <= $smarty.const.TIME || (
+                $product.avail_since > $smarty.const.TIME && $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum
+            )}
+                {$smarty.capture.buttons_product nofilter}
+            {/if}
+        {/if}
+
+    {elseif ($settings.General.inventory_tracking !== "YesNo::NO"|enum && $settings.General.allow_negative_amount != "Y" && (($product_amount <= 0 || $product_amount < $product.min_qty) && $product.tracking != "ProductTracking::DO_NOT_TRACK"|enum) && $product.is_edp != "Y")}
+        {hook name="products:out_of_stock_block"}
+            {assign var="show_qty" value=false}
+            {if !$details_page}
+                {if (!$product.hide_stock_info && !(($product_amount <= 0 || $product_amount < $product.min_qty) && ($product.avail_since > $smarty.const.TIME)))}
+                    <span class="ty-qty-out-of-stock ty-control-group__item" id="out_of_stock_info_{$obj_prefix}{$obj_id}">{$out_of_stock_text}</span>
+                {/if}
+            {elseif ($product.out_of_stock_actions == "OutOfStockActions::SUBSCRIBE"|enum)}
+                {hook name="product_data:back_in_stock_checkbox"}
+                <div class="ty-control-group">
+                    <label for="sw_product_notify_{$obj_prefix}{$obj_id}" class="ty-strong" id="label_sw_product_notify_{$obj_prefix}{$obj_id}">
+                        <input id="sw_product_notify_{$obj_prefix}{$obj_id}" type="checkbox" class="checkbox cm-switch-availability cm-switch-visibility" name="product_notify" {if $product_notification_enabled == "Y"}checked="checked"{/if} onclick="
+                            {if !$auth.user_id}
+                                if (!this.checked) {
+                                    Tygh.$.ceAjax('request', '{"products.product_notifications?enable="|fn_url}' + 'N&amp;product_id={$product.product_id}&amp;email=' + $('#product_notify_email_{$obj_prefix}{$obj_id}').get(0).value, {$ldelim}cache: false{$rdelim});
+                                }
+                            {else}
+                                Tygh.$.ceAjax('request', '{"products.product_notifications?enable="|fn_url}' + (this.checked ? 'Y' : 'N') + '&amp;product_id=' + '{$product.product_id}', {$ldelim}cache: false{$rdelim});
+                            {/if}
+                        "/>{__("notify_when_back_in_stock")}
+                    </label>
+                </div>
+                {/hook}
+                {if !$auth.user_id }
+                <div class="ty-control-group ty-input-append ty-product-notify-email {if $product_notification_enabled != "Y"}hidden{/if}" id="product_notify_{$obj_prefix}{$obj_id}">
+
+                    <input type="hidden" name="enable" value="Y" disabled />
+                    <input type="hidden" name="product_id" value="{$product.product_id}" disabled />
+
+                    <label id="product_notify_email_label" for="product_notify_email_{$obj_prefix}{$obj_id}" class="cm-required cm-email hidden">{__("email")}</label>
+                    <input type="text" name="email" id="product_notify_email_{$obj_prefix}{$obj_id}" size="20" value="{$product_notification_email|default:__("enter_email")}" class="ty-product-notify-email__input cm-hint" title="{__("enter_email")}" disabled />
+
+                    <button class="ty-btn-go cm-ajax" type="submit" name="dispatch[products.product_notifications]" title="{__("go")}"><i class="ty-btn-go__icon ty-icon-right-dir"></i></button>
+
+                </div>
+                {/if}
+            {/if}
+        {/hook}
+    {/if}
+
+    {if $show_list_buttons}
+        {capture name="product_buy_now_`$obj_id`"}
+            {$compare_product_id = $product.product_id}
+
+            {hook name="products:buy_now"}
+            {if $settings.General.enable_compare_products == "Y"}
+                {include file="buttons/add_to_compare_list.tpl" product_id=$compare_product_id}
+            {/if}
+            {/hook}
+        {/capture}
+        {assign var="capture_buy_now" value="product_buy_now_`$obj_id`"}
+
+        {if $smarty.capture.$capture_buy_now|trim}
+            {$smarty.capture.$capture_buy_now nofilter}
+        {/if}
+    {/if}
+
+    {if ($product.avail_since > $smarty.const.TIME)}
+        {include file="common/coming_soon_notice.tpl" avail_date=$product.avail_since add_to_cart=$product.out_of_stock_actions}
+    {/if}
+
+    {* Uncomment these lines in the overrides hooks for back-passing $cart_button_exists variable to the product_data template *}
+    {*if $cart_button_exists}
+        {capture name="cart_button_exists"}Y{/capture}
+    {/if*}
+{/hook}
+{/strip}
+{*<!--add_to_cart_update_{$obj_prefix}{$obj_id}-->*}</div>
+{/if}
+{/capture}

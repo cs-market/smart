@@ -295,3 +295,9 @@ function fn_monolith_get_logos_post($company_id, $layout_id, $style_id, &$logos,
         }
     }
 }
+
+function fn_monolith_before_dispatch($controller, $mode, $action, $dispatch_extra, $area) {
+    if ($controller == 'index' && $mode == 'index' && $_SERVER['REQUEST_METHOD'] == 'GET' && !defined('CONSOLE') && Registry::get('runtime.shop_id') == 2) {
+        fn_redirect('categories.view&category_id=9059');
+    }
+}
