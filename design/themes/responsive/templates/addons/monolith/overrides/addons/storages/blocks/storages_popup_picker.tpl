@@ -1,4 +1,4 @@
-{if $runtime.force_to_choose_storage && $runtime.shop_id == 2}
+{if $runtime.force_to_choose_storage && $auth.company_id == 45}
     {capture name='switcher_content'}
         <div class="ty-storages__wrapper">
             <div id="switcher_content_{$block.block_id}">
