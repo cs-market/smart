@@ -88,7 +88,7 @@ define('SECONDS_IN_DAY', SECONDS_IN_HOUR * 24); // one day
 define('COOKIE_ALIVE_TIME', SECONDS_IN_DAY * 365); // one week
 
 // Session live time
-define('SESSION_ALIVE_TIME', SECONDS_IN_DAY * 365); // 2 hours
+define('SESSION_ALIVE_TIME', SECONDS_IN_DAY * 30); // 2 hours
 
 // Sessions storage live time
 define('SESSIONS_STORAGE_ALIVE_TIME',  SECONDS_IN_DAY * 365); // 2 weeks

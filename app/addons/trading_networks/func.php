@@ -97,7 +97,7 @@ function fn_trading_networks_api_get_auth_token($params, &$response, $user_data)
         list($network_users) = fn_get_users(['network_id' => $user_data['user_id']], Tygh::$app['session']['auth']);
         if (!empty($network_users)) {
             foreach ($network_users as &$user) {
-                list($user['token'], $user['expiry_time']) = fn_get_fresh_user_auth_token($user['user_id'], SESSION_ALIVE_TIME);
+                list($user['token'], $user['expiry_time']) = fn_get_fresh_user_auth_token($user['user_id'], SESSIONS_STORAGE_ALIVE_TIME);
             }
             $response['network_users'] = $network_users;
         }

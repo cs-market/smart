@@ -136,7 +136,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
         // temporary condition
         if (!(in_array(Registry::get('runtime.controller'), ['sd_exim_1c', 'commerceml']) && in_array($params['company_id'], [41,46])))
         if (empty($params['user_managers'])) 
-        $condition['sd_condition'] = ' AND (' . fn_get_company_condition('?:users.company_id', false, $params['company_id'], false, true) . db_quote(" OR ?:users.user_id IN (?n)" . ' )', fn_get_company_customers_ids($params['company_id']));
+        $condition['sd_condition'] = ' AND ' . fn_get_company_condition('?:users.company_id', false, $params['company_id'], false, true);
     }
     // for search in profile fields
     if (!empty($params['search_query'])) {

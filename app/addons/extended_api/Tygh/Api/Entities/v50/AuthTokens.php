@@ -58,7 +58,7 @@ class AuthTokens extends BaseAuthTokens
             if ($user_data && fn_user_password_verify((int) $user_data['user_id'], $password, (string) $user_data['password'], $salt)) {
                 \Tygh::$app['session']->regenerateID();
 
-                list($response['token'], $expiry_time) = fn_get_fresh_user_auth_token($user_data['user_id'], SESSION_ALIVE_TIME);
+                list($response['token'], $expiry_time) = fn_get_fresh_user_auth_token($user_data['user_id'], SESSIONS_STORAGE_ALIVE_TIME);
                 $response['ttl'] = $expiry_time - TIME;
 
                 fn_set_hook('api_get_auth_token', $params, $response, $user_data);

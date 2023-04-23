@@ -2388,6 +2388,10 @@ fn_print_die($orders_wo_points);
     $user_ids = db_get_fields("SELECT user_id FROM ?:user_session_products WHERE type = 'C' GROUP BY user_id HAVING count(product_id) > 80");
     $res = db_query("DELETE FROM ?:user_session_products WHERE type = 'C' AND user_id IN (?a)", $user_ids);
     fn_print_die($res);
+} elseif ($mode == 'remove_heavy_wishlists') {
+    $user_ids = db_get_fields("SELECT user_id FROM ?:user_session_products WHERE type = 'W' GROUP BY user_id HAVING count(product_id) > 60");
+    $res = db_query("DELETE FROM ?:user_session_products WHERE type = 'W' AND user_id IN (?a)", $user_ids);
+    fn_print_die($res);
 } elseif ($mode == 'cleanup_old_promotions') {
     $prev_month = date_create('last day of previous month 23:59:59');
     $promotion_ids = db_get_fields('SELECT promotion_id FROM ?:promotions WHERE ((to_date != 0 AND to_date <= ?i) OR status != ?s) AND company_id = ?i', $prev_month->getTimestamp(), 'A', 45);
@@ -3062,6 +3066,27 @@ fn_print_die($orders_wo_points);
     }
 
     fn_print_die('вне статуса: ' . count($out_of_status), 'а именно: ' . implode(', ', $out_of_status), 'корректировка ниже:', $corrections);
+} if ($mode == 'speedup_store') {
+    // почистим также купленные товары.
+    $res = db_query("truncate table ?:also_bought_products");
+    fn_print_r('почистим также купленные товары', $res);
+
+    // очистим сессии старше месяца
+    $res = db_query('DELETE FROM ?:sessions WHERE expiry < ?i', TIME + 28944000);
+    db_query('UPDATE ?:sessions SET expiry = expiry - 28944000');// SECONDS_IN_DAY * 335
+    fn_print_r('очистим сессии старше месяца', $res);
+
+    // очистим корзины для незарегистрированных
+    $res = db_quote("DELETE FROM ?:user_session_products WHERE user_type = 'U' AND timestamp < ?i", TIME - (SECONDS_IN_DAY * 10));
+    fn_print_die($res);
+    fn_print_r('очистим корзины для незарегистрированных', $res);
+
+    // очистим тяжелые вишлисты
+    $user_ids = db_get_fields("SELECT user_id FROM ?:user_session_products WHERE type = 'W' GROUP BY user_id HAVING count(product_id) > 60");
+    $res = db_query("DELETE FROM ?:user_session_products WHERE type = 'W' AND user_id IN (?a)", $user_ids);
+    fn_print_r('очистим тяжелые вишлисты', count($user_ids), $res);
+
+    fn_print_die('stop');
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
