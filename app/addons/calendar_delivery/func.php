@@ -62,7 +62,8 @@ function fn_calendar_delivery_uninstall()
     }
 }
 
-function fn_calendar_delivery_get_orders($params, $fields, $sortings, &$condition, $join, $group) {
+function fn_calendar_delivery_get_orders($params, &$fields, $sortings, &$condition, $join, $group) {
+    $fields[] = '?:orders.delivery_date';
     if (isset($params['delivery_date']) && !empty($params['delivery_date'])) {
         $condition .= db_quote(' AND (?:orders.delivery_date = ?i OR ?:orders.delivery_date = 0)', $params['delivery_date']);
     }
