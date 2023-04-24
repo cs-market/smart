@@ -7,7 +7,7 @@
                 <div class="ty-float-right">{if $promotion.modify_values_to_price}{include file="common/price.tpl" value=$promotion.goal_value}{else}{$promotion.goal_value}{/if}<i class="ty-smart-icon-flag-finish"></i></div>
             </div>
             <div class="ty-progress-bar" style="--progress: {$promotion.current_value / $promotion.goal_value * 100}%;">
-                <span class="ty-progress-bar__progress">{if $promotion.modify_values_to_price}{include file="common/price.tpl" value=$promotion.current_value} / {include file="common/price.tpl" value=$promotion.goal_value}{else}{$promotion.current_value}/{$promotion.goal_value}{/if}</span>
+                <span class="ty-progress-bar__progress">{if $promotion.modify_values_to_price}{include file="common/price.tpl" value=$promotion.current_value}{* / {include file="common/price.tpl" value=$promotion.goal_value}*}{else}{$promotion.current_value}{*/{$promotion.goal_value}*}{/if}</span>
             </div>
         </div>
     {/foreach}
