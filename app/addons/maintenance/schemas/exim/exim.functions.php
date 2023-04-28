@@ -26,14 +26,15 @@ function fn_maintenance_exim_set_usergroups($user_id, $data, $cleanup = true) {
         );
     }
 
+    $_data = [];
     foreach ($usergroups as $ug_id => $status) {
-        $_data = array(
+        $_data[] = array(
             'user_id' => $user_id,
             'usergroup_id' => $ug_id,
             'status' => $status
         );
-        db_query('REPLACE INTO ?:usergroup_links ?e', $_data);
     }
+    db_query('REPLACE INTO ?:usergroup_links ?m', $_data);
 
     return true;
 }

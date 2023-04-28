@@ -380,7 +380,7 @@ function fn_auto_exim_run_import($imports, $company_id) {
         $execution_time = fn_microtime_float() - $start_time;
         fn_log_event('exim', 'finish_import', ['file' => $import['relative_path'].$import['basename'], 'time' => $execution_time]);
 
-        if ($res) {
+        if ($res && !$debug) {
             $dir = str_replace('autoload/', 'storage/', $import['dirname']);
             $file = fn_date_format(time(), "%H-%M-%d-%m-%Y.").$import['basename'];
             fn_mkdir($dir);

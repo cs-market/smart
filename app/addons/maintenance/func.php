@@ -175,37 +175,44 @@ function fn_maintenance_get_usergroup_ids($data, $without_status = true) {
     $pair_delimiter = ':';
     $set_delimiter = ',';
     $return = [];
-    if (is_array($data)) {
-        $usergroups = $data;
-    } else {
-        $data = str_replace(';', $set_delimiter, $data);
-        $usergroups = explode($set_delimiter, $data);
-    }
+    static $usergroup_cache = [];
+    $_cache_key = md5($data);
+    if (empty($usergroup_cache[$_cache_key])) {
+        if (is_array($data)) {
+            $usergroups = $data;
+        } else {
+            $data = str_replace(';', $set_delimiter, $data);
+            $usergroups = explode($set_delimiter, $data);
+        }
 
-    if (!empty($usergroups)) {
-        array_walk($usergroups, 'fn_trim_helper');
-        foreach ($usergroups as $ug) {
-            $ug_data = fn_explode($pair_delimiter, $ug);
-            if (is_array($ug_data)) {
-                // Check if user group exists
-                $ug_id = false;
-                // search by ID
-                if (is_numeric($ug_data[0])) {
-                    if (in_array($ug_data[0], [USERGROUP_ALL, USERGROUP_GUEST, USERGROUP_REGISTERED])) {
-                        $ug_id = $ug_data[0];
-                    } elseif ($res = db_get_field("SELECT usergroup_id FROM ?:usergroups WHERE usergroup_id = ?i", $ug_data[0])) {
-                        $ug_id = $res;
+        if (!empty($usergroups)) {
+            array_walk($usergroups, 'fn_trim_helper');
+            foreach ($usergroups as $ug) {
+                $ug_data = fn_explode($pair_delimiter, $ug);
+                if (is_array($ug_data)) {
+                    // Check if user group exists
+                    $ug_id = false;
+                    // search by ID
+                    if (is_numeric($ug_data[0])) {
+                        if (in_array($ug_data[0], [USERGROUP_ALL, USERGROUP_GUEST, USERGROUP_REGISTERED])) {
+                            $ug_id = $ug_data[0];
+                        } elseif ($res = db_get_field("SELECT usergroup_id FROM ?:usergroups WHERE usergroup_id = ?i", $ug_data[0])) {
+                            $ug_id = $res;
+                        }
                     }
-                }
-                // search by name
-                if ($ug_id === false && ($db_id = db_get_field("SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s AND lang_code = ?s", $ug_data[0], DESCR_SL))) {
-                    $ug_id = $db_id;
-                }
-                if ($ug_id !== false) {
-                    $return[$ug_id] = isset($ug_data[1]) ? $ug_data[1] : ObjectStatuses::ACTIVE;
+                    // search by name
+                    if ($ug_id === false && ($db_id = db_get_field("SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s AND lang_code = ?s", $ug_data[0], DESCR_SL))) {
+                        $ug_id = $db_id;
+                    }
+                    if ($ug_id !== false) {
+                        $return[$ug_id] = isset($ug_data[1]) ? $ug_data[1] : ObjectStatuses::ACTIVE;
+                    }
                 }
             }
         }
+        $usergroup_cache[$_cache_key] = $return;
+    } else {
+        $return = $usergroup_cache[$_cache_key];
     }
 
     return ($without_status ? array_keys($return) : $return);

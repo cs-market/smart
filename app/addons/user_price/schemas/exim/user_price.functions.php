@@ -16,7 +16,7 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
             };
         }
 
-        if (!isset($db_users[$name]) && $ug_id = $fn_load_usergroups($name)) {
+        if (empty($db_users[$name]) && $ug_id = $fn_load_usergroups($name)) {
             $price = array(
                 'product_id' => $primary_object_id['product_id'],
                 'price' => $object['price'],
@@ -30,7 +30,7 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
             $users = array();
             if (!isset($db_users[$name])) {
                 $names = explode(',', $name);
-                $search_fields = array('cscart_users.user_login', 'cscart_users.firstname', 'cscart_users.email');
+                $search_fields = array('?:users.user_login', '?:users.firstname', '?:users.email');
 
                 list($fields, $join, $condition) = fn_get_users(['get_conditions' => true], $_SESSION['auth']);
 
@@ -45,17 +45,17 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
                 }
                 if (!empty($expression)) {
                     $case = ' CASE ' . implode(' ', $expression) . ' END AS level';
-                    $fields[] = $case;
+                    $search_fields[] = $case;
                     $condition['case_condition'] = ' AND ( ' . implode(' OR ', $conditions) . ' ) ';
                 }
 
-                $users = db_get_hash_multi_array("SELECT " . implode(', ', $fields) . " FROM ?:users $join WHERE 1" . implode('', $condition) , array('level'));
+                $users = db_get_hash_multi_array("SELECT " . implode(', ', $search_fields) . " FROM ?:users WHERE 1" . implode('', $condition) , array('level'));
 
                 if (!empty($users)) {
                     ksort($users);
                     $users = array_unique(array_column(reset($users), 'user_id'));
-                    $db_users[$name] = $users;
                 }
+                $db_users[$name] = $users;
             } else {
                 $users = $db_users[$name];
             }
