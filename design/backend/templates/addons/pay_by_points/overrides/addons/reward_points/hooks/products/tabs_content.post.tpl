@@ -60,7 +60,7 @@
                 <input type="checkbox" name="product_data[is_op]" id="rp_is_op" value="Y" {if $data.is_op == "Y"}checked="checked"{/if} onclick="Tygh.$.disable_elms([{foreach from=$reward_usergroups item=m}'earned_points_{$object_type}_{$m.usergroup_id}',{/foreach}{foreach from=$reward_usergroups item=m}'points_type_{$object_type}_{$m.usergroup_id}',{/foreach}], !this.checked);">
                 {__("override_gc_points")}
             </label>
-            
+
             <div class="table-responsive-wrapper">
                 <table class="table table-middle table-responsive">
                 <thead class="cm-first-sibling">
@@ -68,24 +68,51 @@
                         <th width="20%">{__("usergroup")}</th>
                         <th width="40%">{__("amount")}</th>
                         <th width="40%">{__("amount_type")}</th>
+                        <th width="15%">&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody>
-                {foreach from=$reward_usergroups item=m}
+                {foreach from=$reward_points item=m}
                     <tr>
                         <td data-th="{__("usergroup")}">
                             <input type="hidden" name="product_data[reward_points][{$m.usergroup_id}][usergroup_id]" value="{$m.usergroup_id}">
-                            {$m.usergroup}</td>
+                            {$reward_usergroups.{$m.usergroup_id}.usergroup}
+                        </td>
                         <td data-th="{__("amount")}">
-                            <input type="text" id="earned_points_{$object_type}_{$m.usergroup_id}" name="product_data[reward_points][{$m.usergroup_id}][amount]" value="{$reward_points[$m.usergroup_id].amount|default:"0"}" {if $data.is_op != "Y"}disabled="disabled"{/if}></td>
+                            <input type="text" id="earned_points_{$object_type}_{$m.usergroup_id}" name="product_data[reward_points][{$m.usergroup_id}][amount]" value="{$reward_points[$m.usergroup_id].amount|default:"0"}" {if $data.is_op != "Y"}disabled="disabled"{/if}>
+                        </td>
                         <td data-th="{__("amount_type")}">
                             <select id="points_type_{$object_type}_{$m.usergroup_id}" name="product_data[reward_points][{$m.usergroup_id}][amount_type]" {if $object_type == $smarty.const.PRODUCT_REWARD_POINTS && $data.is_op != 'Y'}disabled="disabled"{/if}>
                                 <option value="A" {if $reward_points[$m.usergroup_id].amount_type == "A"}selected{/if}>{__("absolute")} ({__("points_lower")})</option>
                                 <option value="P" {if $reward_points[$m.usergroup_id].amount_type == "P"}selected{/if}>{__("percent")} (%)</option>
                             </select>
                         </td>
+                        <td width="15%" class="nowrap {$no_hide_input_if_shared_product} right">{include file="buttons/clone_delete.tpl" dummy_href=true microformats="cm-delete-row" no_confirm=true}</td>
                     </tr>
                 {/foreach}
+                {math equation="x+1" x=$_key|default:0 assign="new_key"}
+                <tr class="{cycle values="table-row , " reset=1}{$no_hide_input_if_shared_product}" id="box_add_oper">
+                    <td width="5%" data-th="{__("usergroup")}">
+                        <select id="usergroup_id" name="product_data[reward_points][add_{$new_key}][usergroup_id]" class="span3">
+                            <option value="0">{__('all')}</option>
+                            {foreach from=$reward_usergroups item="usergroup"}
+                                <option value="{$usergroup.usergroup_id}">{$usergroup.usergroup}</option>
+                            {/foreach}
+                        </select>
+                        </td>
+                    <td width="20%" data-th="{__("amount")}">
+                        <input type="text" id="earned_points_{$object_type}_{$m.usergroup_id}" name="product_data[reward_points][add_{$new_key}][amount]" value="0" {if $data.is_op != "Y"}disabled="disabled"{/if}>
+                    </td>
+                    <td width="25%" data-th="{__("amount_type")}">
+                        <select id="points_type_{$object_type}_{$m.usergroup_id}" name="product_data[reward_points][add_{$new_key}][amount_type]" {if $object_type == $smarty.const.PRODUCT_REWARD_POINTS && $data.is_op != 'Y'}disabled="disabled"{/if}>
+                            <option value="A" {if $reward_points[$m.usergroup_id].amount_type == "A"}selected{/if}>{__("absolute")} ({__("points_lower")})</option>
+                            <option value="P" {if $reward_points[$m.usergroup_id].amount_type == "P"}selected{/if}>{__("percent")} (%)</option>
+                        </select>
+                    </td>
+                    <td width="15%" class="right">
+                        {include file="buttons/multiple_buttons.tpl" item_id="add_oper"}
+                    </td>
+                </tr>
                 </tbody>
                 </table>
             </div>
