@@ -2950,6 +2950,39 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($corrections, $params, '"');
     fn_print_die(count($corrections), $corrections);
+} elseif ($mode == 'correct_reward_points_april') {
+    $params= [
+        'period' => 'M',
+        'time_from' => '01/04/2023',
+        'time_to' => '12/04/2023',
+        'usergroup_id' => "15038",
+    ];
+
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $grand_points_order_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+    fn_print_die($grand_points_order_statuses);
+
+    list($orders, ) = fn_get_orders(('time_from' => '01/04/2023','user_id' => $user['user_id'], 'time_to' => '01/08/2019', 'time_from' => '01/12/2018', 'period' => 'C', 'company_id' => $company_id, 'status' => array('P', 'C', 'Y', 'A')));
+    fn_print_die($orders);
+
+    list($logs, $search) = fn_get_logs(['q_type' => 'users', 'q_action' => 'delete']);
+    $report = [];
+    foreach ($logs as $log) {
+        list($user, $extra) = explode(';', $log['content']['user']);
+        $extra = trim(preg_replace('/\((.+?)\)/i', '', $extra));
+        $report[] = [
+            'user' => $user,
+            'extra' => $extra,
+            'user_id' => $log['content']['id'],
+            'date' => fn_date_format($log['timestamp'], Registry::get('settings.Appearance.date_format'))
+        ];
+    }
+    $params['filename'] = "deleted_users.csv";
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($report, $params, '"');
+    fn_print_die($report);
 } elseif ($mode == 'baltica_logs') {
     list($logs, $search) = fn_get_logs(['q_type' => 'users', 'q_action' => 'delete']);
     $report = [];

@@ -23,38 +23,31 @@
         <item lang="ru" id="extended_reward_points.full_payment">Полная оплата товара баллами</item>
         <item lang="ru" id="extended_reward_points.partial_payment">Частичная оплата товара баллами</item>
         <item lang="ru" id="extended_reward_points.max_rp_discount">Ограничить частичную оплату в объеме от заказа</item>
-        <item lang="ru" id="extended_reward_points.min_prices">Минимальные цены товара</item>
+        <item lang="ru" id="extended_reward_points.max_product_discount">Максимальная скидка на товар с участием бонусных баллов</item>
         <item lang="ru" id="extended_reward_points.exim_cleanup_reward_points">Предварительно очистить бонусные баллы</item>
         <item lang="ru" id="extended_reward_points.reward_points_ttl">Время жизни начисленных бонусных баллов</item>
         <item lang="ru" id="extended_reward_points.points_amount_reduced">Число баллов, которое вы ввели, больше, чем можно использовать в этом заказе.</item>
         <item lang="ru" id="extended_reward_points.reward">Будет начисленно в заказе</item>
         <item lang="ru" id="extended_reward_points.points_in_use">Будет списано в заказе</item>
         <item lang="ru" id="extended_reward_points.points_to_use_hint">Введите баллы для списания</item>
-        <item lang="ru" id="extended_reward_points.points_to_use_header">Чтобы оплатить часть заказа баллами, введите количество:</item>
-        
+        <item lang="ru" id="extended_reward_points.points_to_use_header">Чтобы оплатить часть заказа баллами, введите количество</item>
+        <item lang="ru" id="earn_points">Начисление баллов</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `reward_points_mechanics` CHAR(1) NOT NULL DEFAULT 'A';</item>
         <item for="uninstall">ALTER TABLE `?:companies` DROP `reward_points_mechanics`;</item>
 
-        <item>ALTER TABLE `?:companies` ADD `max_rp_discount` TINYINT UNSIGNED NOT NULL DEFAULT '100';</item>
+        <item>ALTER TABLE `?:companies` ADD `max_rp_discount` TINYINT UNSIGNED NOT NULL DEFAULT '20';</item>
         <item for="uninstall">ALTER TABLE `?:companies` DROP `max_rp_discount`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `max_product_discount` TINYINT UNSIGNED NOT NULL DEFAULT '30';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `max_product_discount`;</item>
 
         <item>ALTER TABLE `?:companies` ADD `reward_points_ttl` SMALLINT UNSIGNED NOT NULL DEFAULT '0';</item>
         <item for="uninstall">ALTER TABLE `?:companies` DROP `reward_points_ttl`;</item>
 
         <item>ALTER TABLE `?:products` ADD `earned_points_eq_price` CHAR(1) NOT NULL DEFAULT 'N'</item>
         <item for="uninstall">ALTER TABLE `?:products` DROP `earned_points_eq_price`;</item>
-
-        <item>DROP TABLE IF EXISTS `?:product_min_prices`;</item>
-        <item>CREATE TABLE `?:product_min_prices` (
-          `product_id` mediumint unsigned NOT NULL DEFAULT '0',
-          `price` decimal(12,2) NOT NULL DEFAULT '0.00',
-          `usergroup_id` mediumint unsigned NOT NULL DEFAULT '0',
-          UNIQUE KEY `usergroup` (`product_id`,`usergroup_id`),
-          KEY `product_id` (`product_id`)
-        )</item>
-        <item for="uninstall">DROP TABLE `?:product_min_prices`;</item>
 
         <item>DROP TABLE IF EXISTS `?:reward_point_details`;</item>
         <item>CREATE TABLE `?:reward_point_details` (
