@@ -41,6 +41,7 @@ function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_produ
             $min_subtotal = $max_rp = 0;
 
             foreach ($cart['products'] as &$product) {
+                if (!YesNo::toBool($product['is_pbp'])) continue;
                 $min_subtotal += $product['price'] * $product['amount'] * (1 - ($auth['extended_reward_points']['max_product_discount'] / 100));
                 $max_rp += round($product['price'] * $product['amount'] * $auth['extended_reward_points']['max_rp_discount'] / 100);
                 unset($product['extra']['points_info']['price']);
@@ -111,7 +112,7 @@ function fn_extended_reward_points_add_product_to_cart_get_price($product_data, 
                 $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($tmp, $auth);
             }
             
-            $in_use = fn_get_cart_points_in_use($cart, $product_id);
+            $in_use = fn_get_cart_points_in_use($cart, ($update) ? $product_id : false);
             
             $balance = $auth['points'] - $data['extra']['point_price'] * $amount - $in_use;
             if ($balance < 0) {
@@ -125,20 +126,20 @@ function fn_extended_reward_points_add_product_to_cart_get_price($product_data, 
 function fn_extended_reward_points_get_price_in_points($product, $auth) {
     if (YesNo::toBool(Registry::get('addons.reward_points.auto_price_in_points')) && !YesNo::toBool($product['is_oper'])) {
         $per = Registry::get('addons.reward_points.point_rate');
-
         $subtotal = $product['price'];
         if (!YesNo::toBool(Registry::get('addons.reward_points.price_in_points_with_discounts')) && isset($product['discount'])) {
             $subtotal = $product['price'] + $product['discount'];
         }
     } else {
-        $per = (!empty($product['price']) && floatval($product['price'])) ? fn_get_price_in_points($product['product_id'], $auth) / $product['price'] : 0;
-        $subtotal = $product['price'];
+        $subtotal = fn_get_price_in_points($product['product_id'], $auth);
     }
 
     return ceil($subtotal);
 }
 
 function fn_get_cart_points_in_use($cart, $exclude_products = []) {
+    if (empty($cart)) $cart = Tygh::$app['session']['cart'];
+
     if (!is_array($exclude_products)) {
         $exclude_products = [$exclude_products];
     }
@@ -152,14 +153,4 @@ function fn_get_cart_points_in_use($cart, $exclude_products = []) {
     }
 
     return $total_use_points;
-}
-
-//vega
-function fn_get_available_points($cart) {
-    if (empty($cart)) $cart = Tygh::$app['session']['cart'];
-
-    return max(
-        Tygh::$app['session']['auth']['points'] - @$cart['extended_points_info']['in_use'],
-        0
-    );
 }
