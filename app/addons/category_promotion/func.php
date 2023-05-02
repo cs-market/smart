@@ -219,7 +219,7 @@ function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth
     }
 }
 
-function fn_category_promotion_gather_additional_products_data_post($product_ids, $params, $products, $auth, $lang_code) {
+function fn_category_promotion_gather_additional_products_data_post($product_ids, $params, &$products, $auth, $lang_code) {
     if (Registry::get('addons.product_stickers.status') == 'A') {
         if (empty($params['get_for_one_product'])) {
             $promo_params = array(
