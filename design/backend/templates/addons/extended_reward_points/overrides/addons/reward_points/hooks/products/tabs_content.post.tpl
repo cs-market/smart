@@ -49,7 +49,7 @@
 
             <input type="hidden" name="product_data[is_op]" value="N">
             <label for="rp_is_op" class="checkbox">
-                <input type="checkbox" name="product_data[is_op]" id="rp_is_op" value="Y" {if $data.is_op == "Y"}checked="checked"{/if} onclick="Tygh.$.disable_elms([{foreach from=$reward_usergroups item=m}'earned_points_{$object_type}_{$m.usergroup_id}',{/foreach}{foreach from=$reward_usergroups item=m}'points_type_{$object_type}_{$m.usergroup_id}',{/foreach}], !this.checked);">
+                <input type="checkbox" name="product_data[is_op]" id="rp_is_op" value="Y" {if $data.is_op == "Y"}checked="checked"{/if} onclick="Tygh.$.disable_elms([{foreach from=$reward_points item=m}'earned_points_{$object_type}_{$m.usergroup_id}',{/foreach}'earned_points_{$object_type}_0','points_type_{$object_type}_0',{foreach from=$reward_points item=m}'points_type_{$object_type}_{$m.usergroup_id}',{/foreach}], !this.checked);">
                 {__("override_gc_points")}
             </label>
             
@@ -93,10 +93,10 @@
                         </select>
                         </td>
                     <td width="20%" data-th="{__("amount")}">
-                        <input type="text" id="earned_points_{$object_type}_{$m.usergroup_id}" name="product_data[reward_points][add_{$new_key}][amount]" value="0" {if $data.is_op != "Y"}disabled="disabled"{/if}>
+                        <input type="text" id="earned_points_{$object_type}_0" name="product_data[reward_points][add_{$new_key}][amount]" value="0" {if $data.is_op != "Y"}disabled="disabled"{/if}>
                     </td>
                     <td width="25%" data-th="{__("amount_type")}">
-                        <select id="points_type_{$object_type}_{$m.usergroup_id}" name="product_data[reward_points][add_{$new_key}][amount_type]" {if $object_type == $smarty.const.PRODUCT_REWARD_POINTS && $data.is_op != 'Y'}disabled="disabled"{/if}>
+                        <select id="points_type_{$object_type}_0" name="product_data[reward_points][add_{$new_key}][amount_type]" {if $object_type == $smarty.const.PRODUCT_REWARD_POINTS && $data.is_op != 'Y'}disabled="disabled"{/if}>
                             <option value="A" {if $reward_points[$m.usergroup_id].amount_type == "A"}selected{/if}>{__("absolute")} ({__("points_lower")})</option>
                             <option value="P" {if $reward_points[$m.usergroup_id].amount_type == "P"}selected{/if}>{__("percent")} (%)</option>
                         </select>

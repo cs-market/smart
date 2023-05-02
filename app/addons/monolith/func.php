@@ -15,12 +15,12 @@ function fn_monolith_generate_xml($order_id) {
     if (!in_array($order_info['company_id'], $allowed_companies)) {
         return false;
     }
-
+    $company_settings = db_get_row('SELECT reward_points_mechanics, max_rp_discount, max_product_discount FROM ?:companies WHERE company_id = ?i', $order_info['company_id']);
     if (isset($order_info['points_info']['in_use']['points'])) {
         $d_products = [];
         foreach ($order_info['product_groups'] as $group_id => $group) {
             foreach ($group['products'] as $product) {
-                $available_discount = $product['price'] - $product['min_price'];
+                $available_discount = $product['price']*(1 - $company_settings['max_product_discount']/100);
                 $d_products[$product['item_id']] = ($available_discount > 0) ? $available_discount * $product['amount'] : 0;
             }
         }
