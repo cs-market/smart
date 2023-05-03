@@ -233,23 +233,28 @@ function fn_category_promotion_gather_additional_products_data_post($product_ids
                     if (!empty($promotion['products'])) {
                         foreach(explode(',', $promotion['products']) as $product_id) {
                             if (!in_array($product_id, $product_ids)) continue;
-                            if (!empty($products[$product_id]['promo'])) continue;
+                            foreach ($products as &$product) {
+                                if ($product['product_id'] != $product_id) continue;
+                                
+                                if (!empty($product['promo'])) continue;
 
-                            $products[$product_id]['promo'] = $promotion;
-                            $sticker_id = (!empty($promotion['sticker_ids'])) ? $promotion['sticker_ids'] : Registry::get('addons.category_promotion.promotion_sticker_id');
+                                $product['promo'] = $promotion;
+                                $sticker_id = (!empty($promotion['sticker_ids'])) ? $promotion['sticker_ids'] : Registry::get('addons.category_promotion.promotion_sticker_id');
 
-                            $_params = array();
-                            $_params['sticker_id'] = (!empty($promotion['sticker_ids'])) ? $promotion['sticker_ids'] : Registry::get('addons.category_promotion.promotion_sticker_id');
-                            $_params['get_stickers_for'] = $params['get_stickers_for'];
-                            $_params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
-                            $_params['product'] = $products[$product_id];
-                            if ($res = fn_get_stickers($_params)) {
-                                if (empty($products[$product_id]['stickers'])) {
-                                    $products[$product_id]['stickers'] = $res;
-                                } else {
-                                    $products[$product_id]['stickers'] = array_merge($products[$product_id]['stickers'], $res);
+                                $_params = array();
+                                $_params['sticker_id'] = (!empty($promotion['sticker_ids'])) ? $promotion['sticker_ids'] : Registry::get('addons.category_promotion.promotion_sticker_id');
+                                $_params['get_stickers_for'] = $params['get_stickers_for'];
+                                $_params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
+                                $_params['product'] = $product;
+                                if ($res = fn_get_stickers($_params)) {
+                                    if (empty($product['stickers'])) {
+                                        $product['stickers'] = $res;
+                                    } else {
+                                        $product['stickers'] = array_merge($products[$product_id]['stickers'], $res);
+                                    }
                                 }
                             }
+                            unset($product);
                         }
                     }
                 }
