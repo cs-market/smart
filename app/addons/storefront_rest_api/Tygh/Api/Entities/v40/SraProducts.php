@@ -83,7 +83,7 @@ class SraProducts extends Products
         if ($id) {
             $result['data'] = reset($products);
         } else {
-            $result['data']['products'] = $products;
+            $result['data']['products'] = array_values($products);
             if ($this->safeGet($params, 'get_filters', false)) {
                 $filter_params = $params;
                 if (!empty($result['data']['params']['cid'])) {
