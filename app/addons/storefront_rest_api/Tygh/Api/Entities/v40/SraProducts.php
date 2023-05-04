@@ -38,7 +38,7 @@ class SraProducts extends Products
         $is_discussion_enabled = SraDiscussion::isAddonEnabled();
 
         $params['icon_sizes'] = $this->safeGet($params, 'icon_sizes', [
-            'main_pair'   => [$this->icon_size_big, $this->icon_size_small],
+            'main_pair'   => [$this->icon_size_small],
             'image_pairs' => [$this->icon_size_small],
         ]);
 

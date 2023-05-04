@@ -857,7 +857,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
             }
 
             // Import images
-            if (isset($xml_product_data->{$cml['image']})) {
+            if ($this->company_id != 12 && isset($xml_product_data->{$cml['image']})) {
                 $this->addProductImage($xml_product_data->{$cml['image']}, $product_id, $import_params);
             }
 
