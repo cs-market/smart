@@ -200,9 +200,9 @@ function fn_monolith_generate_xml($order_id) {
                     $addon['order_prefix'] . $order_id,
                     'Baltika_loyalty',
                     'Baltika_loyalty',
-                    '',
-                    'Amount',
                     $product['points_in_use'],
+                    'Amount',
+                    '',
                     $product['product_code'],
                 )
             ];
