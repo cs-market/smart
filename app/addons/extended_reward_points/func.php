@@ -154,3 +154,153 @@ function fn_get_cart_points_in_use($cart, $exclude_products = []) {
 
     return $total_use_points;
 }
+
+function fn_extended_reward_points_change_order_status(&$status_to, &$status_from, &$order_info, &$force_notification, &$order_statuses, &$place_order) {
+    if ($reward_points_ttl = db_get_field('SELECT reward_points_ttl FROM ?:companies WHERE company_id = ?i', $order_info['company_id'])) {
+
+        $points_info = (isset($order_info['points_info'])) ? $order_info['points_info'] : array();
+
+        if (!empty($points_info)) {
+            $grant_points_to = (!empty($order_statuses[$status_to]['params']['grant_reward_points'])) ? $order_statuses[$status_to]['params']['grant_reward_points'] : 'N';
+            $grant_points_from = (!empty($order_statuses[$status_from]['params']['grant_reward_points'])) ? $order_statuses[$status_from]['params']['grant_reward_points'] : 'N';
+
+            if ($order_statuses[$status_to]['params']['inventory'] == 'I' && $order_statuses[$status_from]['params']['inventory'] == 'D') {
+                if (!empty($points_info['in_use']['points'])) {
+                    fn_extended_reward_points_release_points($order_info['order_id']);
+                }
+            }
+            if ($order_statuses[$status_to]['params']['inventory'] == 'D' && $order_statuses[$status_from]['params']['inventory'] == 'I') {
+                if (!empty($points_info['in_use']['points'])) {
+                    // decrease points in use
+                    if ($points_info['in_use']['points'] <= fn_get_user_additional_data(POINTS, $order_info['user_id'])) {
+                        fn_extended_reward_points_use_points($points_info['in_use']['points'], $order_info['user_id'], $order_info['order_id']);
+                    }
+                }
+            }
+
+            if (
+                $grant_points_to === YesNo::YES && $points_info['is_gain'] === YesNo::NO && !empty($points_info['reward'])
+            ) {
+                if (!db_get_field('SELECT order_id FROM ?:reward_point_details WHERE order_id = ?i', $order_info['order_id'])) {
+                    $insert = [
+                        'user_id' => $order_info['user_id'],
+                        'order_id' => $order_info['order_id'],
+                        'amount' => $points_info['reward'],
+                        'ttl' => time() + $reward_points_ttl * SECONDS_IN_DAY,
+                        'repaid_order_ids' => '',
+                        'details' => serialize(''),
+                    ];
+                    db_query('INSERT INTO ?:reward_point_details SET ?u', $insert);
+                }
+            }
+        }
+    }
+}
+
+function fn_extended_reward_points_expire_points() {
+    if ($data = db_get_array('SELECT * FROM ?:reward_point_details WHERE ttl < ?i AND amount > ?s', TIME, 0)) {
+        foreach ($data as $expiry) {
+            $reason = array(
+                'order_id' => $expiry['order_id'],
+                'text' => __('extended_reward_points.expired_reward_points_ttl'),
+            );
+            fn_change_user_points(-$expiry['amount'], $expiry['user_id'], serialize($reason), CHANGE_DUE_SUBTRACT);
+        }
+        db_query('UPDATE ?:reward_point_details SET amount = ?i WHERE ttl < ?i', 0, TIME);
+    }
+}
+
+function fn_extended_reward_points_use_points($points, $user_id, $repaid_order_id) {
+    if (empty($user_id)) return;
+
+    if ($data = db_get_row('SELECT * FROM ?:reward_point_details WHERE user_id = ?i AND amount != ?i AND order_id != ?i ORDER BY ttl', $user_id, 0, $repaid_order_id)) {
+        $data['details'] = unserialize($data['details']);
+        $data['repaid_order_ids'] = array_filter(explode(',', $data['repaid_order_ids']));
+
+        $diff = $data['amount'] - $points;
+        $decrease = $data['amount'] - max(0, $diff);
+        $data['details'][$repaid_order_id] = ['time' => TIME, 'decrease' => $decrease];
+        $data['repaid_order_ids'][] = $repaid_order_id;
+        $data['repaid_order_ids'] = array_unique($data['repaid_order_ids']);
+        $data['amount'] = max(0, $diff);
+
+        $data['details'] = serialize($data['details']);
+        $data['repaid_order_ids'] = implode(',', $data['repaid_order_ids']);
+
+        db_query('UPDATE ?:reward_point_details SET ?u WHERE order_id = ?i', $data, $data['order_id']);
+        if ($diff < 0) {
+            fn_extended_reward_points_use_points(abs($diff), $user_id, $repaid_order_id);
+        }
+    }
+}
+
+function fn_extended_reward_points_release_points($repaid_order_id) {
+    if ($items = db_get_array('SELECT * FROM ?:reward_point_details WHERE FIND_IN_SET(?i, repaid_order_ids)', $repaid_order_id)) {
+        foreach($items as $data) {
+            $data['details'] = unserialize($data['details']);
+            $data['repaid_order_ids'] = array_filter(explode(',', $data['repaid_order_ids']));
+            if (!empty($data['details'][$repaid_order_id])) {
+                $data['amount'] += $data['details'][$repaid_order_id]['decrease'];
+                unset($data['details'][$repaid_order_id]);
+                if (($key = array_search($repaid_order_id, $data['repaid_order_ids'])) !== false) {
+                    unset($data['repaid_order_ids'][$key]);
+                }
+            }
+
+            $data['details'] = serialize($data['details']);
+            $data['repaid_order_ids'] = implode(',', $data['repaid_order_ids']);
+            db_query('UPDATE ?:reward_point_details SET ?u WHERE order_id = ?i', $data, $data['order_id']);
+        }
+    }
+}
+
+function fn_generate_reward_points_report($params) {
+    $default_params = array(
+        'delimiter' => 'S',
+        'company_id' => '45',
+        'period' => 'custom',
+        'time_from' => strtotime("-3 month"),
+        'time_to' => TIME,
+        'filename' => date('dMY_His', TIME) . '.csv',
+    );
+
+    $params = array_filter($params);
+    if (isset($params['period']) && $params['period'] == 'A') unset($params['period']);
+
+    if (is_array($params)) {
+        $params = array_merge($default_params, $params);
+    } else {
+        $params = $default_params;
+    }
+
+    list($params['time_from'], $params['time_to']) = fn_create_periods($params);
+
+    if (Registry::get('runtime.company_id')) {
+        $params['company_id'] = Registry::get('runtime.company_id');
+    }
+
+    $output = array();
+    if (isset($params['is_search'])) {
+
+        list($orders, $c_params, $totals) = fn_get_orders($params);
+
+        if ($orders) {
+            foreach ($orders as $order) {
+                $user = fn_get_user_info($order['user_id']);
+                $points_info = unserialize(db_get_field('SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order['order_id'], POINTS_IN_USE));
+                $ttl = db_get_field('SELECT ttl FROM ?:reward_point_details WHERE order_id = ?i', $order['order_id']);
+                $output[] = [
+                    __('region') => $user['s_state'],
+                    __('login') => $user['user_login'],
+                    __('order') => $order['order_id'],
+                    __('order_date') => fn_date_format($order['timestamp'], Registry::get('settings.Appearance.date_format')),
+                    __('earned_points') => $order['points'] ?? 0,
+                    __('extended_reward_points.reward_points_ttl') => (!empty($ttl)) ? fn_date_format($ttl, Registry::get('settings.Appearance.date_format')) : '', 
+                    __('points_in_use') => $points_info['points'] ?? 0,
+                    __('extended_reward_points.user_points') => fn_get_user_additional_data(POINTS, $order['user_id'])
+                ];
+            }
+        }
+    }
+    return array($output, $params);
+}

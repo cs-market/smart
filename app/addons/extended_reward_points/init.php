@@ -12,4 +12,5 @@ fn_register_hooks(
     'pre_place_order',
     'get_order_info',
     'user_init',
+    'change_order_status'
 );

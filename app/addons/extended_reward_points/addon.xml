@@ -32,6 +32,9 @@
         <item lang="ru" id="extended_reward_points.points_to_use_hint">Введите баллы для списания</item>
         <item lang="ru" id="extended_reward_points.points_to_use_header">Чтобы оплатить часть заказа баллами, введите количество</item>
         <item lang="ru" id="earn_points">Начисление баллов</item>
+        <item lang="ru" id="reward_points_report">Отчет о бонусных баллах</item>
+        <item lang="ru" id="extended_reward_points.expired_reward_points_ttl">Истек срок действия бонусных баллов</item>
+        <item lang="ru" id="extended_reward_points.user_points">Баллы пользователя</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `reward_points_mechanics` CHAR(1) NOT NULL DEFAULT 'A';</item>
@@ -51,17 +54,15 @@
 
         <item>DROP TABLE IF EXISTS `?:reward_point_details`;</item>
         <item>CREATE TABLE `?:reward_point_details` (
-          `user_id` mediumint unsigned NOT NULL DEFAULT '0',
-          `earn_order_id` decimal(12,2) NOT NULL DEFAULT '0.00',
-          `amount` mediumint unsigned NOT NULL DEFAULT '0',
-          `ttl` mediumint unsigned NOT NULL DEFAULT '0',
-          `is_repaid` char(1) NOT NULL DEFAULT 'N',
-          `repaid_order_ids` varchar(255) NOT NULL DEFAULT '',
+          `user_id` MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
+          `order_id` MEDIUMINT NOT NULL DEFAULT '0.00',
+          `amount` MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
+          `ttl` INT UNSIGNED NOT NULL DEFAULT '0',
+          `repaid_order_ids` VARCHAR(255) NOT NULL DEFAULT '',
           `details` TEXT,
-          UNIQUE KEY `uniq` (`user_id`,`earn_order_id`),
+          UNIQUE KEY `uniq` (`earn_order_id`),
           KEY `user_id` (`user_id`),
           KEY `ttl` (`ttl`),
-          KEY `is_repaid` (`is_repaid`),
           KEY `repaid_order_ids` (`repaid_order_ids`)
         )</item>
         <item for="uninstall">DROP TABLE `?:reward_point_details`;</item>
