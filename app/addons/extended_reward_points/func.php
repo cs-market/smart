@@ -23,6 +23,18 @@ function fn_extended_reward_points_gather_additional_product_data_before_discoun
     }
 }
 
+// temporary fix for mobile app
+function fn_extended_reward_points_storefront_rest_api_gather_additional_products_data_post(&$products, $params, $data_gather_params) {
+    $auth = Tygh::$app['session']['auth'];
+    foreach ($products as &$product) {
+        if (SiteArea::isStorefront(AREA) && YesNo::toBool($product['is_pbp']) && RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics'])) {
+            $product['price'] = 0;
+        }
+    }
+
+    unset($product);
+}
+
 function fn_extended_reward_points_pre_get_cart_product_data($hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, &$fields, &$join, $params) {
     $fields[] = '?:products.is_pbp';
     $fields[] = '?:products.is_oper';
@@ -60,6 +72,9 @@ function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_produ
                 if (!YesNo::toBool($data['is_pbp'])) continue;
                 $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($data, $auth);
                 $cart_products[$key]['price'] = 0;
+
+                // temporary fix for mobile app
+                $data['extra']['pay_by_points']['point_price'] = $data['extra']['point_price'];
             }
             unset($data);
 
@@ -92,8 +107,16 @@ function fn_extended_reward_points_user_init(&$auth, $user_info) {
     }
 }
 
+function fn_extended_reward_points_fill_auth(&$auth, $user_data, $area, $original_auth) {
+    if (empty($auth['extended_reward_points']) && !empty(Tygh::$app['session']['auth']['extended_reward_points']) && Tygh::$app['session']['auth']['user_id'] == $auth['user_id'] && defined('API')) {
+        $auth['extended_reward_points'] = Tygh::$app['session']['auth']['extended_reward_points'];
+        $auth['points'] = Tygh::$app['session']['auth']['points'];
+    }
+}
+
 // vega
 function fn_extended_reward_points_add_product_to_cart_get_price($product_data, $cart, $auth, $update, $_id, &$data, $product_id, $amount, $price, $zero_price_action, &$allow_add) {
+
     if (RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics']) && $allow_add) {
         if (!empty($cart['products'][$_id])) {
             $data['is_pbp'] = $cart['products'][$_id]['is_pbp'];
