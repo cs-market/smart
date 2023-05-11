@@ -233,21 +233,23 @@ function fn_product_groups_place_suborders($cart, &$suborder_cart, $key_group) {
     $suborder_cart['products'] = $cart['product_groups'][$key_group]['products'];
 
     foreach ($suborder_cart['promotions'] as $promotion_id => $promo_data) {
-        $found = false;
-        foreach ($promo_data['bonuses'] as $bonus) {
-            if (in_array($bonus['bonus'], ['free_products', 'promotion_step_free_products'])) {
-                $products = array_column($bonus['value'], 'product_id');
-                $cart_products = array_filter($suborder_cart['products'], function($v) {
-                    return !$v['price'];
-                });
-                $cart_products = array_column($cart_products, 'product_id');
-                foreach ($products as $pid) {
-                    $found = ($found || in_array($pid, $cart_products));
+        if (!empty($promo_data['bonuses'])) {
+            $found = false;
+            foreach ($promo_data['bonuses'] as $bonus) {
+                if (in_array($bonus['bonus'], ['free_products', 'promotion_step_free_products'])) {
+                    $products = array_column($bonus['value'], 'product_id');
+                    $cart_products = array_filter($suborder_cart['products'], function($v) {
+                        return !$v['price'];
+                    });
+                    $cart_products = array_column($cart_products, 'product_id');
+                    foreach ($products as $pid) {
+                        $found = ($found || in_array($pid, $cart_products));
+                    }
                 }
             }
-        }
-        if (!$found) {
-            unset($suborder_cart['promotions'][$promotion_id]);
+            if (!$found) {
+                unset($suborder_cart['promotions'][$promotion_id]);
+            }
         }
     }
 }
