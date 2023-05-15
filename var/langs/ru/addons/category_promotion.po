@@ -63,3 +63,7 @@ msgstr "Скидка на товары, удовлетворяющие усло�
 msgctxt "Languages::promotion_bonus_static_discount_on_products_from_conditions"
 msgid "Common discount on products from conditions"
 msgstr "Общая скидка на товары, удовлетворяющие условия"
+
+msgctxt "Languages::promotion_cond_limit_discount_bonus_by_amount_packages"
+msgid "Limit discount bonus by amount packages"
+msgstr "Скидка ограничена упаковками"

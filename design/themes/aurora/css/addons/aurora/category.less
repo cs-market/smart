@@ -62,12 +62,11 @@ Category page
         margin-top: auto;
         gap: 10px;
     }
-    @scroller_gap: 15px;
     .owl-item > div {
-        margin: 15px @scroller_gap;
+        margin: 15px var(--scroller-gap);
     }
     &.ty-scroller-list {
-        margin: 0 -@scroller_gap;
+        margin: 0 calc(~"-var(--scroller-gap)" * -1);
         width: auto;
         .product-title {
             height: 51px;

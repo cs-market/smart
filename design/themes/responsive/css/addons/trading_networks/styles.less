@@ -9,21 +9,23 @@
     &__item {
         font-size: 120%;
         border-color: @decorative;
+        white-space: initial;
     }
     &__dialog {
         .ty-dialog-non-closable();
     }
 }
-.ty-aurora-account-switcher-fake-button {
-    display: flex;
-    align-items: center;
-    .ty-tile-button();
-    .ty-icon-aurora-account {
-        font-size: 24px;
-        margin-right: 8px;
-    }
-    .ty-icon-down-micro {
-        color: #0b295c;
-        font-size: 20px;
+.ty-account-switcher{
+    &__fake-button {
+        display: flex;
+        align-items: center;
+        .ty-tile-button();
+        .ty-icon-aurora-house {
+            font-size: 20px;
+        }
+        .ty-icon-down-micro {
+            color: #0b295c;
+            font-size: 20px;
+        }
     }
 }

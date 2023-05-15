@@ -32,6 +32,7 @@ body {
     --border-color-active: @border-color-active;
     --button-background: lighten(@grey, 5%);
     --button-background-active: @grey-bg;
+    --scroller-gap: 15px;
 }
 * {
     outline: 0;
@@ -314,6 +315,9 @@ select {
         // @media @mobile {
         //     padding: 6px 10px;
         // }
+        .ty-account-info__title {
+            padding: initial;
+        }
         .ty-top-menu & .ty-minicart__icon, .ty-top-menu & .ty-icon-user {
             position: static;
             font-size: 20px;
@@ -376,10 +380,6 @@ select {
             background-color: @base;
             color: #fff;
         }
-    }
-    .ty-icon-aurora-truck {
-        font-size: 24px;
-        margin-right: 8px;
     }
 }
 

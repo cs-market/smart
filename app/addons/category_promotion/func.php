@@ -333,7 +333,7 @@ function fn_category_promotion_check_unique_amount_conditioned_products($id, $pr
 }
 
 function fn_category_promotion_apply_cart_rule($bonus, &$cart, &$auth, &$cart_products) {
-    if ($bonus['bonus'] == 'discount_on_products_from_conditions') {
+    if (in_array($bonus['bonus'], ['discount_on_products_from_conditions', 'static_discount_on_products_from_conditions'])) {
         $condition_products = fn_category_promotion_get_cart_promotioned_products($bonus['promotion_id'], $cart_products);
 
         foreach ($cart_products as $k => $v) {
@@ -346,34 +346,6 @@ function fn_category_promotion_apply_cart_rule($bonus, &$cart, &$auth, &$cart_pr
             if ($bonus['bonus'] == 'discount_on_products_from_conditions') {
                 $valid = fn_promotion_validate_attribute($v['product_id'], $bonus['value'], 'in') && fn_promotion_validate_attribute($v['product_id'], array_column($condition_products, 'product_id'), 'in');
             }
-
-            if ($valid) {
-                if (!isset($cart_products[$k]['promotions'])) {
-                    $cart_products[$k]['promotions'] = array();
-                }
-
-                if (isset($cart['products'][$k]['extra']['promotions'][$bonus['promotion_id']])) {
-                    $cart_products[$k]['promotions'][$bonus['promotion_id']] = $cart['products'][$k]['extra']['promotions'][$bonus['promotion_id']];
-                }
-
-                if (!isset($cart_products[$k]['promotions'][$bonus['promotion_id']])
-                    && fn_promotion_apply_discount($bonus['promotion_id'], $bonus, $cart_products[$k], true, $cart, $cart_products)
-                ) {
-                    $cart['use_discount'] = true;
-                }
-            }
-        }
-    }
-    if ($bonus['bonus'] == 'static_discount_on_products_from_conditions') {
-        $condition_products = fn_category_promotion_get_cart_promotioned_products($bonus['promotion_id'], $cart_products);
-
-        foreach ($cart_products as $k => $v) {
-            if (isset($v['exclude_from_calculate']) || (!floatval($v['base_price']) && $v['base_price'] != 0)) {
-                continue;
-            }
-
-            $valid = false;
-
             if ($bonus['bonus'] == 'static_discount_on_products_from_conditions') {
                 $valid = fn_promotion_validate_attribute($v['product_id'], array_column($condition_products, 'product_id'), 'in');
             }
@@ -385,6 +357,14 @@ function fn_category_promotion_apply_cart_rule($bonus, &$cart, &$auth, &$cart_pr
 
                 if (isset($cart['products'][$k]['extra']['promotions'][$bonus['promotion_id']])) {
                     $cart_products[$k]['promotions'][$bonus['promotion_id']] = $cart['products'][$k]['extra']['promotions'][$bonus['promotion_id']];
+                }
+
+                $promotion = fn_get_promotion_data($bonus['promotion_id']);
+                $limit_discount_bonus_condition = fn_find_promotion_condition($promotion['conditions'], 'limit_discount_bonus_by_amount_packages');
+                if (!empty($limit_discount_bonus_condition) && $v['amount']/$v['items_in_package'] > $limit_discount_bonus_condition['value']) {
+                    $discount = fn_promotions_calculate_discount($bonus['discount_bonus'], $v['base_price'], $bonus['discount_value'], $v['price']);
+                    $bonus['discount_bonus'] = 'by_fixed';
+                    $bonus['discount_value'] = $limit_discount_bonus_condition['value'] / $v['amount'] * $v['items_in_package'] * $discount;
                 }
 
                 if (!isset($cart_products[$k]['promotions'][$bonus['promotion_id']])

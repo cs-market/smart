@@ -1,5 +1,7 @@
 <?php
 
+use Tygh\Registry;
+
 if (!fn_allowed_for('ULTIMATE:FREE')) {
     $schema['conditions']['total_conditioned_products'] = array(
         'operators' => array ('gte'),
@@ -21,6 +23,15 @@ if (!fn_allowed_for('ULTIMATE:FREE')) {
         'field_function' => array('fn_category_promotion_check_unique_amount_conditioned_products', '#id', '#this', '@cart_products'),
         'zones' => array('cart'),
     );
+
+    if (Registry::get('addons.product_packages.status') == 'A') {
+        $schema['conditions']['limit_discount_bonus_by_amount_packages'] = array(
+            'operators' => array ('eq'),
+            'type' => 'input',
+            'field_function' => array(function() {return true;}),
+            'zones' => array('cart'),
+        );
+    }
 
     $schema['bonuses']['discount_on_products_from_conditions'] = array(
         'type' => 'picker',

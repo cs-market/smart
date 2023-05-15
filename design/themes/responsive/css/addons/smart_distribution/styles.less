@@ -60,6 +60,7 @@
         @media @tablet {
             --grid-gap: 20px;
         }
+        --scroller-gap: 5px;
     }
     .ty-promotion-motivation {
         background-color: #ff9900;
@@ -68,11 +69,29 @@
         .ty-mainbox-simple-title {
             position: absolute;
         }
-        .ty-grid-list .owl-item > div {
-            margin: 5px 5px 15px;
+        &.ty-mainbox-simple-container {
+            padding: 10px;
+            margin: 10px 0;
+            .border-radius(2*@border-radius);
+            background-color: lighten(@base, 30%);
+        }
+        .ty-grid-list__item {
+            .box-shadow(none);
+        }
+        .owl-theme .owl-controls .owl-buttons {
+            border-color: darken(@border-color, 15%);
+            i {
+                color: darken(@border-color, 45%);
+                
+            }
+            > div:hover i
+            {
+                color: #fff;
+            }
         }
     }
     .ty-grid-list {
+        @scroller-gap: 5px;
         &__item-name, .product-list-field {
             margin: 0;
         }
@@ -170,7 +189,7 @@
                 }
             }
             &__my-account {
-                order: 1;
+                order: 10;
                 margin-left: 6px;
                 .ty-dropdown-box__content {
                     left: 0;
@@ -178,11 +197,17 @@
                 }
             }
             &__wishlist {
-                order: 2;
+                order: 20;
             }
             &__cart-content {
-                order: 4;
+                order: 50;
                 .ty-minicart-title {
+                    display: none;
+                }
+            }
+            &__account-switcher {
+                order: 40;
+                .ty-account-switcher__dropdown-title {
                     display: none;
                 }
             }

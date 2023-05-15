@@ -9,8 +9,14 @@
     &__item {
         font-size: 120%;
         border-color: @decorative;
+        white-space: initial;
     }
     &__dialog {
         .ty-dialog-non-closable();
+    }
+    &__dropdown-title {
+        max-width: 144px;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 }
