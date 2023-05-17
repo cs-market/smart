@@ -3087,6 +3087,64 @@ fn_print_die($orders_wo_points);
     fn_print_r('очистим тяжелые вишлисты', count($user_ids), $res);
 
     fn_print_die('stop');
+} if ($mode == 'correct_reward_points_may') {
+    $company_id = [1810, 2058];
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $grant_reward_points_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+
+    //$orders = db_get_fields('SELECT order_id FROM ?:orders WHERE company_id IN (?a) AND parent_order_id != ?i AND timestamp > 1677618000 AND subtotal > 0 AND order_id = 342934', $company_id, 0);
+    $orders = db_get_fields('SELECT order_id FROM ?:orders WHERE company_id IN (?a) AND parent_order_id != ?i AND timestamp > 1677618000 AND subtotal > 0', $company_id, 0);
+    $uncorrected_orders = [];
+    foreach ($orders as $order_id) {
+        $order_info = fn_get_order_info($order_id);
+        if (! in_array($order_info['status'], array_keys($grant_reward_points_statuses))) continue;
+
+        if (empty($order_info['points_info']['reward'])) {
+            $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s', $order_info['user_id'], CHANGE_DUE_ORDER);
+
+            $is_corrected = false;
+            foreach ($reward_point_changes as $change) {
+                $details = unserialize($change['reason']);
+
+                if (!empty($details['order_id']) && $details['order_id'] == $order_id && strpos($details['correction'], 'correct_reward_points') !== false) {
+                    $is_corrected = true;
+                    break;
+                }
+            }
+
+            if (!$is_corrected) {
+                // if ($promotions = db_get_field('SELECT promotions FROM ?:orders WHERE order_id = ?i', $order_info['parent_order_id'])) {
+                //     $promotions = unserialize($promotions);
+                //     $promotions = array_filter($promotions, function($v) {
+                //         return isset($v['bonuses']['give_percent_points']);
+                //     });
+                //     if (!empty($promotions)) {
+                //         $max = 0;
+                //         foreach ($promotions as $promo) {
+                //             $max = max($max, $promo['bonuses']['give_percent_points']['value']);
+                //         }
+                //         $correction = [
+                //             'user_id' => $order_info['user_id'],
+                //             'order_id' => $order_id,
+                //             'status' => $order_info['status'],
+                //             'login' => db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $order_info['user_id']),
+                //             'total' => $order_info['total'],
+                //             'correct_points' => round($order_info['total']*$max/100),
+                //         ];
+                //         $corrections[] = $correction;
+                //     }
+                // }
+                fn_print_r($order_id);
+            }
+        }
+    }
+
+    $params['filename'] = 'correct_reward_points_may.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($corrections, $params, '"');
+    fn_print_die(count($corrections), $corrections);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)

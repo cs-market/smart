@@ -15,7 +15,7 @@ if ($mode == 'cron') {
     $allowed_companies = explode(',', $addon['company_ids']);
     if (!empty($allowed_companies)) {
         $params = array(
-            'status' => ['O', 'P'],
+            'status' => ['O'],
             'period' => 'C',
             'time_to' => strtotime('-2 minutes'),
             'time_from' => strtotime('-30 minutes'),
