@@ -60,7 +60,7 @@
           `ttl` INT UNSIGNED NOT NULL DEFAULT '0',
           `repaid_order_ids` VARCHAR(255) NOT NULL DEFAULT '',
           `details` TEXT,
-          UNIQUE KEY `uniq` (`earn_order_id`),
+          UNIQUE KEY `uniq` (`order_id`),
           KEY `user_id` (`user_id`),
           KEY `ttl` (`ttl`),
           KEY `repaid_order_ids` (`repaid_order_ids`)
