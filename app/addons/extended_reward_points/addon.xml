@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>extended_reward_points</id>
+    <name>Smart distribution: Бонусные баллы</name>
+    <description>Добавляет различные механики использования бонусных баллов</description>
+    <status>active</status>
+    <version>1.0.1</version>
+    <priority>1900</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <has_icon>Y</has_icon>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <compatibility>
+        <dependencies>reward_points</dependencies>
+    </compatibility>
+    <language_variables>
+        <item lang="ru" id="extended_reward_points.allowed_points_to_use">Доступно к использованию в заказе:</item>
+        <item lang="ru" id="extended_reward_points.not_enough_points">Не хватает [n] балл для оплаты баллами| Не хватает [n] балла для оплаты баллами| Не хватает [n] баллов для оплаты баллами</item>
+        <item lang="ru" id="extended_reward_points">Расширенные бонусные баллы</item>
+        <item lang="ru" id="extended_reward_points.reward_points_mechanics">Механика бонусных баллов</item>
+        <item lang="ru" id="extended_reward_points.full_payment">Полная оплата товара баллами</item>
+        <item lang="ru" id="extended_reward_points.partial_payment">Частичная оплата товара баллами</item>
+        <item lang="ru" id="extended_reward_points.max_rp_discount">Ограничить частичную оплату в объеме от заказа</item>
+        <item lang="ru" id="extended_reward_points.max_product_discount">Максимальная скидка на товар с участием бонусных баллов</item>
+        <item lang="ru" id="extended_reward_points.exim_cleanup_reward_points">Предварительно очистить бонусные баллы</item>
+        <item lang="ru" id="extended_reward_points.reward_points_ttl">Время жизни начисленных бонусных баллов</item>
+        <item lang="ru" id="extended_reward_points.points_amount_reduced">Число баллов, которое вы ввели, больше, чем можно использовать в этом заказе.</item>
+        <item lang="ru" id="extended_reward_points.reward">Будет начисленно в заказе</item>
+        <item lang="ru" id="extended_reward_points.points_in_use">Будет списано в заказе</item>
+        <item lang="ru" id="extended_reward_points.points_to_use_hint">Введите баллы для списания</item>
+        <item lang="ru" id="extended_reward_points.points_to_use_header">Чтобы оплатить часть заказа баллами, введите количество</item>
+        <item lang="ru" id="earn_points">Начисление баллов</item>
+        <item lang="ru" id="reward_points_report">Отчет о бонусных баллах</item>
+        <item lang="ru" id="extended_reward_points.expired_reward_points_ttl">Истек срок действия бонусных баллов</item>
+        <item lang="ru" id="extended_reward_points.user_points">Баллы пользователя</item>
+    </language_variables>
+    <queries>
+        <item>ALTER TABLE `?:companies` ADD `reward_points_mechanics` CHAR(1) NOT NULL DEFAULT 'A';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `reward_points_mechanics`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `max_rp_discount` TINYINT UNSIGNED NOT NULL DEFAULT '20';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `max_rp_discount`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `max_product_discount` TINYINT UNSIGNED NOT NULL DEFAULT '30';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `max_product_discount`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `reward_points_ttl` SMALLINT UNSIGNED NOT NULL DEFAULT '0';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `reward_points_ttl`;</item>
+
+        <item>ALTER TABLE `?:products` ADD `earned_points_eq_price` CHAR(1) NOT NULL DEFAULT 'N'</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `earned_points_eq_price`;</item>
+
+        <item>DROP TABLE IF EXISTS `?:reward_point_details`;</item>
+        <item>CREATE TABLE `?:reward_point_details` (
+          `user_id` MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
+          `order_id` MEDIUMINT NOT NULL DEFAULT '0.00',
+          `amount` MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
+          `ttl` INT UNSIGNED NOT NULL DEFAULT '0',
+          `repaid_order_ids` VARCHAR(255) NOT NULL DEFAULT '',
+          `details` TEXT,
+          UNIQUE KEY `uniq` (`earn_order_id`),
+          KEY `user_id` (`user_id`),
+          KEY `ttl` (`ttl`),
+          KEY `repaid_order_ids` (`repaid_order_ids`)
+        )</item>
+        <item for="uninstall">DROP TABLE `?:reward_point_details`;</item>
+    </queries>
+</addon>

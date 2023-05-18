@@ -113,7 +113,8 @@ function fn_reward_points_ult_delete_company(&$company_id)
 
 function fn_reward_points_get_cart_product_data(&$product_id, &$_pdata, &$product)
 {
-    $_pdata = fn_array_merge($_pdata, db_get_row("SELECT is_pbp, is_oper, is_op FROM ?:products WHERE product_id = ?i", $product_id));
+    // [cs-market] optimize database requests
+    if (!isset($_pdata['is_pbp']) || !isset($_pdata['is_oper']) || !isset($_pdata['is_op'])) $_pdata = fn_array_merge($_pdata, db_get_row("SELECT is_pbp, is_oper, is_op FROM ?:products WHERE product_id = ?i", $product_id));
     if (isset($product['extra']['configuration'])) {
         $_pdata['extra']['configuration'] = $product['extra']['configuration'];
     }
@@ -760,6 +761,7 @@ function fn_gather_reward_points_data(&$product, &$auth, $get_point_info = true)
     fn_calculate_product_price_in_points($product, $auth, $get_point_info);
 }
 
+// [cs-market] updates from 4.16.2
 function fn_calculate_product_price_in_points(&$product, &$auth, $get_point_info = true)
 {
     if (isset($product['exclude_from_calculate'])
@@ -776,7 +778,7 @@ function fn_calculate_product_price_in_points(&$product, &$auth, $get_point_info
         return false;
     }
 
-    if ((Registry::get('runtime.controller') == 'checkout' && isset($product['subtotal'])) || defined('ORDER_MANAGEMENT')) {
+    if (isset($product['subtotal']) || defined('ORDER_MANAGEMENT')) {
         if (Registry::get('addons.reward_points.auto_price_in_points') == 'Y' && $product['is_oper'] == 'N') {
             $per = Registry::get('addons.reward_points.point_rate');
 
@@ -806,7 +808,7 @@ function fn_calculate_product_price_in_points(&$product, &$auth, $get_point_info
         }
     }
 
-    $product['points_info']['raw_price'] = $per * $subtotal;
+    $product['points_info']['raw_price'] = fn_convert_to_numeric($per) * $subtotal;
     $product['points_info']['price'] = ceil($product['points_info']['raw_price']);
 }
 

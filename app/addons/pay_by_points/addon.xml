@@ -12,5 +12,8 @@
 	<queries>
         <item>ALTER TABLE `?:products` ADD `points_eq_price` CHAR(1) NOT NULL DEFAULT 'N' AFTER `is_pbp`</item>
 		<item for="uninstall">ALTER TABLE `?:products` DROP `points_eq_price`;</item>
+
+        <item>ALTER TABLE `?:products` ADD `earned_points_eq_price` CHAR(1) NOT NULL DEFAULT 'N'</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `earned_points_eq_price`;</item>
     </queries>
 </addon>

@@ -11,8 +11,31 @@ function fn_monolith_generate_xml($order_id) {
     $allowed_companies = explode(',', $addon['company_ids']);
 
     $order_info = fn_get_order_info($order_id);
+
     if (!in_array($order_info['company_id'], $allowed_companies)) {
         return false;
+    }
+    $company_settings = db_get_row('SELECT reward_points_mechanics, max_rp_discount, max_product_discount FROM ?:companies WHERE company_id = ?i', $order_info['company_id']);
+    if (isset($order_info['points_info']['in_use']['points'])) {
+        $d_products = [];
+        foreach ($order_info['product_groups'] as $group_id => $group) {
+            foreach ($group['products'] as $product) {
+                $available_discount = $product['price']*(1 - $company_settings['max_product_discount']/100);
+                $d_products[$product['item_id']] = ($available_discount > 0) ? $available_discount * $product['amount'] : 0;
+            }
+        }
+        arsort($d_products);
+
+        $coeff = $order_info['points_info']['in_use']['points'] / array_sum($d_products);
+        foreach ($order_info['products'] as &$product) {
+            $product['points_in_use'] = round($d_products[$product['item_id']] * $coeff);
+        }
+        unset($product);
+
+        $spread_points = array_sum(array_column($order_info['products'], 'points_in_use'));
+        if ($rounding_error = $order_info['points_info']['in_use']['points'] - $spread_points) {
+            $order_info['products'][key($d_products)]['points_in_use'] += $rounding_error;
+        }
     }
 
     $monolith_order = &$schema['extdata']['scheme']['data']['o'];
@@ -69,6 +92,9 @@ function fn_monolith_generate_xml($order_id) {
             } elseif($bonus['discount_bonus'] == 'to_percentage') {
                 $price = fn_format_price($p['base_price'] * ($bonus['discount_value']/100));
             }
+        }
+        if (isset($p['points_in_use'])) {
+            $price -= fn_format_price($p['points_in_use'] / $p['amount']);
         }
 
         $iterator += 1;
@@ -163,6 +189,23 @@ function fn_monolith_generate_xml($order_id) {
                     ];
                 }
             }
+        }
+    }
+    if (isset($order_info['points_info']['in_use']['points'])) {
+        foreach ($order_info['products'] as $product) {
+            if (empty($product['points_in_use'])) continue;
+            $CRMOrderDiscountLine[] = [
+                'f' => array(
+                    date("Y-m-d\T00:00:00", $order_info['timestamp']),
+                    $addon['order_prefix'] . $order_id,
+                    'Baltika_loyalty',
+                    'Baltika_loyalty',
+                    $product['points_in_use'],
+                    'Amount',
+                    '',
+                    $product['product_code'],
+                )
+            ];
         }
     }
 
