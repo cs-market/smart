@@ -69,12 +69,12 @@ function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_produ
             }
         } else {
             foreach ($cart['products'] as $key => &$data) {
+                // temporary fix for mobile app
+                $data['extra']['pay_by_points']['point_price'] = $data['extra']['point_price'] ?? 0;
+
                 if (!YesNo::toBool($data['is_pbp'])) continue;
                 $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($data, $auth);
                 $cart_products[$key]['price'] = 0;
-
-                // temporary fix for mobile app
-                $data['extra']['pay_by_points']['point_price'] = $data['extra']['point_price'];
             }
             unset($data);
 
