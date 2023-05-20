@@ -12,10 +12,13 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 use Tygh\ExtendedAPI;
+use Tygh\Enum\SiteArea;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_extended_api_user_init($auth, $user_info, $first_init) {
+    if (SiteArea::isAdmin(AREA)) return;
+
     if ($auth['user_id']) {
         if (empty(Tygh::$app['session']['cart']['user_data'])) {
             $profile_id = fn_get_session_data('last_order_profile_id');
