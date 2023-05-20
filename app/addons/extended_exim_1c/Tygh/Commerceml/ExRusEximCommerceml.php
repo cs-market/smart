@@ -970,6 +970,8 @@ class ExRusEximCommerceml extends RusEximCommerceml
     public function importFileOrders($xml)
     {
         $cml = $this->cml;
+        
+        $func = (Registry::get('addons.maintenance.status') == 'A') ? 'fn_maintenance_exim_import_price' : 'floatval';
         if (isset($xml->{$cml['document']})) {
             $orders_data = $xml->{$cml['document']};
 
@@ -1008,7 +1010,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
                     if ($product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml)) {
                         $xml_products[$product_data['product_id']] = $xml_products[$product_data['product_id']] ?? 0;
-                        $xml_products[$product_data['product_id']] += intval($xml_product->{$cml['amount']});
+                        $xml_products[$product_data['product_id']] += $func(strval($xml_product->{$cml['amount']}));
                     }
                 }
                 $order_products = array_filter(fn_array_column($order_info['products'], 'amount', 'product_id'));
@@ -1724,6 +1726,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
 
     public function dataProductFeatures($data_product, $product, $import_params)
     {
+        $func = (Registry::get('addons.maintenance.status') == 'A') ? 'fn_maintenance_exim_import_price' : 'floatval';
         $property_for_promo_text = trim($this->s_commerceml['exim_1c_property_product']);
         $cml = $this->cml;
         $features_commerceml = $this->features_commerceml;
@@ -1736,13 +1739,13 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 fn_set_hook('exim_1c_import_features_values', $product, $_feature, $features_commerceml, $cml);
 
                 if (!empty($features_commerceml['qty_step']['id']) && $features_commerceml['qty_step']['id'] == $_feature -> {$cml['id']}) {
-                    $product['qty_step'] = floatval($_feature -> {$cml['value']});
+                    $product['qty_step'] = $func(strval($_feature -> {$cml['value']}));
                 }
                 if (!empty($features_commerceml['min_qty']['id']) && $features_commerceml['min_qty']['id'] == $_feature -> {$cml['id']}) {
-                    $product['min_qty'] = floatval($_feature -> {$cml['value']});
+                    $product['min_qty'] = $func(strval($_feature -> {$cml['value']}));
                 }
                 if (!empty($features_commerceml['max_qty']['id']) && $features_commerceml['max_qty']['id'] == $_feature -> {$cml['id']}) {
-                    $product['max_qty'] = floatval($_feature -> {$cml['value']});
+                    $product['max_qty'] = $func(strval($_feature -> {$cml['value']}));
                 }
 
                 if (!isset($features_commerceml[$feature_id])) {

@@ -44,7 +44,8 @@ function fn_product_packages_pre_add_to_cart(&$product_data) {
 
 function fn_product_packages_exim_1c_import_value_fields(&$product, $value_field, $_name_field, $_v_field, $cml) {    
     if (in_array($_name_field, $cml['items_in_package'])) {
-        $product['items_in_package'] = (float) $_v_field;
+        $func = (Registry::get('addons.maintenance.status') == 'A') ? 'fn_maintenance_exim_import_price' : 'floatval';
+        $product['items_in_package'] = $func(strval($_feature -> {$cml['value']}));
     }
 }
 
@@ -57,6 +58,7 @@ function fn_product_packages_exim_1c_import_features_definition(&$features_impor
 
 function fn_product_packages_exim_1c_import_features_values(&$product, $_feature, $features_commerceml, $cml) {
     if (!empty($features_commerceml['items_in_package']['id']) && $features_commerceml['items_in_package']['id'] == $_feature -> {$cml['id']}) {
-        $product['items_in_package'] = intval($_feature -> {$cml['value']});
+        $func = (Registry::get('addons.maintenance.status') == 'A') ? 'fn_maintenance_exim_import_price' : 'floatval';
+        $product['items_in_package'] = $func(strval($_feature -> {$cml['value']}));
     }
 }
