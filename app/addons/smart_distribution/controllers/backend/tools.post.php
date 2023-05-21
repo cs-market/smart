@@ -3000,7 +3000,7 @@ fn_print_die($orders_wo_points);
     });
     fn_print_die($grand_points_order_statuses);
 
-    list($orders, ) = fn_get_orders(('time_from' => '01/04/2023','user_id' => $user['user_id'], 'time_to' => '01/08/2019', 'time_from' => '01/12/2018', 'period' => 'C', 'company_id' => $company_id, 'status' => array('P', 'C', 'Y', 'A')));
+    list($orders, ) = fn_get_orders(['time_from' => '01/04/2023','user_id' => $user['user_id'], 'time_to' => '01/08/2019', 'time_from' => '01/12/2018', 'period' => 'C', 'company_id' => $company_id, 'status' => array('P', 'C', 'Y', 'A')]);
     fn_print_die($orders);
 
     list($logs, $search) = fn_get_logs(['q_type' => 'users', 'q_action' => 'delete']);
