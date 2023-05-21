@@ -344,13 +344,3 @@ function fn_monolith_before_dispatch($controller, $mode, $action, $dispatch_extr
         fn_redirect('categories.view&category_id=9059');
     }
 }
-
-function fn_monolith_get_autostickers_pre(&$stickers, $product, $auth, $params) {
-    if (empty($params['get_for_one_product'])) {
-        // probably heavy
-        fn_gather_reward_points_data($product, $auth);
-    }
-
-    if (!empty($product['points_info']['reward']['amount'])) $stickers['grant_rp'] = Registry::get('addons.monolith.grant_rp_sticker_id');
-    if (!empty($product['points_info']['price'])) $stickers['reduce_rp'] = Registry::get('addons.monolith.reduce_rp_sticker_id');
-}

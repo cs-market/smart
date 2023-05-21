@@ -14,5 +14,6 @@ fn_register_hooks(
     'get_order_info',
     'user_init',
     'fill_auth',
-    'change_order_status'
+    'change_order_status',
+    'get_autostickers_pre'
 );

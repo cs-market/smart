@@ -15,6 +15,22 @@
     <compatibility>
         <dependencies>reward_points</dependencies>
     </compatibility>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="grant_rp_sticker_id">
+                        <type>input</type>
+                        <name>Grant reward points sticker id</name>
+                    </item>
+                    <item id="reduce_rp_sticker_id">
+                        <type>input</type>
+                        <name>Reduce reward points sticker id</name>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
     <language_variables>
         <item lang="ru" id="extended_reward_points.allowed_points_to_use">Доступно к использованию в заказе:</item>
         <item lang="ru" id="extended_reward_points.not_enough_points">Не хватает [n] балл для оплаты баллами| Не хватает [n] балла для оплаты баллами| Не хватает [n] баллов для оплаты баллами</item>

@@ -34,14 +34,6 @@
                         <name>Order prefix</name>
                         <default_value>Smart.</default_value>
                     </item>
-                    <item id="grant_rp_sticker_id">
-                        <type>input</type>
-                        <name>Grant reward points sticker id</name>
-                    </item>
-                    <item id="reduce_rp_sticker_id">
-                        <type>input</type>
-                        <name>Reduce reward points sticker id</name>
-                    </item>
                 </items>
             </section>
         </sections>

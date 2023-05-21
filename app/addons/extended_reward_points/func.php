@@ -330,3 +330,13 @@ function fn_generate_reward_points_report($params) {
     }
     return array($output, $params);
 }
+
+function fn_extended_reward_points_get_autostickers_pre(&$stickers, $product, $auth, $params) {
+    if (empty($params['get_for_one_product'])) {
+        // probably heavy
+        fn_gather_reward_points_data($product, $auth);
+    }
+
+    if (!empty($product['points_info']['reward']['amount'])) $stickers['grant_rp'] = Registry::get('addons.extended_reward_points.grant_rp_sticker_id');
+    if (!empty($product['points_info']['price'])) $stickers['reduce_rp'] = Registry::get('addons.extended_reward_points.reduce_rp_sticker_id');
+}
