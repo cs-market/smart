@@ -8,4 +8,5 @@ fn_register_hooks(
     'get_promotions_search_by_query',
     'get_logos_post',
     'before_dispatch',
+    'get_autostickers_pre',
 );
