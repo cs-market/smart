@@ -29,5 +29,6 @@
     <language_variables>
         <item lang="ru" id="promotion_cond_catalog_once_per_customer">Один раз для покупателя</item>
         <item lang="ru" id="export_found_orders">Экспортировать найденные заказы</item>
+        <item lang="ru" id="export_found_users">Экспортировать найденные пользователи</item>
     </language_variables>
 </addon>

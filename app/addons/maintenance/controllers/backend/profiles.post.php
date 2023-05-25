@@ -68,4 +68,25 @@ if ($mode == 'update') {
     }
 } elseif ($mode == 'manage') {
     Tygh::$app['view']->assign('can_add_user', true);
+} elseif ($mode == 'export_found') {
+
+    if (empty(Tygh::$app['session']['export_ranges'])) {
+        Tygh::$app['session']['export_ranges'] = [];
+    }
+
+    if (empty(Tygh::$app['session']['export_ranges']['users']['pattern_id'])) {
+        Tygh::$app['session']['export_ranges']['users'] = ['pattern_id' => 'users'];
+    }
+
+    Tygh::$app['session']['export_ranges']['users']['data_provider'] = [
+        'count_function' => 'fn_exim_get_last_view_users_count',
+        'function'       => 'fn_exim_get_last_view_user_ids_condition',
+    ];
+
+    unset($_REQUEST['redirect_url'], Tygh::$app['session']['export_ranges']['users']['data']);
+
+    return [
+        CONTROLLER_STATUS_OK,
+        'exim.export?section=users&pattern_id=' . Tygh::$app['session']['export_ranges']['users']['pattern_id'],
+    ];
 }

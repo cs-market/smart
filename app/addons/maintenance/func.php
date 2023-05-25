@@ -385,3 +385,57 @@ function fn_exim_get_last_view_orders_count()
 
     return $last_view_results['total_items'];
 }
+
+function fn_exim_get_last_view_user_ids_condition()
+{
+    $last_view = new Backend(AREA, 'profiles', 'index');
+    $view_id = $last_view->getCurrentViewId();
+
+    $last_view_results = $last_view->getViewParams($view_id);
+    
+    $data_function_params = [];
+    if ($last_view_results) {
+        unset(
+            $last_view_results['total_items'],
+            $last_view_results['sort_by'],
+            $last_view_results['sort_order'],
+            $last_view_results['sort_order_rev'],
+            $last_view_results['page'],
+            $last_view_results['items_per_page']
+        );
+        $data_function_params = $last_view_results;
+    }
+
+    $data_function_params['get_conditions'] = true;
+
+    list($fields, $join, $condition) = fn_get_users($data_function_params, Tygh::$app['session']['auth'], 0, CART_LANGUAGE);
+
+    $user_ids = db_get_fields(
+        'SELECT DISTINCT ?p' .
+        ' FROM ?:users' .
+        ' ?p' .
+        ' WHERE 1 = 1' .
+        ' ?p',
+        '?:users.user_id',
+        $join,
+        implode(' ', $condition)
+    );
+
+    return [
+        'user_id' => $user_ids
+    ];
+}
+
+function fn_exim_get_last_view_users_count()
+{ 
+    $last_view = new Backend(AREA, 'profiles', 'index');
+    $view_id = $last_view->getCurrentViewId();
+
+    $last_view_results = $last_view->getViewParams($view_id);
+
+    if (!$last_view_results) {
+        return 0;
+    }
+
+    return $last_view_results['total_items'];
+}
