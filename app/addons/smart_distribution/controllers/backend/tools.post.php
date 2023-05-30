@@ -3178,6 +3178,159 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($corrections, $params, '"');
     fn_print_die(count($corrections), $corrections);
+} if ($mode == 'correct_reward_points_may2') {
+    // Промо апреля Начисление ЮГ Самара на май:
+
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24977 апрель круп 80к-1%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24978 апрель круп 150к-1.5%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24979 апрель круп 250к-2%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24980 апрель розн 0к-0.5%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24982 апрель розн 20к-1%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24983 апрель розн 50к-2%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24984 апрель розн 80к-2.5%
+
+    // Промо апреля Начисление ЮГ Тольятти на май:
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24994 апрель круп 80к-1%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24995 апрель круп 150к-1.5%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24996 апрель круп 250к-2%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24990 апрель розн 0к-0.5%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24991 апрель розн 20к-1%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24992 апрель розн 50к-2%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=24993 апрель розн 80к-2.5%
+ 
+    // Вега_Самара_Розничные
+    $promotions[1810][13858] = [24984, 24983, 24982, 24980];
+    // Вега_Самара_Крупнооптовые_клиенты
+    $promotions[1810][13360] = [24979, 24978, 24977];
+
+    // Вега_Тольятти_Розничные клиенты
+    $promotions[2058][14776] = [24993, 24992, 24991, 24990];
+    // Вега_Тольятти_Крупный ОПТ
+    $promotions[2058][13361] = [24996, 24994, 24995];
+
+    // 1 апреля - 1680296400, 1 мая 1682888400
+    $user_ids = db_get_fields('SELECT user_id FROM ?:orders WHERE company_id IN (?a) AND timestamp >= ?i AND timestamp < ?i', [1810, 2058], 1680296400, 1682888400);
+
+    foreach ([1810, 2058] as $company_id) {
+        $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s AND user_id IN (?a)', $company_id, 'C', $user_ids);
+
+        foreach ($users as $user_id) {
+            $usergroups_ = db_get_fields('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s', $user_id, 'A');
+
+            foreach($usergroups_ as $ug_id) {
+                if (!isset($promotions[$company_id][$ug_id])) continue;
+
+                foreach ($promotions[$company_id][$ug_id] as $promotion_id) {
+                    $promotion = fn_get_promotion_data($promotion_id);
+                    $progress_condition = fn_find_promotion_condition($promotion['conditions'], 'progress_total_paid');
+                    $val = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, ['user_id' => $user_id], $promotion);
+                    if ($val > $progress_condition['value']) {
+                        foreach($promotion['bonuses'] as $bonus) {
+                            if ($bonus['bonus'] == 'give_usergroup') {
+                                if (!in_array($bonus['value'], $usergroups_)) {
+                                    $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
+                                    db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
+                                    $user_info = fn_get_user_info($user_id);
+                                    $insert['user_login'] = $user_info['user_login'];
+                                    $insert['firstname'] = $user_info['firstname'];
+                                    $insert['usergroup'] = fn_get_usergroup_name($bonus['value']);
+                                    $insert['total_sales'] = $val;
+                                    $insert['promo'] = $promotion['name'];
+                                    $insert['vendor'] = ($company_id == 1810) ? 'вега' : 'вегаТ';
+                                    $insert['user_type'] = fn_get_usergroup_name($ug_id);
+
+                                    $result[] = $insert;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    $params['filename'] = 'grade_usergroups_april.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($result, $params, '"');
+    fn_print_die($result);
+} if ($mode == 'correct_reward_points_may3') {
+    // Промо мая, Начисление ЮГ Самара июнь:
+
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30593 май круп 80к-1%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30594 май круп 150к-1.5%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30595 май круп 250к-2%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30585 май розн 0к-0.5%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30586 май розн 20к-1%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30587 май розн 50к-2%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30588 май розн 80к-2.5%
+
+    // Промо мая, Начисление ЮГ Тольятти июнь:
+
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30596 май круп 80к-1%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30597 май круп 150к-1.5%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30598 май круп 250к-2%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30589 май розн 0к-0.5%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30590 май розн 20к-1%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30591 май розн 50к-2%
+    // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=30592 май розн 80к-2.5%
+ 
+    // Вега_Самара_Розничные
+    $promotions[1810][13858] = [30588, 30587, 30586, 30585];
+    // Вега_Самара_Крупнооптовые_клиенты
+    $promotions[1810][13360] = [30595, 30594, 30593];
+
+    // Вега_Тольятти_Розничные клиенты
+    $promotions[2058][14776] = [30592, 30591, 30590, 30589];
+    // Вега_Тольятти_Крупный ОПТ
+    $promotions[2058][13361] = [30598, 30597, 30596];
+
+    // 1 мая - 1682888400, 1 июня 1685566800
+    $user_ids = db_get_fields('SELECT user_id FROM ?:orders WHERE company_id IN (?a) AND timestamp >= ?i AND timestamp < ?i', [1810, 2058], 1682888400, 1685566800);
+
+    foreach ([1810, 2058] as $company_id) {
+        $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s AND user_id IN (?a)', $company_id, 'C', $user_ids);
+
+        foreach ($users as $user_id) {
+            $usergroups_ = db_get_fields('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s', $user_id, 'A');
+
+            foreach($usergroups_ as $ug_id) {
+                if (!isset($promotions[$company_id][$ug_id])) continue;
+
+                foreach ($promotions[$company_id][$ug_id] as $promotion_id) {
+                    $promotion = fn_get_promotion_data($promotion_id);
+                    $progress_condition = fn_find_promotion_condition($promotion['conditions'], 'progress_total_paid');
+                    $val = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, ['user_id' => $user_id], $promotion);
+                    if ($val > $progress_condition['value']) {
+                        foreach($promotion['bonuses'] as $bonus) {
+                            if ($bonus['bonus'] == 'give_usergroup') {
+                                if (!in_array($bonus['value'], $usergroups_)) {
+                                    $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
+                                    db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
+                                    $user_info = fn_get_user_info($user_id);
+                                    $insert['user_login'] = $user_info['user_login'];
+                                    $insert['firstname'] = $user_info['firstname'];
+                                    $insert['usergroup'] = fn_get_usergroup_name($bonus['value']);
+                                    $insert['total_sales'] = $val;
+                                    $insert['promo'] = $promotion['name'];
+                                    $insert['vendor'] = ($company_id == 1810) ? 'вега' : 'вегаТ';
+                                    $insert['user_type'] = fn_get_usergroup_name($ug_id);
+
+                                    $result[] = $insert;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    $params['filename'] = 'grade_usergroups_may.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($result, $params, '"');
+    fn_print_die($result);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
