@@ -9,7 +9,7 @@
                 <label class="control-label" for="pd_is_pbp">{__("pay_by_points")}</label>
                 <div class="controls">
                     <input type="hidden" name="product_data[is_pbp]" value="N" />
-                    <input type="checkbox" name="product_data[is_pbp]" id="pd_is_pbp" value="Y" {if $data.is_pbp == "Y" || $runtime.mode == "add"}checked="checked"{/if} onclick="{if $is_auto != 'Y'}Tygh.$.disable_elms(['price_in_points'], !this.checked);{else}Tygh.$.disable_elms(['is_oper'], !this.checked); Tygh.$.disable_elms(['price_in_points'], !this.checked || !Tygh.$('#is_oper').prop('checked'));{/if}">
+                    <input type="checkbox" name="product_data[is_pbp]" id="pd_is_pbp" value="Y" {if $data.is_pbp == "Y"}checked="checked"{/if} onclick="{if $is_auto != 'Y'}Tygh.$.disable_elms(['price_in_points'], !this.checked);{else}Tygh.$.disable_elms(['is_oper'], !this.checked); Tygh.$.disable_elms(['price_in_points'], !this.checked || !Tygh.$('#is_oper').prop('checked'));{/if}">
                 </div>
             </div>
 
