@@ -3331,6 +3331,92 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($result, $params, '"');
     fn_print_die($result);
+} elseif ($mode == 'correct_reward_points_may4') {
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+    $grant_reward_order_statuses = array_filter($order_statuses, function($v) {
+        return $v['params']['grant_reward_points'] == 'Y';
+    });
+    $corrected_orders = 0;
+    $total_orders = $out_of_status = [];
+    
+    $usergroups = [15918 => 0.5, 15919 => 1, 15920 => 1.5, 15921 => 2, 15922 => 2.5, 15923 => 0.5, 15924 => 1, 15925 => 1.5, 15926 => 2, 15927 => 2.5];
+
+    $users = db_get_array('SELECT user_id, usergroup_id FROM ?:usergroup_links WHERE usergroup_id IN (?a) AND status = ?s', array_keys($usergroups), 'A');
+    $users = fn_group_array_by_key($users, 'user_id');
+
+    foreach ($users as $user_id => &$value) {
+        $ug = array_column($value, 'usergroup_id');
+        $res = [];
+        foreach ($ug as $ug_id) {
+            $res[$ug_id] = $usergroups[$ug_id];
+        }
+        krsort($res);
+        $value=[];
+        $value['usergroup_id'] = key($res);
+        $value['bonus'] = $res[$value['usergroup_id']];
+    }
+
+    foreach ($users as $user_id => $user) {
+        // 1 мая - 1682888400, 1 июня 1685566800
+        if ($check_orders = db_get_fields('SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp >= ?i AND timestamp < ?i AND status IN (?a) AND group_id NOT IN (?a)', $user_id, 1682888400, 1685566800, array_keys($order_statuses), [17,18])) {
+
+            $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i', $user_id);
+
+            foreach ($reward_point_changes as &$change) {
+                $details = unserialize($change['reason']);
+                $details = unserialize($change['reason']);
+                if (!empty($details['order_id']) && $details['correction'] == 'correct_reward_points_may4') {
+                    $corrected_order_ids[] = $details['order_id'];
+                }
+
+                if (!empty($details['order_id']) && in_array($details['order_id'], $check_orders)) {
+                    $points_movement[$details['order_id']] += $change['amount'];
+                }
+            }
+
+            foreach ($check_orders as $order_id) {
+
+                $order_info = fn_get_order_info($order_id);
+                $db_points = &$order_info['points_info']['reward'];
+
+                $correction = [
+                    'user_id' => $order_info['user_id'],
+                    'usergroup' => fn_get_usergroup_name($user['usergroup_id']),
+                    'order_id' => $order_id,
+                    'status' => $order_info['status'],
+                    'login' => db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $order_info['user_id']),
+                    'order_points' => $points_movement[$order_id] ?? 0,
+                    'total' => $order_info['total'],
+                    'correct_points' => round($order_info['total'] * $usergroups[$user['usergroup_id']] / 100),
+                ];
+
+                if (abs($correction['order_points'] - $correction['correct_points']) > 2) {
+                    $total_orders[] = $order_id;
+                    if (in_array($correction['status'], array_keys($grant_reward_order_statuses))) {
+                        $corrected_orders += 1;
+                        if (!in_array($correction['order_id'], $corrected_order_ids)) {
+                            $reason = array('order_id' => $correction['order_id'], 'to' => $correction['status'], 'correction' => 'correct_reward_points_may4');
+                            fn_change_user_points($correction['correct_points'] - $correction['order_points'], $correction['user_id'], serialize($reason), CHANGE_DUE_ORDER, $order_info['timestamp']);
+                            $corrections[] = $correction;
+                        }
+                    } else {
+                        $out_of_status[] = $order_id;
+                    }
+                }
+            }
+        }
+    }
+
+    fn_print_r(
+        'всего заказов к корректировке: '. count($total_orders), 
+        'из них уже скорректировано: ' . $corrected_orders, 
+        'ожидают статус ' . count($out_of_status) . ' заказов: ' . implode(', ', $out_of_status), 
+        'последняя корректировка (ниже):', $corrections
+    );
+    $params['filename'] = 'points_to_correct_may.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($corrections, $params, '"');
+    fn_print_die('done');
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
