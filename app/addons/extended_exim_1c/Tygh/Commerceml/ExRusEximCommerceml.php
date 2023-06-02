@@ -16,6 +16,7 @@ use Tygh\Addons\ProductVariations\ServiceProvider as VariationsServiceProvider;
 
 class ExRusEximCommerceml extends RusEximCommerceml 
 {
+    const PRODUCT_STATUS_DISABLED = 'D';
     public $prices_commerseml = array();
     public $data_prices = array();
     public $storages_map = array();
@@ -723,7 +724,11 @@ class ExRusEximCommerceml extends RusEximCommerceml
             } elseif (!empty($this->features_commerceml['status']) && isset($xml_product_data->{$cml['properties_values']}->{$cml['property_values']})) {
                 foreach ($xml_product_data->{$cml['properties_values']}->{$cml['property_values']} as $_feature) {
                     if ($_feature->{$cml['id']} == $this->features_commerceml['status']['id']) {
-                        $product_status = $this->features_commerceml['status']['variants'][strval($_feature -> {$cml['value']})]['value'];
+                        if (!empty($this->features_commerceml['status']['variants'])) {
+                            $product_status = strval($this->features_commerceml['status']['variants'][strval($_feature -> {$cml['value']})]['value']);
+                        } else {
+                            $product_status = strval($_feature -> {$cml['value']});
+                        }
                     }
                 }
             }
@@ -734,9 +739,11 @@ class ExRusEximCommerceml extends RusEximCommerceml
                     return "\n Deleted product: " . strval($xml_product_data -> {$cml['name']});
                 }
                 if ($product_status == $cml['disabled']) {
-                    $product['status'] = 'D';
+                    $product['status'] = self::PRODUCT_STATUS_DISABLED;
                 } elseif ($product_status == $cml['hidden']) {
-                    $product['status'] = 'H';
+                    $product['status'] = self::PRODUCT_STATUS_HIDDEN;
+                } elseif ($product_status == $cml['active']) {
+                    $product['status'] = self::PRODUCT_STATUS_ACTIVE;
                 }
                 \Tygh::$app['session']['ex_exim_1c']['status_commerceml'][$product_id] = ['ttl' => TIME + SECONDS_IN_HOUR, 'status' => $product['status']];
             }
