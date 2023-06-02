@@ -19,6 +19,14 @@ class ExRusEximCommerceml extends RusEximCommerceml
     public $prices_commerseml = array();
     public $data_prices = array();
     public $storages_map = array();
+
+    public function __construct(Connection $db, Logs $log, $path_commerceml) {
+        parent::__construct($db, $log, $path_commerceml);
+        $status_commerceml = & \Tygh::$app['session']['ex_exim_1c']['status_commerceml'];
+        $status_commerceml = array_filter($status_commerceml, function($status_data) {
+            return (isset($status_data['ttl']) && $status_data['ttl'] > TIME);
+        });
+    }
     
     public function importCategoriesFile($data_categories, $import_params, $parent_id = 0)
     {
@@ -704,36 +712,34 @@ class ExRusEximCommerceml extends RusEximCommerceml
         $product_update = !empty($product_data['update_1c']) ? $product_data['update_1c'] : 'Y';
         $product_id = (!empty($product_data['product_id'])) ? $product_data['product_id'] : 0;
 
-        $product_status = $xml_product_data->attributes()->{$cml['status']};
-        if (!empty($this->features_commerceml['status']) && isset($xml_product_data->{$cml['properties_values']}->{$cml['property_values']})) {
-            foreach ($xml_product_data->{$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
-                if ($_feature -> {$cml['id']} == $this->features_commerceml['status']['id']) {
-                    $product_status = $this->features_commerceml['status']['variants'][strval($_feature -> {$cml['value']})]['value'];
-                }
-            }
-        }
-
-        if (!empty($product_status) && (string) $product_status == $cml['delete']) {
-            if ($product_id != 0) {
-                fn_delete_product($product_id);
-                $log_message = "\n Deleted product: " . strval($xml_product_data -> {$cml['name']});
-            }
-
-            return $log_message;
-        }
-
-        if (!empty($xml_product_data -> {$cml['status']}) && strval($xml_product_data -> {$cml['status']}) == $cml['delete']) {
-            if ($product_id != 0) {
-                fn_delete_product($product_id);
-                $log_message = "\n Deleted product: " . strval($xml_product_data -> {$cml['name']});
-            }
-
-            return $log_message;
-        }
-
         if ($this->checkUploadProduct($product_id, $product_update)) {
             if (Registry::get('runtime.company_id') == '1815') $this->s_commerceml['exim_1c_import_product_name'] = 'full_name';
             $product = $this->dataProductFile($xml_product_data, $product_id, $guid_product, $categories_commerceml, $import_params);
+
+            if (!empty(strval($xml_product_data->attributes()->{$cml['status']}))) {
+                $product_status = strval($xml_product_data->attributes()->{$cml['status']});
+            } elseif (!empty(strval($xml_product_data->{$cml['status']}))) {
+                $product_status = strval($xml_product_data->{$cml['status']});
+            } elseif (!empty($this->features_commerceml['status']) && isset($xml_product_data->{$cml['properties_values']}->{$cml['property_values']})) {
+                foreach ($xml_product_data->{$cml['properties_values']}->{$cml['property_values']} as $_feature) {
+                    if ($_feature->{$cml['id']} == $this->features_commerceml['status']['id']) {
+                        $product_status = $this->features_commerceml['status']['variants'][strval($_feature -> {$cml['value']})]['value'];
+                    }
+                }
+            }
+
+            if (!empty($product_status)) {
+                if ($product_status == $cml['delete'] && $product_id != 0) {
+                    fn_delete_product($product_id);
+                    return "\n Deleted product: " . strval($xml_product_data -> {$cml['name']});
+                }
+                if ($product_status == $cml['disabled']) {
+                    $product['status'] = 'D';
+                } elseif ($product_status == $cml['hidden']) {
+                    $product['status'] = 'H';
+                }
+                \Tygh::$app['session']['ex_exim_1c']['status_commerceml'][$product_id] = ['ttl' => TIME + SECONDS_IN_HOUR, 'status' => $product['status']];
+            }
 
             // [cs-market] default func adds default category to existing ones
             if (($key = array_search($this->s_commerceml['exim_1c_default_category'], $product['category_ids'])) !== false && count($product['category_ids']) > 1) {
@@ -1709,6 +1715,8 @@ class ExRusEximCommerceml extends RusEximCommerceml
         if (!is_numeric($amount)) {
             return self::PRODUCT_STATUS_ACTIVE;
         }
+
+        if (isset(\Tygh::$app['session']['ex_exim_1c']['status_commerceml'][$product_id])) return self::PRODUCT_STATUS_ACTIVE;
 
         $product_status = $this->getProductStatusByAmount($amount);
 
