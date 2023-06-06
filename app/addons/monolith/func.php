@@ -344,3 +344,11 @@ function fn_monolith_before_dispatch($controller, $mode, $action, $dispatch_extr
         fn_redirect('categories.view&category_id=9059');
     }
 }
+
+function fn_monolith_api_exec($_this, $entity, $entity_properties, $response) {
+    if (in_array($entity_properties['name'], ['products', 'users']) && $_this->getRequest()->getMethod() == 'PUT' && count($_this->getRequest()->getData()) == 1) {
+        $body = $response->getBody();
+        $body[key($_this->getRequest()->getData())] = 'OK';
+        $response->setBody($body);
+    }
+}
