@@ -8,5 +8,6 @@ fn_register_hooks(
     'get_promotions_search_by_query',
     'get_logos_post',
     'before_dispatch',
-    'api_exec'
+    'api_exec',
+    'update_product_post'
 );

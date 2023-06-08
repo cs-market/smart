@@ -352,3 +352,22 @@ function fn_monolith_api_exec($_this, $entity, $entity_properties, $response) {
         $response->setBody($body);
     }
 }
+
+function fn_monolith_update_product_post(&$product_data, $product_id, $lang_code, $create) {
+    if (isset($product_data['storages']) && defined('API') && !empty($product_id)) {
+        $cid = $product_data['company_id'] ?? Registry::get('runtime.company_id') ?? db_get_field("SELECT company_id FROM ?:products WHERE product_id = ?i", $product_id);
+        $allowed_cids = explode(',', Registry::get('addons.monolith.company_ids'));
+        if (in_array($cid, $allowed_cids)) {
+            $current_storages = fn_get_storages_amount($product_id);
+            $diff = array_diff_key($current_storages, fn_array_value_to_key($product_data['storages'], 'storage_id'));
+            if (!empty($diff)) {
+                array_walk($diff, function(&$v) {
+                    $v['amount'] = 0;
+                    unset($v['product_id']);
+                });
+
+                $product_data['storages'] = array_merge($product_data['storages'], array_values($diff));
+            }
+        }
+    }
+}

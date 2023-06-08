@@ -111,7 +111,7 @@ function fn_extended_reward_points_user_init(&$auth, $user_info) {
 }
 
 function fn_extended_reward_points_fill_auth(&$auth, $user_data, $area, $original_auth) {
-    if (empty($auth['extended_reward_points']) && !empty(Tygh::$app['session']['auth']['extended_reward_points']) && Tygh::$app['session']['auth']['user_id'] == $auth['user_id'] && defined('API')) {
+    if (empty($auth['extended_reward_points']) && !empty(Tygh::$app['session']['auth']['extended_reward_points']) && Tygh::$app['session']['auth']['user_id'] == $auth['user_id'] && defined('API') && SiteArea::isStorefront(AREA)) {
         $auth['extended_reward_points'] = Tygh::$app['session']['auth']['extended_reward_points'];
         $auth['points'] = Tygh::$app['session']['auth']['points'];
     }
