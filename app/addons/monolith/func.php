@@ -192,13 +192,14 @@ function fn_monolith_generate_xml($order_id) {
         }
     }
     if (isset($order_info['points_info']['in_use']['points'])) {
+        $usergroup = db_get_field('SELECT u.usergroup FROM ?:usergroup_descriptions AS u LEFT JOIN ?:reward_points AS rp ON u.usergroup_id = rp.usergroup_id WHERE object_id IN (?a) AND object_type = ?s AND lang_code = ?s', array_column($order_info['products'], 'product_id'), 'P', DESCR_SL);
         foreach ($order_info['products'] as $product) {
             if (empty($product['points_in_use'])) continue;
             $CRMOrderDiscountLine[] = [
                 'f' => array(
                     date("Y-m-d\T00:00:00", $order_info['timestamp']),
                     $addon['order_prefix'] . $order_id,
-                    'Baltika_loyalty',
+                    $usergroup,
                     'Baltika_loyalty',
                     $product['points_in_use'],
                     'Amount',
