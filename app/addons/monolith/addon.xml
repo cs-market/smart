@@ -38,8 +38,4 @@
             </section>
         </sections>
     </settings>
-    <queries>
-        <item>ALTER TABLE `?:promotions` ADD `external_id` VARCHAR(255) NOT NULL DEFAULT '';</item> 
-        <item for="uninstall">ALTER TABLE `?:promotions` DROP `external_id`;</item>
-    </queries>
 </addon>

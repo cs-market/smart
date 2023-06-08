@@ -7,6 +7,7 @@ use Tygh\Settings;
 use Tygh\Registry;
 use Tygh\Storage;
 use Tygh\Enum\ProductFeatures;
+use Tygh\Enum\YesNo;
 use Tygh\Database\Connection;
 use Tygh\Enum\ProductTracking;
 use Tygh\Bootstrap;
@@ -354,12 +355,12 @@ class ExRusEximCommerceml extends RusEximCommerceml
 
         // [csmarket]
         $company_condition = fn_get_company_condition('company_id', true, '', false, true);
-        if ($product_guid) $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE external_id = ?s $company_condition", $product_guid);
+        if ($product_guid) $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp, show_out_of_stock_product FROM ?:products WHERE external_id = ?s $company_condition", $product_guid);
 
         if (empty($product_data)) {
             $_product_data = $this->getProductDataByLinkType($link_type, reset($offers), $cml);
             if (!empty($_product_data))
-            $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE product_id = ?s $company_condition", $_product_data['product_id']);
+            $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp, show_out_of_stock_product FROM ?:products WHERE product_id = ?s $company_condition", $_product_data['product_id']);
         }
 
         $product_id = empty($product_data['product_id']) ? 0 : $product_data['product_id'];
@@ -1726,8 +1727,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
         if (isset(\Tygh::$app['session']['ex_exim_1c']['status_commerceml'][$product_id])) return self::PRODUCT_STATUS_ACTIVE;
 
         $product_status = $this->getProductStatusByAmount($amount);
-
-        if ($product_data['tracking'] != ProductTracking::DO_NOT_TRACK) {
+        if ($product_data['tracking'] != ProductTracking::DO_NOT_TRACK && $product_data['show_out_of_stock_product'] != YesNo::Yes) {
             $this->db->query(
                 'UPDATE ?:products SET status = ?s WHERE update_1c = ?s AND product_id = ?i',
                 $product_status,
