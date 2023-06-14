@@ -1190,3 +1190,8 @@ function fn_smart_distribution_get_filters_pre($params, &$cache_params) {
 function fn_smart_distribution_get_available_destination_pre(&$location) {
     $location['country'] = !empty($location['country']) ? $location['country'] : 'RU';
 }
+
+function fn_smart_distribution_storefront_rest_api_strip_service_data_post(&$cart) {
+    if ($cart['user_data']['company_id'] == 1810) $cart['min_order_notice'] = 1500;
+    if ($cart['user_data']['company_id'] == 2058) $cart['min_order_notice'] = 1200;
+}

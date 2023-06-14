@@ -70,4 +70,5 @@ fn_register_hooks(
     'get_filters_products_count_post',
     'get_filters_pre',
     'get_available_destination_pre',
+    'storefront_rest_api_strip_service_data_post',
 );
