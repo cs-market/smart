@@ -22,7 +22,7 @@
             <span class="ty-caret-info"><span class="ty-caret-outer"></span><span class="ty-caret-inner"></span></span>
             <span class="ty-reward-points__txt-point">
                 {*{__("text_point_in_account")} {__("points_lowercase", [$user_info.points])}.*}
-                {if $cart.points_info.max_reward_points}<br>{__("extended_reward_points.allowed_points_to_use")} {__("points_lowercase", [$cart.points_info.max_reward_points])}.{/if}
+                {if $cart.points_info.max_reward_points}<br>{__("extended_reward_points.allowed_points_to_use")} {__("points_lowercase", [min($cart.points_info.max_reward_points, $user_info.points)])}.{/if}
             </span>
 
             {if $cart.points_info.in_use.points}
