@@ -1727,7 +1727,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
         if (isset(\Tygh::$app['session']['ex_exim_1c']['status_commerceml'][$product_id])) return self::PRODUCT_STATUS_ACTIVE;
 
         $product_status = $this->getProductStatusByAmount($amount);
-        if ($product_data['tracking'] != ProductTracking::DO_NOT_TRACK && $product_data['show_out_of_stock_product'] != YesNo::Yes) {
+        if ($product_data['tracking'] != ProductTracking::DO_NOT_TRACK && $product_data['show_out_of_stock_product'] != YesNo::YES) {
             $this->db->query(
                 'UPDATE ?:products SET status = ?s WHERE update_1c = ?s AND product_id = ?i',
                 $product_status,
