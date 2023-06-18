@@ -3417,6 +3417,17 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($corrections, $params, '"');
     fn_print_die('done');
+} elseif ($mode == 'delete_draftmaster_users') {
+    $ids = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s AND user_id NOT IN (?a)', 2059, 'C', [199999]);
+
+    db_query('DELETE FROM ?:user_session_products WHERE user_id IN (?a) AND user_type = ?s', $ids, 'R');
+    db_query('DELETE FROM ?:user_price WHERE user_id IN (?a)', $ids);
+    db_query('DELETE FROM ?:user_data WHERE user_id IN (?a)', $ids);
+    db_query('DELETE FROM ?:user_profiles WHERE user_id IN (?a)', $ids);
+    db_query('DELETE FROM ?:user_storages WHERE user_id IN (?a)', $ids);
+    db_query('DELETE FROM ?:usergroup_links WHERE user_id IN (?a)', $ids);
+    db_query('DELETE FROM ?:users WHERE user_id IN (?a)', $ids);
+    fn_print_die('end');
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
