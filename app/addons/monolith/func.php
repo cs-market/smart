@@ -76,6 +76,34 @@ function fn_monolith_generate_xml($order_id) {
 
     $CRMOrderLine = [];
 
+    foreach ($order_info['products'] as $k => $p) {
+        if (empty($p['extra']['limit_discount_bonus_by_amount_packages'])) continue;
+        $base_product = &$order_info['products'][$p['extra']['limit_discount_bonus_by_amount_packages']];
+
+        $sku_total = ($p['price'] * $p['amount'] + $base_product['price'] * $base_product['amount']);
+        $base_product['amount'] += $p['amount'];
+        $base_product['price'] = $sku_total / $base_product['amount'];
+        unset($order_info['products'][$k]);
+
+        if (empty($base_product['promotions'])) continue;
+        
+        // recalcutale promotion bonus
+        $product_promotions = [];
+        foreach($base_product['promotions'] as $promotion_id => $promotion) {
+            $product_promotions[$promotion_id] = $promotion['bonuses'][0];
+        }
+        $product_promotions = fn_sort_array_by_key($product_promotions, 'discount', SORT_DESC);
+        $promotion_id = key($product_promotions);
+
+        $base_product['promotions'][$promotion_id]['bonuses'][0] = [
+            'discount_bonus' => 'by_fixed',
+            'discount_value' => $base_product['base_price'] - $base_product['price'],
+            'discount' => $base_product['base_price'] - $base_product['price'],
+        ];
+
+        unset($base_product);
+    }
+
     foreach ($order_info['products'] as $p) {
         $price = $p['price'];
         if (!empty($p['promotions'])) {
@@ -137,7 +165,7 @@ function fn_monolith_generate_xml($order_id) {
 
                 $discount_value = $value['discount'];
                 $discount_unit = 'Amount';
-                $discount_price = $value['discount_value'];
+                $discount_price = $value['discount_value']; // to_fixed
 
                 if ($value['discount_bonus'] == 'by_fixed') {
                     $discount_price = $product['price'];
@@ -156,9 +184,9 @@ function fn_monolith_generate_xml($order_id) {
                         $addon['order_prefix'] . $order_id,
                         $external_id,
                         htmlspecialchars($applied_promotions[$promotion_id]['name']),
-                        $discount_value,
+                        fn_format_price($discount_value),
                         $discount_unit,
-                        $discount_price,
+                        fn_format_price($discount_price),
                         $product['product_code']
                     )
                 ];
