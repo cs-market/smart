@@ -12,5 +12,6 @@ fn_register_hooks(
     'get_promotions',
     'get_promotions_post',
     'pre_add_to_cart',
-    'generate_cart_id'
+    'generate_cart_id',
+    'promotion_apply_pre'
 );
