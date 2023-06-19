@@ -220,7 +220,7 @@ function fn_monolith_generate_xml($order_id) {
         }
     }
     if (isset($order_info['points_info']['in_use']['points'])) {
-        $usergroup = db_get_field('SELECT DISTINCT(u.usergroup) FROM ?:usergroup_descriptions AS u LEFT JOIN ?:reward_points AS rp ON u.usergroup_id = rp.usergroup_id LEFT JOIN ?:usergroup_links AS ul ON ul.usergroup_id = u.usergroup_id AND ul.status = ?s WHERE object_id IN (?a) AND object_type = ?s AND lang_code = ?s AND ul.user_id = ?i', 'A', array_column($order_info['products'], 'product_id'), 'P', DESCR_SL, $order_info['user_id']);
+        $usergroup = db_get_field('SELECT DISTINCT(u.usergroup) FROM ?:usergroup_descriptions AS u LEFT JOIN ?:reward_points AS rp ON u.usergroup_id = rp.usergroup_id LEFT JOIN ?:usergroup_links AS ul ON ul.usergroup_id = u.usergroup_id AND ul.status = ?s WHERE object_type = ?s AND lang_code = ?s AND ul.user_id = ?i AND u.usergroup LIKE ?l', 'A', 'P', DESCR_SL, $order_info['user_id'], '%BaltOn%');
 
         foreach ($order_info['products'] as $product) {
             if (empty($product['points_in_use'])) continue;
