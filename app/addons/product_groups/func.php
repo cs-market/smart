@@ -178,7 +178,8 @@ function fn_product_groups_split_cart($cart, $only_mandatory_order_split = false
                     $proto['products'] = [];
 
                     foreach ($group_products as $cart_id => $product) {
-                        if ($product['group_id'] == $group_id) {
+                        // string "(int)_free" can be converted to (int) during comparison
+                        if ((string) $group_id == (string) $product['group_id']) {
                             $proto['products'][$cart_id] = $product;
                             unset($group_products[$cart_id]);
                         }
