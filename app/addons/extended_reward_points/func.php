@@ -307,6 +307,11 @@ function fn_generate_reward_points_report($params) {
 
     $output = array();
     if (isset($params['is_search'])) {
+        $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
+        $grant_reward_points_statuses = array_filter($order_statuses, function($v) {
+            return $v['params']['grant_reward_points'] == 'Y';
+        });
+
         list($orders, $c_params, $totals) = fn_get_orders($params);
 
         $ttl = db_get_hash_single_array('SELECT ttl, order_id FROM ?:reward_point_details WHERE order_id IN (?a)', array('order_id', 'ttl'), array_column($orders, 'order_id'));
@@ -320,7 +325,7 @@ function fn_generate_reward_points_report($params) {
                     __('login') => $users_data[$order['user_id']]['user_login'],
                     __('order') => $order['order_id'],
                     __('order_date') => fn_date_format($order['timestamp'], Registry::get('settings.Appearance.date_format')),
-                    __('earned_points') => $order['points'] ?? 0,
+                    __('earned_points') => (in_array($order['status'], array_keys($grant_reward_points_statuses)) && !empty($order['points'])) ? $order['points'] : 0,
                     __('extended_reward_points.reward_points_ttl') => (!empty($ttl[$order['order_id']])) ? fn_date_format($ttl[$order['order_id']], Registry::get('settings.Appearance.date_format')) : '-',
                     __('points_in_use') => (!empty($points_info[$order['order_id']])) ? unserialize($points_info[$order['order_id']])['points'] : 0,
                     __('extended_reward_points.user_points') => (!empty($users_data[$order['user_id']]['data'])) ? unserialize($users_data[$order['user_id']]['data']) : 0
