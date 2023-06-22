@@ -3428,6 +3428,12 @@ fn_print_die($orders_wo_points);
     db_query('DELETE FROM ?:usergroup_links WHERE user_id IN (?a)', $ids);
     db_query('DELETE FROM ?:users WHERE user_id IN (?a)', $ids);
     fn_print_die('end');
+} elseif ($mode == 'baltica_maintenance5') {
+    $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s', 45, 'C');
+    db_query('DELETE FROM ?:user_data WHERE user_id IN (?a) AND type = ?s', $users, 'W');
+    db_query('DELETE FROM ?:reward_point_changes WHERE user_id IN (?a)', $users);
+
+    fn_print_die('end');
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)

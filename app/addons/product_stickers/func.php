@@ -132,13 +132,19 @@ function fn_execute_data_replacement(&$stickers, &$params) {
                     $piece = &$params['product'];
                     $parts = explode('.', $content);
                     foreach ($parts as $i => $part) {
-                        if (!is_array($piece) || !array_key_exists($part, $piece) || is_array($piece[$part]) || empty(strip_tags($piece[$part]))) {
+                        if (!is_array($piece) || !array_key_exists($part, $piece)) {
                             unset($stickers[$sticker_id]);
                             continue 2;
                         }
 
                         $piece = & $piece[$part];
                     }
+
+                    if (is_array($piece) || empty(strip_tags($piece))) {
+                        unset($stickers[$sticker_id]);
+                        continue;
+                    }
+
                     $replace['['.$content.']'] = trim(strip_tags($piece));
                     if (is_numeric($replace['['.$content.']'])) $replace['['.$content.']'] += 0;
                 }

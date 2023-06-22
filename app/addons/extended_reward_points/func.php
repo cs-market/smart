@@ -336,7 +336,7 @@ function fn_generate_reward_points_report($params) {
     return array($output, $params);
 }
 
-function fn_extended_reward_points_get_autostickers_pre(&$stickers, $product, $auth, $params) {
+function fn_extended_reward_points_get_autostickers_pre(&$stickers, &$product, $auth, $params) {
     if (empty($params['get_for_one_product'])) {
         // probably heavy
         fn_gather_reward_points_data($product, $auth);
