@@ -47,9 +47,9 @@ $schema = array(
         'class' => 'input-mini',
     ),
     'margin-vertical' => array(
-        'label' => 'margin vertical',
+        'label' => 'Margin vertical',
         'type' => 'input',
-        'name' => 'margin-horisontal',
+        'name' => 'margin-vertical',
         'suffix' => 'px',
         'class' => 'input-mini',
         'render' => array(
@@ -58,7 +58,7 @@ $schema = array(
         ),
     ),
     'margin-horisontal' => array(
-        'label' => 'margin horisontal',
+        'label' => 'Margin horisontal',
         'type' => 'input',
         'name' => 'margin-horisontal',
         'suffix' => 'px',
@@ -209,7 +209,7 @@ $schema = array(
         'tooltip' => '<a href="https://www.cssmatic.com/box-shadow" target="_blank">https://www.cssmatic.com/box-shadow</a>'
     ),
     'opacity' => array(
-        'label' => 'opacity',
+        'label' => 'Opacity',
         'type' => 'slider',
         'name' => 'opacity',
         'class' => 'input-xlarge',
