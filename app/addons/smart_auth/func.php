@@ -17,6 +17,7 @@ function fn_settings_variants_addons_smart_auth_auth_fields() {
 function fn_smart_auth_auth_routines($request, $auth, &$field, &$condition, &$user_login) {
     if (!empty(trim($user_login))) {
         $login_fields = Registry::get('addons.smart_auth.auth_fields');
+        if (empty($login_fields)) return;
         $where = [];
         foreach ($login_fields as $field => &$data) {
             if (strpos($field, 'phone') !== false) {

@@ -46,6 +46,26 @@ function fn_extended_reward_points_get_cart_product_data($product_id, &$_pdata, 
     $product['is_oper'] = $_pdata['is_oper'];
 }
 
+function fn_extended_reward_points_calculate_cart_items(&$cart, &$cart_products, $auth, $apply_cart_promotions) {
+    if (!empty($auth['extended_reward_points']) && RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics'])) {
+        $is_changed = false;
+        foreach ($cart['products'] as $key => &$data) {
+            if (!YesNo::toBool($data['is_pbp'])) continue;
+            $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($data, $auth);
+            $cart_products[$key]['price'] = $cart_products[$key]['subtotal'] = 0;
+
+            $is_changed = true;
+        }
+        unset($data);
+
+        if ($is_changed) {
+            $cart['subtotal'] = array_sum(array_column($cart_products, 'subtotal'));
+        }
+
+        $cart['extended_points_info']['in_use'] = fn_get_cart_points_in_use($cart);
+    }
+}
+
 function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_products, $shipping_rates, $calculate_taxes, $auth) {
     if (!empty($auth['extended_reward_points'])) {
         if (RewardPointsMechanics::isPartialPayment($auth['extended_reward_points']['reward_points_mechanics'])) {
@@ -68,17 +88,17 @@ function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_produ
                 fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('extended_reward_points.points_amount_reduced'));
             }
         } else {
-            foreach ($cart['products'] as $key => &$data) {
-                // temporary fix for mobile app
-                $data['extra']['pay_by_points']['point_price'] = $data['extra']['point_price'] ?? 0;
+            // foreach ($cart['products'] as $key => &$data) {
+            //     // temporary fix for mobile app
+            //     $data['extra']['pay_by_points']['point_price'] = $data['extra']['point_price'] ?? 0;
 
-                if (!YesNo::toBool($data['is_pbp'])) continue;
-                $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($data, $auth);
-                $cart_products[$key]['price'] = 0;
-            }
-            unset($data);
+            //     if (!YesNo::toBool($data['is_pbp'])) continue;
+            //     $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($data, $auth);
+            //     $cart_products[$key]['price'] = 0;
+            // }
+            // unset($data);
 
-            $cart['extended_points_info']['in_use'] = fn_get_cart_points_in_use($cart);
+            // $cart['extended_points_info']['in_use'] = fn_get_cart_points_in_use($cart);
         }
     }
 }

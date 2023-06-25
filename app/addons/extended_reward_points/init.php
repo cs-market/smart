@@ -8,6 +8,7 @@ fn_register_hooks(
     'storefront_rest_api_gather_additional_products_data_post', 
     'pre_get_cart_product_data',
     'get_cart_product_data',
+    'calculate_cart_items',
     'calculate_cart_taxes_pre',
     'add_product_to_cart_get_price',
     'pre_place_order',

@@ -141,7 +141,7 @@ function fn_calendar_get_nearest_delivery_day($shipping_params = [], $get_ts = f
         $monday = new \DateTime('next tuesday');
         $diff = $now->diff($monday)->d;
 
-        $nearest_delivery = ($diff > $nearest_delivery) ? $diff : $nearest_delivery;
+        $nearest_delivery = max($diff, $nearest_delivery);
     }
 
     if (!empty((int) $shipping_params['weekdays_availability'])) {
