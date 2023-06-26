@@ -3442,10 +3442,13 @@ fn_print_die($orders_wo_points);
     });
     $grant_reward_order_statuses = array_keys($grant_reward_order_statuses);
 
+    $usergroups = ['17612', '17613', '17614', '17615', '17616',    '17617', '17618', '17619', '17620', '17621'];
+    $users = db_get_fields('SELECT distinct(user_id) FROM ?:usergroup_links WHERE usergroup_id IN (?a)', $usergroups);
+
     foreach ($company_ids as $company_id) {
         list($orders, $params) = fn_get_orders([
             'time_to' => '01/06/2023', 
-            'time_from' => '30/06/2023', 
+            'time_from' => '30/06/2023',
             'period' => 'M',
             'company_id' => $company_id, 
             //'status' => $grant_reward_order_statuses
@@ -3454,6 +3457,7 @@ fn_print_die($orders_wo_points);
         foreach ($orders as $order) {
             $order_id = $order['order_id'];
             $order_info = fn_get_order_info($order_id);
+            if (!$order_info['group_id']) continue;
             if (!empty($order_info['points_info']['reward']) && !empty($order_info['points_info']['in_use']['points']) ) {
                 if (in_array($order_info['status'], $grant_reward_order_statuses)) {
                     $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s', $order_info['user_id'], CHANGE_DUE_ORDER);
@@ -3463,8 +3467,8 @@ fn_print_die($orders_wo_points);
                         $details = unserialize($change['reason']);
                         if (!empty($details['order_id']) && $details['order_id'] == $order_id ) {
                             if ($change['amount'] > 0) $granted = $change['amount'];
-                            if (strpos($details['correction'], 'correct_reward_points') !== false) {
-                                $is_corrected = true;
+                            if (strpos($details['correction'], 'correct_reward_points_june') !== false) {
+                                $is_corrected = $change;
                                 break;
                             }
                         } else {
@@ -3475,19 +3479,24 @@ fn_print_die($orders_wo_points);
                     if (!$is_corrected && $granted) {
                         $reason = array('order_id' => $order_info['order_id'], 'to' => $order_info['status'], 'correction' => 'correct_reward_points_june');
                         fn_change_user_points(-$granted, $order_info['user_id'], serialize($reason), CHANGE_DUE_ORDER, $order_info['timestamp']);
-                        $corrections[] = $reason + ['user_id' => $order_info['user_id'], 'amount' => $granted];
+                        $corrections[] = $reason + ['user_id' => $order_info['user_id'], 'amount' => $granted, 'total' => $order_info['total'], 'subtotal' => $order_info['subtotal'], 'group_id' => $order_info['group_id'], 'status' => $order_info['status']];
                     } elseif ($is_corrected) {
                         $reason = array('order_id' => $order_info['order_id'], 'to' => $order_info['status'], 'correction' => 'correct_reward_points_june');
                         $prev_corrections[] = $reason + ['user_id' => $order_info['user_id'], 'amount' => $granted];
                     }
                 } else {
                     // грохнуть из заказа данные пока не начислялись баллы, чтобы не запускать обработку по ним потом
+                    $removed[] = $order_id;
                     db_query('DELETE FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order_id, 'W');
                 }
             }
+
+            // if ($order_info['total'] <= 0) continue;
+            // if (!in_array($order_info['user_id'], $users)) continue;
+            // fn_print_die($order_info);
         }
     }
-
+    fn_print_r($removed);
     fn_print_r(
         'всего заказов к корректировке: '. count($corrections), 
         'из них уже скорректировано: ' . count($prev_corrections), 
@@ -3497,6 +3506,24 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($corrections, $params, '"');
     fn_print_die('done');
+} elseif ($mode == 'correct_reward_points_june2') {
+    $order_ids = db_get_fields("SELECT o.order_id FROM ?:orders AS o LEFT JOIN cscart_order_details AS od ON o.order_id = od.order_id WHERE od.product_id IN (?a)", [179166,178598,176731,176730,176704,176703,176702,174783,174782,170420,170419,170066]);
+    $wrong = [];
+    foreach ($order_ids as $order_id) {
+        $order_info = fn_get_order_info($order_id);
+        if (empty($order_info['points_info']['in_use']['points'])) continue;
+        $row[] = [
+            'order_id' => $order_info['order_id'],
+            'status' => $order_info['status'],
+            'date' => fn_date_format($order_info['timestamp'], Registry::get('settings.Appearance.date_format')),
+            'points' => $order_info['points_info']['in_use']['points'],
+        ];
+    }
+
+    $params['filename'] = 'correct_reward_points_june2.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($row, $params, '"');
+    fn_print_die($row);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
