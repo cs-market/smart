@@ -551,14 +551,14 @@ function fn_product_sticker_render_styles($properties) {
                     if (isset($schema[$name]['prefix'])) {
                         if (strpos($val, '#prefix') !== false) {
                             $val = str_replace('#prefix', $schema[$name]['prefix'], $val);
-                        } else {
+                        } elseif (strpos($val, $schema[$name]['prefix']) === false) {
                             $val = $schema[$name]['prefix'] . $val;
                         }
                     }
                     if (isset($schema[$name]['suffix'])) {
                         if (strpos($val, '#suffix') !== false) {
                             $val = str_replace('#suffix', $schema[$name]['suffix'], $val);
-                        } else {
+                        } elseif (strpos($val, $schema[$name]['suffix']) === false) {
                             $val .= $schema[$name]['suffix'];
                         }
                     }
