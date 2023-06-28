@@ -1,4 +1,4 @@
-{if $runtime.force_to_choose_storage && $auth.company_id == 45}
+{if $runtime.force_to_choose_storage}
     {capture name='switcher_content'}
         <div class="ty-storages__wrapper">
             <div id="switcher_content_{$block.block_id}">
@@ -11,10 +11,13 @@
         </div>
     {/capture}
 
+    {$title=__("storage_switcher")}
+    {if $auth.company_id == 45}{$title=__("baltika_storage_switcher")}{/if}
+
     {include file="common/popupbox.tpl"
         link_text=__("")
         link_meta="cm-dialog-non-closable"
-        title=__("baltika_storage_switcher")
+        title=$title
         id="storage_switcher"
         content=$smarty.capture.switcher_content
         wysiwyg=false

@@ -54,7 +54,7 @@
                 <div class="ty-center ty-value-changer cm-value-changer">
                     <a class="cm-increase ty-value-changer__increase">&#43;</a>
             {/if}
-            <input type="text" size="3" id="amount_{$key}" name="cart_products[{$key}][amount]" value="{$cp.amount}" data-ca-val="{$cp.amount}" class="input-micro cm-amount" {if $cp.qty_step> 1} data-ca-step="{$cp.qty_step}"{/if} />
+            <input type="text" size="3" id="amount_{$key}" name="cart_products[{$key}][amount]" value="{$cp.amount}" data-ca-val="{$cp.amount}" class="input-micro cm-amount" {if $cp.qty_step != 1 && $cp.qty_step != 0} data-ca-step="{$cp.qty_step}"{/if} />
             {if $settings.Appearance.quantity_changer == "Y"}
                     <a class="cm-decrease ty-value-changer__decrease">&minus;</a>
                 </div>
