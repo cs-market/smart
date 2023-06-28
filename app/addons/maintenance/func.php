@@ -439,3 +439,9 @@ function fn_exim_get_last_view_users_count()
 
     return $last_view_results['total_items'];
 }
+
+function fn_maintenance_get_payments_pre(&$params) {
+    if (defined('ORDER_MANAGEMENT')) {
+        $params['status'] = 'A';
+    }
+}
