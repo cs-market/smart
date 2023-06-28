@@ -445,3 +445,9 @@ function fn_maintenance_get_payments_pre(&$params) {
         $params['status'] = 'A';
     }
 }
+
+function fn_maintenance_shippings_get_shippings_list_conditions($group, $shippings, $fields, $join, &$condition, $order_by) {
+    if (defined('ORDER_MANAGEMENT')) {
+        $condition .= " AND (" . fn_find_array_in_set(\Tygh::$app['session']['customer_auth']['usergroup_ids'], '?:shippings.usergroup_ids', true) . ")";
+    }
+}
