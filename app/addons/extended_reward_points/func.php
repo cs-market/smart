@@ -50,6 +50,9 @@ function fn_extended_reward_points_calculate_cart_items(&$cart, &$cart_products,
     if (!empty($auth['extended_reward_points']) && RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics'])) {
         $is_changed = false;
         foreach ($cart['products'] as $key => &$data) {
+            // temporary fix for mobile app
+            $data['extra']['pay_by_points']['point_price'] = $data['extra']['point_price'] ?? 0;
+
             if (!YesNo::toBool($data['is_pbp'])) continue;
             $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($data, $auth);
             $cart_products[$key]['price'] = $cart_products[$key]['subtotal'] = 0;
@@ -87,18 +90,6 @@ function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_produ
                 $cart['points_info']['in_use']['points'] = $cart['points_info']['max_reward_points'];
                 fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('extended_reward_points.points_amount_reduced'));
             }
-        } else {
-            // foreach ($cart['products'] as $key => &$data) {
-            //     // temporary fix for mobile app
-            //     $data['extra']['pay_by_points']['point_price'] = $data['extra']['point_price'] ?? 0;
-
-            //     if (!YesNo::toBool($data['is_pbp'])) continue;
-            //     $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($data, $auth);
-            //     $cart_products[$key]['price'] = 0;
-            // }
-            // unset($data);
-
-            // $cart['extended_points_info']['in_use'] = fn_get_cart_points_in_use($cart);
         }
     }
 }
