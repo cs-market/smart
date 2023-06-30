@@ -219,3 +219,7 @@ msgstr "Пользователь с этим email не найден"
 msgctxt "Languages::message_sent_successfully"
 msgid "Your message has been successfully sent"
 msgstr "Ваше сообщение успешно отправлено"
+
+msgctxt "Languages::check_connection"
+msgid "Check the connection"
+msgstr "Проверить соединение"

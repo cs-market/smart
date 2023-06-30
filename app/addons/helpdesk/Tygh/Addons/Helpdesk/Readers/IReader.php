@@ -17,4 +17,6 @@ interface IReader
      * @return \Tygh\Common\OperationResult List of fields that imported items have
      */
     public function setSettings($params);
+
+    public function getErrors();
 }

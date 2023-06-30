@@ -106,6 +106,7 @@
                 }
             </div>
         </div>
+        {include file="buttons/button.tpl" but_meta="cm-post cm-ajax" but_name="dispatch[mailboxes.check_connection]" but_text=__('check_connection')}
     </fieldset>
     <!--content_tab_details_{$id}--></div>
 </div>

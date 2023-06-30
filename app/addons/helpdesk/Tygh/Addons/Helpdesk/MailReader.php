@@ -20,4 +20,8 @@ class MailReader
     public function setSettings($params) {
         return $this->reader->setSettings($params);
     }
+
+    public function getErrors() {
+        return $this->reader->getErrors();
+    }
 }

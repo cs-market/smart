@@ -48,11 +48,16 @@ class ImapReader implements IReader {
             }
             else {$this->unread=false;}
             imap_close($this->mbox);
+        } else {
+            $this->errors = imap_errors();
         }
     }
 
     public function getMail(){ return $this->unread;}
-    
+
+    public function getErrors(){
+        return $this->errors;
+    }
 
     private function decode($enc){
         $parts = imap_mime_header_decode($enc);

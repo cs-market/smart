@@ -1,8 +1,21 @@
 <?php
 
+use Tygh\Enum\NotificationSeverity;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if ($mode == 'check_connection') {
+        if ($settings = $_REQUEST['mailbox_data']) {
+            $mail_reader = Tygh::$app['addons.helpdesk.mail_reader'];
+            $mail_reader->setSettings(['host' => "{" . $settings['host'] . "}", 'login' => $settings['email'], 'password' => $settings['password'] ] );
+            if ($errors = $mail_reader->getErrors()) {
+                fn_set_notification(NotificationSeverity::ERROR, __('error'), __('rus_online_cash_register.connection_refused', ['[error]' => '<br>'. implode('<br>', $errors)]));
+            } else {
+                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('rus_online_cash_register.connection_successful'));
+            }
+        }
+    }
     if ($mode == 'update') {
         if (!empty($_REQUEST['mailbox_data'])) {
             $mailbox_id = fn_update_mailbox($_REQUEST['mailbox_data'], $_REQUEST['mailbox_id']);

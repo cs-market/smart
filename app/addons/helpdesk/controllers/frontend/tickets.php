@@ -4,6 +4,7 @@ use Tygh\Registry;
 use Tygh\Bootstrap;
 use Tygh\Storage;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\NotificationSeverity;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -22,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 list($user_id) = fn_update_user(0, ['email' => $ticket_data['email'], 'name' => $ticket_data['email']], $auth, 'N', true);
             } else {
                 // TODO prevent it in GET!!
-                fn_set_notification('W', __('warning'), __('helpdesk_user_not_found'));
+                fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('helpdesk_user_not_found'));
                 fn_save_post_data('ticket_data');
                 return array(CONTROLLER_STATUS_REDIRECT, 'tickets.new');
             }
@@ -38,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($ticket_data['ticket_id'])) {
             $message_id = fn_update_message($ticket_data);
             if ($message_id) {
-                fn_set_notification('N', __('notice'), __('message_sent_successfully'));
+                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('message_sent_successfully'));
             }
             $suffix = ".view?ticket_id=".$ticket_data['ticket_id'];
         } else {
@@ -52,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($ticket_data['ticket_id'])) {
             $message_id = fn_update_message($ticket_data);
             if ($message_id) {
-                fn_set_notification('N', __('notice'), __('message_sent_successfully'));
+                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('message_sent_successfully'));
             }
             $ticket_id = $ticket_data['ticket_id'];
             $suffix = ".view?ticket_id=$ticket_id";

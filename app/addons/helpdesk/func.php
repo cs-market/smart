@@ -5,6 +5,7 @@ use Tygh\Storage;
 use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\NotificationSeverity;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -93,7 +94,7 @@ function fn_update_template($template, $template_id = 0) {
             unset($template['template_id']);
             $template_id = db_query('UPDATE ?:helpdesk_templates SET ?u WHERE template_id = ?i', $template, $template_id);
         } else {
-            fn_set_notification('W', __('warning'), __('helpdesk.template_owned_by') . ' ' . fn_get_user_name($current_data['user_id']));
+            fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('helpdesk.template_owned_by') . ' ' . fn_get_user_name($current_data['user_id']));
         }
     } else {
 
@@ -109,7 +110,7 @@ function fn_delete_message_template($template_id = 0) {
     if ($current_data['user_id'] == Tygh::$app['session']['auth']['user_id']) {
         $res = db_query("DELETE FROM ?:helpdesk_templates WHERE template_id = ?i", $template_id);
     } else {
-        fn_set_notification('W', __('warning'), __('helpdesk.template_owned_by') . ' ' . fn_get_user_name($current_data['user_id']));
+        fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('helpdesk.template_owned_by') . ' ' . fn_get_user_name($current_data['user_id']));
     }
     return $res;
 }
@@ -478,10 +479,14 @@ function fn_helpdesk_get_mail() {
     $mailboxes = fn_get_mailboxes();
     $i = 0;
     $mails = array();
+
     foreach ($mailboxes as $settings) {
         $mail_reader = Tygh::$app['addons.helpdesk.mail_reader'];
         $mail_reader->setSettings(['host' => "{" . $settings['host'] . "}", 'login' => $settings['email'], 'password' => $settings['password'] ] );
-        if ($mail_reader) {
+        if ($errors = $mail_reader->getErrors()) {
+            fn_print_r($settings['mailbox_name'], $errors);
+            continue;
+        } else {
             $mails = $mail_reader->getMail();
             if (!empty($mails)) {
                 foreach ($mails as $mail) {
@@ -592,7 +597,7 @@ function fn_helpdesk_send_mail() {
                 $to = array_filter(filter_var_array(array_column($message['users'], 'email'), FILTER_VALIDATE_EMAIL));
                 if (!empty($to)) {
                     $notified = $mailer->send(array(
-                        'to' => array_column($message['users'], 'email'),
+                        'to' => $to,
                         'from' => array('name' => $mailboxes[$message['mailbox_id']]['mailbox_name'], 'email' => $settings['email']),
                         'tpl' => $body,
                         'is_html' => true,

@@ -3,6 +3,7 @@
 use Tygh\Registry;
 use Tygh\Storage;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\NotificationSeverity;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -59,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
             $master_pattern = '/'.implode("|",$patterns).'/i';
             if (preg_match($master_pattern, $message) ) {
-                fn_set_notification('E', __('error'), __('incorrect_filling_message'));
+                fn_set_notification(NotificationSeverity::ERROR, __('error'), __('incorrect_filling_message'));
                 fn_save_post_data('ticket_data');
                 return array(CONTROLLER_STATUS_OK);
             }
@@ -73,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($ticket_data['ticket_id'])) {
             $message_id = fn_update_message($ticket_data);
             if ($message_id) {
-                fn_set_notification('N', __('notice'), __('message_sent_successfully'));
+                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('message_sent_successfully'));
             }
             $ticket_id = $ticket_data['ticket_id'];
             $suffix = ".view?ticket_id=$ticket_id";
