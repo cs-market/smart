@@ -4,6 +4,7 @@ use Tygh\Registry;
 use Tygh\Enum\UserTypes;
 use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserRoles;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -196,7 +197,7 @@ function fn_managers_vendor_communication_add_thread_message_post( $thread_full_
 function fn_managers_place_order($order_id, $action, $order_status, $cart, $auth) {
     $order_info = fn_get_order_info($order_id);
     $field = (isset($cart['order_id']) && !empty($cart['order_id'])) ? 'notify_manager_order_update' : 'notify_manager_order_create';
-    if (db_get_field("SELECT $field FROM ?:companies WHERE company_id = ?i", $order_info['company_id']) == 'Y') {
+    if (YesNo::toBool(db_get_field("SELECT $field FROM ?:companies WHERE company_id = ?i", $order_info['company_id']))) {
         $mailer = Tygh::$app['mailer'];
         list($shipments) = fn_get_shipments_info(array('order_id' => $order_info['order_id'], 'advanced_info' => true));
         $use_shipments = !fn_one_full_shipped($shipments);
@@ -243,7 +244,7 @@ function fn_managers_generate_sales_report(&$params, &$elements_join, &$elements
 }
 
 function fn_managers_generate_sales_report_post($params, &$row, $user) {
-    if ($params['show_manager'] == 'Y') {
+    if (YesNo::toBool($params['show_manager'])) {
         $roles = UserRoles::getList(UserTypes::ADMIN);
         unset($roles[UserRoles::CUSTOMER]);
         array_walk($user['managers'], function(&$v) {

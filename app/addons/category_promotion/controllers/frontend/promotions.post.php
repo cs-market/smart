@@ -28,6 +28,9 @@ if ($mode == 'view') {
                 'get_features' => false
             ));
 
+            fn_promotion_apply_bonuses($promotion_data, $tmp, Tygh::$app['session']['auth'], $products);
+            
+
             Tygh::$app['view']->assign('products', $products);
             Tygh::$app['view']->assign('search', $search);
 

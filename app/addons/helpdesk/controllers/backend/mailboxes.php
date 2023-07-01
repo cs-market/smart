@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'check_connection') {
         if ($settings = $_REQUEST['mailbox_data']) {
             $mail_reader = Tygh::$app['addons.helpdesk.mail_reader'];
+            if (empty(trim($settings['password'])) && !empty($_REQUEST['mailbox_id'])) $settings['password'] = db_get_field('SELECT password FROM ?:helpdesk_mailboxes WHERE mailbox_id = ?i', $_REQUEST['mailbox_id']) ;
             $mail_reader->setSettings(['host' => "{" . $settings['host'] . "}", 'login' => $settings['email'], 'password' => $settings['password'] ] );
             if ($errors = $mail_reader->getErrors()) {
                 fn_set_notification(NotificationSeverity::ERROR, __('error'), __('rus_online_cash_register.connection_refused', ['[error]' => '<br>'. implode('<br>', $errors)]));
