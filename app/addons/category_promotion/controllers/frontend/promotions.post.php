@@ -31,7 +31,14 @@ if ($mode == 'view') {
             // emulate discount
             $bonuses = array_column($promotion_data['bonuses'], 'bonus');
             if (!array_intersect(['free_products', 'promotion_step_free_products', 'promotion_step_give_condition_products'], $bonuses)) {
+                $backup_amount = [];
+                foreach ($products as $key => &$product) {
+                    $backup_amount[$key]['amount'] = $product['amount'];
+                    $product['amount'] = 9999;
+                }
+
                 fn_promotion_apply_bonuses($promotion_data, $tmp, Tygh::$app['session']['auth'], $products);
+                $products = fn_array_merge($products, $backup_amount);
             }
 
             Tygh::$app['view']->assign('products', $products);
