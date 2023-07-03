@@ -28,8 +28,11 @@ if ($mode == 'view') {
                 'get_features' => false
             ));
 
-            fn_promotion_apply_bonuses($promotion_data, $tmp, Tygh::$app['session']['auth'], $products);
-            
+            // emulate discount
+            $bonuses = array_column($promotion_data['bonuses'], 'bonus');
+            if (!array_intersect(['free_products', 'promotion_step_free_products', 'promotion_step_give_condition_products'], $bonuses)) {
+                fn_promotion_apply_bonuses($promotion_data, $tmp, Tygh::$app['session']['auth'], $products);
+            }
 
             Tygh::$app['view']->assign('products', $products);
             Tygh::$app['view']->assign('search', $search);
