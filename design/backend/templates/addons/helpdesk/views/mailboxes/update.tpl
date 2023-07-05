@@ -95,10 +95,12 @@
         <div class="control-group">
             <label for="elm_mailbox_admin_notifications_{$id}" class="control-label">{__("admin_notifications")}:</label>
             <div class="controls">
+                {$user_type = 'A'}
+                {if "MULTIVENDOR"|fn_allowed_for}{$user_type = 'V'}{/if}
                 {include
                     file="pickers/users/picker.tpl"
                     but_text=__("choose")
-                    extra_url="&user_type=A"
+                    extra_url="&user_type=`$user_type`"
                     data_id="responsible_admin"
                     but_meta="btn"
                     input_name="mailbox_data[responsible_admin]"
