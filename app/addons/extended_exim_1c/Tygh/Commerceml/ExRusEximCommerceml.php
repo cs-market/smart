@@ -24,10 +24,12 @@ class ExRusEximCommerceml extends RusEximCommerceml
 
     public function __construct(Connection $db, Logs $log, $path_commerceml) {
         parent::__construct($db, $log, $path_commerceml);
-        $status_commerceml = & \Tygh::$app['session']['ex_exim_1c']['status_commerceml'];
-        $status_commerceml = array_filter($status_commerceml, function($status_data) {
-            return (isset($status_data['ttl']) && $status_data['ttl'] > TIME);
-        });
+
+        if ($status_commerceml = & \Tygh::$app['session']['ex_exim_1c']['status_commerceml']) {
+            $status_commerceml = array_filter($status_commerceml, function($status_data) {
+                return (isset($status_data['ttl']) && $status_data['ttl'] > TIME);
+            });
+        }
     }
     
     public function importCategoriesFile($data_categories, $import_params, $parent_id = 0)
@@ -300,7 +302,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
     {
         $cml = $this->cml;
         $result = [];
-
+        $func = (Registry::get('addons.maintenance.status') == 'A') ? 'fn_maintenance_exim_import_price' : 'floatval';
         /** @var \SimpleXMLElement $warehouse_info */
         foreach ($offer->{$cml['warehouse']} as $storage_info) {
 
@@ -312,7 +314,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 continue;
             }
 
-            $result[$storage_id] = (int) $storage->{$cml['warehouse_in_stock']};
+            $result[$storage_id] = $func($storage->{$cml['warehouse_in_stock']});
             if ($result[$storage_id] < 0) $result[$storage_id] = 0;
         }
 

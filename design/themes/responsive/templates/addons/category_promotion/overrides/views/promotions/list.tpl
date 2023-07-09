@@ -1,6 +1,6 @@
 <div class="ty-grid-list ty-grid-list__promotions" >
     {foreach $promotions as $promotion_id => $promotion}
-            <div class="ty-grid-list__item  ty-flex-column ty-grid-list__item--overlay">
+            <div class="ty-grid-list__item ty-grid-list__item--overlay">
             	<a href="{"promotions.view&promotion_id=$promotion_id"|fn_url}">
                 {if $promotion.image}
                     {include file="common/image.tpl"
