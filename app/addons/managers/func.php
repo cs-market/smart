@@ -114,7 +114,7 @@ function fn_managers_get_order_info(&$order, $additional_data) {
 
 function fn_managers_get_users(&$params, &$fields, &$sortings, &$condition, &$join, $auth) {
     if (UserRoles::is_management_user()) {
-        if ($params['user_type'] == 'C') $params['manager_users'] = $auth['user_id'];
+        if (isset($params['user_type']) && $params['user_type'] == UserTypes::CUSTOMER) $params['manager_users'] = $auth['user_id'];
     }
 
     if (!empty($params['manager_users'])) {

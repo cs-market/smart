@@ -5,6 +5,7 @@ namespace Tygh\Api\Entities\v50;
 use Tygh\Api\Entities\v40\SraDiscussion as BaseSraDiscussion;
 use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
 use Tygh\Enum\Addons\Discussion\DiscussionTypes;
+use Tygh\Enum\NotificationSeverity;
 
 class SraDiscussion extends BaseSraDiscussion
 {

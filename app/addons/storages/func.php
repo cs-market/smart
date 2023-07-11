@@ -582,7 +582,7 @@ function fn_storages_get_orders($params, $fields, $sortings, &$condition, $join,
 function fn_storages_get_order_info(&$order, $additional_data) {
     if (!empty($order['storage_id'])) {
         list($storages,) = fn_get_storages(['storage_id' => $order['storage_id']]);
-        $order['storage'] = reset($storages);
+        if (!empty($storages)) $order['storage'] = reset($storages);
     }
 }
 
