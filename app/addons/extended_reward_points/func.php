@@ -9,7 +9,7 @@ use Tygh\Enum\RewardPointsMechanics;
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_extended_reward_points_update_product_post($product_data, $product_id) {
-    if (isset($product_data['reward_points']) && YesNo::toBool($product_data['is_op'])) {
+    if (isset($product_data['reward_points']) && isset($product_data['is_op']) && YesNo::toBool($product_data['is_op'])) {
         $usergroup_ids = array_column($product_data['reward_points'], 'usergroup_id');
         if (!empty($usergroup_ids)) {
             db_query('DELETE FROM ?:reward_points WHERE object_id = ?i AND object_type = ?s AND usergroup_id NOT IN (?a)', $product_id, PRODUCT_REWARD_POINTS, $usergroup_ids);
@@ -18,7 +18,7 @@ function fn_extended_reward_points_update_product_post($product_data, $product_i
 }
 
 function fn_extended_reward_points_gather_additional_product_data_before_discounts(&$product, $auth, $params) {
-    if (SiteArea::isStorefront(AREA) && YesNo::toBool($product['is_pbp']) && RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics'])) {
+    if (SiteArea::isStorefront(AREA) && isset($product['is_pbp']) && YesNo::toBool($product['is_pbp']) && RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics'])) {
         $product['point_price'] = fn_extended_reward_points_get_price_in_points($product, $auth);
     }
 }
@@ -86,7 +86,7 @@ function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_produ
             $max_products_discount = round($cart['subtotal'] - $min_subtotal);
 
             $cart['points_info']['max_reward_points'] = min($max_rp, $max_products_discount);
-            if ($cart['points_info']['in_use']['points'] > $cart['points_info']['max_reward_points']) {
+            if (isset($cart['points_info']['in_use']['points']) && $cart['points_info']['in_use']['points'] > $cart['points_info']['max_reward_points']) {
                 $cart['points_info']['in_use']['points'] = $cart['points_info']['max_reward_points'];
                 fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('extended_reward_points.points_amount_reduced'));
             }
@@ -184,7 +184,7 @@ function fn_get_cart_points_in_use($cart, $exclude_products = []) {
     $total_use_points = 0;
     if (!empty($cart['products']))
     foreach ($cart['products'] as &$product) {
-        if (in_array($product['product_id'], $exclude_products) || !YesNo::toBool($product['extra']['is_pbp'])) continue;
+        if (in_array($product['product_id'], $exclude_products) || !isset($product['extra']['is_pbp']) || !YesNo::toBool($product['extra']['is_pbp'])) continue;
 
         $total_use_points += $product['extra']['point_price'] * $product['amount'];
     }

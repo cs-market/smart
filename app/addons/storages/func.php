@@ -267,7 +267,7 @@ function fn_storages_load_products_extra_data(&$extra_fields, $products, $produc
             'condition' => db_quote(' AND ?:storages_products.storage_id = ?i', $storage['storage_id'])
         ];
 
-        if (!empty(array_filter($storage['usergroup_ids']))) {
+        if (isset($storage['usergroup_ids']) && !empty(array_filter($storage['usergroup_ids']))) {
             $params['auth_usergroup_ids'] = array_intersect($params['auth_usergroup_ids'], $storage['usergroup_ids']);
         }
     }
@@ -378,7 +378,7 @@ function fn_storages_user_logout_before_save_cart($auth) {
 function fn_storages_pre_add_to_cart(&$product_data, $cart, $auth, $update) {
     if ($update) {
         foreach ($product_data as $key => &$data) {
-            $data['extra']['storage_id'] = $cart['products'][$key]['extra']['storage_id'];
+            $data['extra']['storage_id'] = isset($cart['products'][$key]['extra']['storage_id']) ? $cart['products'][$key]['extra']['storage_id'] : Registry::ifGet('runtime.current_storage.storage_id', false);
         }
         unset($data);
     } elseif ($storage_id = Registry::ifGet('runtime.current_storage.storage_id', false)) {
