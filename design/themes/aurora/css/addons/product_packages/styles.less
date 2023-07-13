@@ -4,22 +4,22 @@
     ma
 }
 .ty-switcher-checkbox {
-    margin-bottom: 6px;
+    // margin-bottom: 6px;
     flex-grow: 1;
     &__controls {
         display: flex;
         justify-content: space-between;
     }
-    &__control {
-        padding: 6px;
-        .border-radius(20px);
-        .cm-packages-switcher:not(:checked) + & {
-            background-color: #f1f5f9;
-        }
-        .cm-packages-switcher:checked ~ &:last-child {
-            background-color: #f1f5f9;
-        }
-    }
+    // &__control {
+    //     padding: 6px;
+    //     .border-radius(20px);
+    //     .cm-packages-switcher:not(:checked) + & {
+    //         background-color: #f1f5f9;
+    //     }
+    //     .cm-packages-switcher:checked ~ &:last-child {
+    //         background-color: #f1f5f9;
+    //     }
+    // }
     input[type=radio] {
         display: none;
         + label {
@@ -40,6 +40,7 @@
     }
 }
 .box-price {
+    flex-basis: 100%;
     & &__suffix {
         color: #8c8c8c;
     }
