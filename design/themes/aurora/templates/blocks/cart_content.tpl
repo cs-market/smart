@@ -7,11 +7,11 @@
             {hook name="checkout:dropdown_title"}
                 {if $smarty.session.cart.amount}
                     <i class="ty-minicart__icon ty-icon-cart filled"></i>
-                    <span class="ty-minicart-title ty-hand">{$smarty.session.cart.amount}&nbsp;{__("items")} {__("for")}&nbsp;{include file="common/price.tpl" value=$smarty.session.cart.display_subtotal}</span>
+                    <span class="ty-minicart-title ty-hand"><span>{$smarty.session.cart.amount}&nbsp;{__("items")} {__("for")}&nbsp;</span>{include file="common/price.tpl" value=$smarty.session.cart.display_subtotal}</span>
                     <i class="ty-icon-down-micro"></i>
                 {else}
                     <i class="ty-minicart__icon ty-icon-cart empty"></i>
-                    <span class="ty-minicart-title empty-cart ty-hand">{__("cart_is_empty")}</span>
+                    <span class="ty-minicart-title empty-cart ty-hand"><span>{__("cart_is_empty")}</span></span>
                     <i class="ty-icon-down-micro"></i>
                 {/if}
                 <span class="ty-minicart-title__counter">{$smarty.session.cart.products|count}</span>
