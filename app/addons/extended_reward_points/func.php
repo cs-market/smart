@@ -252,6 +252,7 @@ function fn_extended_reward_points_use_points($points, $user_id, $repaid_order_i
 
     if ($data = db_get_row('SELECT * FROM ?:reward_point_details WHERE user_id = ?i AND amount != ?i AND order_id != ?i ORDER BY ttl', $user_id, 0, $repaid_order_id)) {
         $data['details'] = unserialize($data['details']);
+        if (empty($data['details'])) $data['details'] = [];
         $data['repaid_order_ids'] = array_filter(explode(',', $data['repaid_order_ids']));
 
         $diff = $data['amount'] - $points;

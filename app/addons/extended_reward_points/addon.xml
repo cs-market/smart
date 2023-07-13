@@ -5,7 +5,7 @@
     <description>Добавляет различные механики использования бонусных баллов</description>
     <status>active</status>
     <version>1.0.1</version>
-    <priority>1900</priority>
+    <priority>1950</priority>
     <position>0</position>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
     <default_language>ru</default_language>

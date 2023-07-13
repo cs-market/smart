@@ -21,6 +21,7 @@ Category page
         .box-shadow(~"rgba(0, 0, 0, 0.08) 0px 1px 20px 0px, rgba(0, 0, 0, 0.04) 0px 2px 8px 0px");
         &:hover {
             .box-shadow(rgba(90, 112, 114, 0.3) 0px 4px 18px);
+            background-color: #fff;
         }
         .transition(@transition);
         > form {
@@ -32,6 +33,7 @@ Category page
     &__item-name {
         .product-title {
             // height: 51px;
+            font-weight: 500;
             color: @font;
             overflow-y: hidden;
               display: -webkit-box;
@@ -44,7 +46,10 @@ Category page
         padding: 0;
     }
     &__qty {
-        float: left;
+        width: 100%;
+        .ty-grid-list__controls:not(.is-weighted) & {
+            display: none;
+        }
     }
     &__sku {
         * {
@@ -54,13 +59,31 @@ Category page
             display: none;
         }
     }
+    &__price {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: auto;
+        .ty-price-actual {
+            order: -1;
+        }
+    }
     &__controls {
         display: flex;
-        align-items: end;
         justify-content: space-between;
         padding-top: 20px;
-        margin-top: auto;
-        gap: 10px;
+        gap: 8px 3px;
+        flex-wrap: wrap;
+        &.in-cart:not(.is-weighted) {
+            .ty-grid-list__qty {
+                display: block;
+            }
+            .button-container {
+                display: none;
+            }
+        }
+    }
+    .button-container {
+        flex-grow: 1;
     }
     .owl-item > div {
         margin: 15px var(--scroller-gap);
@@ -80,17 +103,22 @@ Category page
         --grid-width-max: auto;
     }
 }
+[id^="add_to_cart_update"] {
+    display: flex;
+    align-items: center;
+}
 .ty-price {
     &-old {
         color: #b7b9be;
-        font-size: 16px;
+        font-size: 22px;
         line-height: 24px;
+        margin-left: 6px;
     }
     &-actual {
         font-size: 22px;
     }
-    &-old ~ &-actual {
-        color: #f36;
+    &-old ~ div {
+        color: #f22222;
         * {
             color: inherit;
         }

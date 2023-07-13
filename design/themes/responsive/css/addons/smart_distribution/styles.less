@@ -104,12 +104,6 @@
         &__sku {
             display: none;
         }
-        &__promotioned_item .ty-btn__add-to-cart:not(.ty-btn__active) {
-            background: #ff9900;
-            &:hover {
-                background-color: #50b946;
-            }
-        }
     }
     @media @mobile {
         .ty-minicart-title, 
@@ -150,7 +144,7 @@
         }
     }
     .ty-cart-content {
-        &__qty .quantity {
+        .ty-cart-content__qty .quantity {
             float: left;
         }
         &__top-buttons {
@@ -212,14 +206,13 @@
                 }
             }
             &__search {
-                order: 999;
+                order: 990;
             }
         }
     }
     .baltika-filters {
         display: none;
-        position: absolute;
-        right: 60px;
+        order: 999;
         .ty-dropdown-box__title {
             a {
                 font-size: 20px;
@@ -228,6 +221,11 @@
                 .ty-icon-aurora-filter();
             }
         }
+    }
+    .flex-break {
+        order: 900;
+        flex-basis: 100%;
+        margin: 0;
     }
     .debt-stats {
         display: none;

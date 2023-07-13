@@ -117,19 +117,24 @@ Product page
 
 .ty-qty {
     margin: 0;
+    &-in-stock, &-out-of-stock {
+        font-weight: normal;
+    }
     &-backorder {
         color: #f4a900;
     }
 }
+
 .ty-value-changer, .touch .ty-value-changer {
     .border-radius(50px);
     border: @border-width solid var(--border-color);
     width: auto;
-    padding: 3px 5px;
+    padding: 2px 4px;
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
     background-color: #fff;
+    height: 30px;
     input&__input {
         float: initial;
         border: none;
@@ -141,9 +146,9 @@ Product page
         float: initial;
         border: none;
         .border-radius(50%);
-        .square(35px);
+        .square(29px);
         display: inline-block;
-        line-height: 35px;
+        line-height: 30px;
         background-color: #fff;
         color: @base;
         font-size: 16px;
