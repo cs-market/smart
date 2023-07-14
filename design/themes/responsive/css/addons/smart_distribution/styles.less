@@ -53,6 +53,13 @@
 .ty-top-menu div.ty-top-menu__storages {
     flex-basis: 100%;
 }
+// replace icons for all
+.ty-icon-aurora-star-empty {
+    .ty-icon-aurora-heart-empty()
+}
+.ty-icon-aurora-star-full {
+    .ty-icon-aurora-heart-full()
+}
 .baltika {
     body {
         --grid-columns: 4;
@@ -121,12 +128,6 @@
             content: "\e00a";
             font-size: 18px;
         }
-    }
-    .ty-icon-aurora-star-empty {
-        .ty-icon-aurora-heart-empty()
-    }
-    .ty-icon-aurora-star-full {
-        .ty-icon-aurora-heart-full()
     }
     .homepage-hotdeals {
         display: none;
