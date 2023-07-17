@@ -14,7 +14,7 @@
                     <span class="ty-minicart-title empty-cart ty-hand"><span>{__("cart_is_empty")}</span></span>
                     <i class="ty-icon-down-micro"></i>
                 {/if}
-                <span class="ty-minicart-title__counter">{$smarty.session.cart.products|count}</span>
+                <span class="ty-minicart-title__counter">{$smarty.session.cart.display_subtotal}</span>
             {/hook}
         </a>
         </div>
