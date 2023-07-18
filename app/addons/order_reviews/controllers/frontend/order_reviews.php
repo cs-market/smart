@@ -3,7 +3,7 @@
 use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
 use Tygh\Enum\Addons\Discussion\DiscussionTypes;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $post_data = isset($_REQUEST['post_data']) ? $_REQUEST['post_data'] : array();

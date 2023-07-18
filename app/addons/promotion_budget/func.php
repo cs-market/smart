@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_promotion_validate_budget($id, $condition, $cart) {
     if ($condition['value'] > 0) return true;

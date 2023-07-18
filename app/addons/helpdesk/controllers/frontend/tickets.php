@@ -6,7 +6,7 @@ use Tygh\Storage;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\NotificationSeverity;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 fn_trusted_vars (
     'ticket_data'

@@ -2,6 +2,8 @@
 
 use Tygh\Registry;
 
+defined('BOOTSTRAP') or die('Access denied');
+
 if ($mode == 'cron') {
     $condition = db_quote(' AND autoimport = ?s', 'Y');
     if (!empty($action)) {

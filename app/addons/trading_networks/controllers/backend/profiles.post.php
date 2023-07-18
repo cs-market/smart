@@ -2,7 +2,7 @@
 
 use Tygh\Enum\UserRoles;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return array(CONTROLLER_STATUS_OK);

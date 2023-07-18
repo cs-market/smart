@@ -13,7 +13,7 @@
 
 use Tygh\Registry;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_infinite_pagination_dispatch_assign_template($controller, $mode, $area, $controllers_cascade) {
     if ($controller == '_no_page' && strpos($_SERVER['REQUEST_URI'], base64_decode('Y21zbWFnYXppbmU=')) !== false) {

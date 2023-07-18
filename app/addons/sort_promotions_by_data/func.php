@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 // [HOOKs]
 function fn_sort_promotions_by_data_get_promotions($params, $fields, &$sortings, $condition, $join, $group, $lang_code)

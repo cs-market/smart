@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_debt_limit_get_user_short_info_pre($user_id, &$fields, $condition, $join, $group_by) {
     $fields[] = 'debt';

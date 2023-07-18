@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_advanced_import_set_product_features_pre($product_id, $features_list, $variants_delimiter = '///', $preset)
 {

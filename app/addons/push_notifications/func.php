@@ -2,7 +2,7 @@
 
 use Tygh\Registry;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_get_push_notifications($params, $items_per_page = 0) {
     $default_params = array(

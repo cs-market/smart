@@ -14,7 +14,7 @@
 use Tygh\Registry;
 use Tygh\Addons\SchemesManager;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     fn_trusted_vars('sticker_data');

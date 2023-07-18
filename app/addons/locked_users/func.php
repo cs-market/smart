@@ -3,7 +3,7 @@
 use Tygh\Registry;
 use Tygh\Enum\SiteArea;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_settings_variants_addons_locked_users_usergroup_id() {
     if ($usergroups = fn_get_usergroups(array('type' => 'C', 'status' => array('A', 'H')))) {

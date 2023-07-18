@@ -2,7 +2,7 @@
 
 use Tygh\Registry;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($mode == 'cron') {
     $u_data = db_get_array('SELECT user_id, company_id FROM ?:orders GROUP BY user_id, company_id HAVING count(order_id) >= ?i', Registry::get('addons.sales_plan.orders_amount'));

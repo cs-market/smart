@@ -4,7 +4,7 @@ use Tygh\Enum\ProductTracking;
 use Tygh\Registry;
 use Tygh\Enum\OutOfStockActions;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_promotion_step_check_amount_in_stock_before_check($product_id, $amount, $product_options, $cart_id, $is_edp, $original_amount, $cart, $update_id, &$product, $current_amount){
     foreach ($cart['products'] as $key => $products) {

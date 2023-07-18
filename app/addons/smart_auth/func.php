@@ -2,7 +2,7 @@
 
 use Tygh\Registry;
 
-if ( !defined('AREA') ) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_settings_variants_addons_smart_auth_auth_fields() {
     $fields = [];

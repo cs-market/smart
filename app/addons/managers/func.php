@@ -6,7 +6,7 @@ use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserRoles;
 use Tygh\Enum\YesNo;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_get_managers($params = []) {
     if (!is_array($params)) $params = [];

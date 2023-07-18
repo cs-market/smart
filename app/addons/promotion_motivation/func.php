@@ -3,7 +3,7 @@
 use Tygh\Registry;
 use Tygh\Enum\SiteArea;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_promotion_motivation_promotion_apply_pre($promotions, $zone, &$data, $auth, $cart_products) {
     if ($zone == 'cart') {

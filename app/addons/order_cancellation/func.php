@@ -4,7 +4,7 @@ use Tygh\Registry;
 use Tygh\Enum\YesNo;
 use Tygh\Api\Response;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_settings_variants_addons_order_cancellation_cancellation_status() {
     return fn_get_simple_statuses('O');

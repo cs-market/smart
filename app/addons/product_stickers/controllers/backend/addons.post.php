@@ -16,7 +16,7 @@ use Tygh\Settings;
 use Tygh\Http;
 use Tygh\Addons\SchemesManager;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$parent_directories = fn_get_parent_directory_stack(str_replace(Registry::get('config.dir.addons'), '', __FILE__), '\\/');

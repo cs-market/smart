@@ -3,7 +3,7 @@
 use Tygh\Registry;
 use Tygh\Addons\Helpdesk\ServiceProvider;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 Tygh::$app->register(new ServiceProvider());
 

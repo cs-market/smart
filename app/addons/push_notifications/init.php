@@ -11,7 +11,7 @@
 *  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 fn_register_hooks(
     'get_users_pre',

@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($mode == 'print_invoice_for_payment') {
     if (!empty($_REQUEST['order_id'])) {

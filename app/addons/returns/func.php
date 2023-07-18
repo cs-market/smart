@@ -4,7 +4,7 @@ use Tygh\Registry;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\Addons\Returns\ReturnOperationStatuses;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_returns_get_products($params, $fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
     if (isset($params['only_ordered']) && $params['only_ordered']) {

@@ -11,9 +11,7 @@
 *  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-// use Tygh\Registry;
-
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return [CONTROLLER_STATUS_OK];
@@ -40,4 +38,3 @@ if ($mode == 'export_found') {
         'exim.export?section=orders&pattern_id=' . Tygh::$app['session']['export_ranges']['orders']['pattern_id'],
     ];
 }
-

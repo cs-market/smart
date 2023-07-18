@@ -16,7 +16,7 @@ use Tygh\Enum\SiteArea;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\ProductTracking;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_storages_install() {
     if (Registry::get('addons.user_price.status') == 'A') {

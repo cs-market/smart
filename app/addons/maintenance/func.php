@@ -1,20 +1,14 @@
 <?php
 
 use Tygh\Registry;
-// use Tygh\Models\Vendor;
-// use Tygh\Enum\ObjectStatuses;
-// use Tygh\Enum\ProfileDataTypes;
 use Tygh\Enum\SiteArea;
-// use Tygh\Enum\UserTypes;
 use Tygh\Enum\UsergroupTypes;
-// use Tygh\Storage;
 use Tygh\Enum\YesNo;
-// use Tygh\BlockManager\Block;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\UserTypes;
 use Tygh\Navigation\LastView\Backend;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 /* ADDON SETTINGS */
 function fn_settings_variants_addons_maintenance_service_usergroups() {

@@ -19,7 +19,7 @@ use Tygh\BlockManager\ProductTabs;
 use Tygh\Settings;
 use Tygh\Enum\YesNo;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_cross_sells_get_products_before_select(&$params, &$join, &$condition, $u_condition, $inventory_join_cond, $sortings, $total, $items_per_page, $lang_code, $having) {
     if (!empty($params['cross_sell'])) {

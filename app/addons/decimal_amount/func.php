@@ -15,7 +15,7 @@ use Tygh\Enum\ProductTracking;
 use Tygh\Enum\OutOfStockActions;
 use Tygh\Registry;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_decimal_amount_update_product_pre(&$product_data, $product_id, $lang_code, $can_update) {
     if (!empty($product_data['min_qty'])) {

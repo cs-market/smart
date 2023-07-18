@@ -1,6 +1,6 @@
 <?php
 use Tygh\Payments\Processors\PSBankLib;
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_psbankpayment_install()
 {

@@ -2,7 +2,7 @@
 
 use Tygh\Registry;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_extended_exim_1c_get_categories(&$params, $join, &$condition, $fields, $group_by, $sortings, $lang_code) {
     if (isset($params['search_query']) && !fn_is_empty($params['search_query'])) {

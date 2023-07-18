@@ -3,7 +3,7 @@
 use Tygh\Registry;
 use Tygh\Enum\YesNo;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_min_order_amount_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
     if (!$user_data['min_order_amount'] && AREA == 'C') {

@@ -14,7 +14,7 @@
 use Tygh\Registry;
 use Tygh\Storage;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_get_fake_image($object_id = 0, $img = [], $object_type = 'product', $image_type = 'detailed') {
     $image_name = Registry::get('addons.fake_image.image');

@@ -2,7 +2,7 @@
 
 use Tygh\Pdf;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 //  [HOOKs]
 function fn_invoice_for_payment_update_company_pre(&$company_data, $company_id, $lang_code, $can_update)

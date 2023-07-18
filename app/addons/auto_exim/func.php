@@ -11,7 +11,7 @@ use Tygh\Addons\AdvancedImport\ServiceProvider;
 use Tygh\Settings;
 use Tygh\Languages\Languages;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_auto_exim_install() {
     $setting = Settings::instance()->getSettingDataByName('log_type_exim');

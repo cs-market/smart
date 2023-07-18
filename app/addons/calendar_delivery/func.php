@@ -6,7 +6,7 @@ use Tygh\Registry;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\SiteArea;
 
-if ( !defined('AREA') ) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_calendar_delivery_install()
 {

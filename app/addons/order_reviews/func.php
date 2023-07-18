@@ -4,7 +4,7 @@ use Tygh\Enum\SiteArea;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_order_reviews_get_order_info(&$order, $additional_data) {
     if (SiteArea::isStorefront(AREA)) {

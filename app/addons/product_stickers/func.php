@@ -16,7 +16,7 @@ use Tygh\Enum\ProductFeatures;
 use Tygh\Settings;
 use Tygh\Registry;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_get_stickers($params, $lang_code = DESCR_SL) {
     static $cache = array();

@@ -4,7 +4,7 @@ use Tygh\Registry;
 use Tygh\Tools\DateTimeHelper;
 use Tygh\Enum\UserTypes;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 /** @var array<string, int|string|array> $auth */
 $auth = Tygh::$app['session']['auth'];

@@ -11,7 +11,7 @@
 *  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'add') {

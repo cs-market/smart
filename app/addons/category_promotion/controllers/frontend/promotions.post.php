@@ -3,7 +3,7 @@
 use Tygh\Registry;
 use Tygh\Enum\YesNo;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if (AREA == 'C' && empty($auth['user_id'])) {
     fn_redirect('auth.login_form');

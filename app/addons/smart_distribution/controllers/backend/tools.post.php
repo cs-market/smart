@@ -3507,17 +3507,33 @@ fn_print_die($orders_wo_points);
     $export = fn_exim_put_csv($corrections, $params, '"');
     fn_print_die('done');
 } elseif ($mode == 'correct_reward_points_june2') {
-    $order_ids = db_get_fields("SELECT o.order_id FROM ?:orders AS o LEFT JOIN cscart_order_details AS od ON o.order_id = od.order_id WHERE od.product_id IN (?a)", [179166,178598,176731,176730,176704,176703,176702,174783,174782,170420,170419,170066]);
+    $product_ids = [179166,178598,176731,176730,176704,176703,176702,174783,174782,170420,170419,170066];
+    $order_ids = db_get_fields("SELECT o.order_id FROM ?:orders AS o LEFT JOIN cscart_order_details AS od ON o.order_id = od.order_id WHERE od.product_id IN (?a) AND o.is_parent_order = ?s", $product_ids, 'N');
+
     $wrong = [];
     foreach ($order_ids as $order_id) {
+        if ($order_id == '297266') continue;
         $order_info = fn_get_order_info($order_id);
         if (empty($order_info['points_info']['in_use']['points'])) continue;
-        $row[] = [
-            'order_id' => $order_info['order_id'],
-            'status' => $order_info['status'],
-            'date' => fn_date_format($order_info['timestamp'], Registry::get('settings.Appearance.date_format')),
-            'points' => $order_info['points_info']['in_use']['points'],
-        ];
+
+        $products = array_filter($order_info['products'], function($v) use ($product_ids) {
+            return in_array($v['product_id'], $product_ids);
+        });
+        fn_print_die($products);
+        foreach ($products as $product) {
+            $row[] = [
+                'order_id' => $order_info['order_id'],
+                'status' => $order_info['status'],
+                'email' => $order_info['email'],
+                'date' => fn_date_format($order_info['timestamp'], Registry::get('settings.Appearance.date_format')),
+                'order_points_in_use' => $order_info['points_info']['in_use']['points'],
+                'product' => $product['product'],
+                'product_code' => $product['product_code'],
+                'price incl discount' => $product['base_price'] - $product['discount'],
+                'amount' => $product['amount'],
+                'row_total' => $product['amount'] * ($product['base_price'] - $product['discount']),
+            ];
+        }
     }
 
     $params['filename'] = 'correct_reward_points_june2.csv';

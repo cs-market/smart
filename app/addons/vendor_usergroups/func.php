@@ -3,7 +3,7 @@
 use Tygh\Registry;
 use Tygh\Models\Vendor;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_vendor_usergroups_get_usergroups($params, $lang_code, $field_list, $join, &$condition, $group_by, $order_by, $limit) {
     if (!isset($params['usergroup_id']))

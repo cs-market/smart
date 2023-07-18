@@ -14,7 +14,7 @@
 use Tygh\Registry;
 use Tygh\Settings;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'update' && $_REQUEST['addon'] == 'product_stickers') {

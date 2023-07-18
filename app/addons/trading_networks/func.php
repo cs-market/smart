@@ -17,7 +17,7 @@ use Tygh\Enum\YesNo;
 use Tygh\Enum\ProductTracking;
 use Tygh\Enum\UserRoles;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_init_network($request) {
     if (SiteArea::isAdmin(AREA)) {

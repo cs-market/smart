@@ -16,7 +16,7 @@ use Tygh\Commerceml\ExRusEximCommerceml;
 use Tygh\Commerceml\Logs;
 use Tygh\Registry;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 $path_file = 'exim/1C_' . date('dmY') . '/';
 $path = fn_get_files_dir_path() . $path_file;

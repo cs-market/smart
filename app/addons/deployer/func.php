@@ -17,7 +17,7 @@ use Tygh\UpgradeCenter\Migrations\Migration;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Validators;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_write_deploy_log($data, $filename = 'var/files/deploy.log') {
     $file = fopen($filename, 'a');

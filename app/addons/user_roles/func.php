@@ -13,7 +13,7 @@
 
 use Tygh\Enum\UserRoles;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_get_user_role_list($user_type = '') {
     return UserRoles::getList($user_type);

@@ -14,7 +14,7 @@
 use Tygh\ExtendedAPI;
 use Tygh\Enum\SiteArea;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_extended_api_user_init($auth, $user_info, $first_init) {
     if (SiteArea::isAdmin(AREA)) return;

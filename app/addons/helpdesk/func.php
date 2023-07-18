@@ -7,7 +7,7 @@ use Tygh\Enum\UserTypes;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\NotificationSeverity;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_get_mailboxes($params = array()) {
     $condition = '';
