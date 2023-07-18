@@ -373,7 +373,7 @@ function fn_get_ticket_users($params) {
         ];
 
         if (!empty($params['notification'])) {
-            $condition['notification'] = db_quote(' AND u.helpdesk_notification = ?s', $params['notification']);
+            $fields['notification'] = 'u.helpdesk_notification';
         }
 
         fn_set_hook('helpdesk_get_ticket_users_pre', $params, $fields, $join, $condition);
@@ -381,6 +381,12 @@ function fn_get_ticket_users($params) {
         $users = db_get_hash_array("SELECT " . implode(', ', $fields) . " FROM ?:users AS u $join WHERE ?p", 'user_id', implode(' ', $condition));
 
         fn_set_hook('helpdesk_get_ticket_users_post', $users, $params, $fields, $join, $condition);
+
+        if (!empty($params['notification'])) {
+            $users = array_filter($users, function($u) use ($params) {
+                return (!isset($u['helpdesk_notification']) || $u['helpdesk_notification'] == $params['notification']);
+            });
+        }
 
         if (!empty($params['user_type'])) {
             $user_type = $params['user_type'];
@@ -663,4 +669,8 @@ function fn_helpdesk_get_predefined_statuses($type, &$statuses) {
             'C' => __('helpdesk.closed'),
         );
     }
+}
+
+function fn_helpdesk_get_users($params, &$fields, $sortings, $condition, $join, $auth) {
+    $fields['helpdesk_notification'] = '?:users.helpdesk_notification';
 }

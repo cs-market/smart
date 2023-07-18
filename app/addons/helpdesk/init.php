@@ -7,7 +7,7 @@ defined('BOOTSTRAP') or die('Access denied');
 
 Tygh::$app->register(new ServiceProvider());
 
-fn_register_hooks('get_predefined_statuses');
+fn_register_hooks('get_predefined_statuses', 'get_users');
 
 Registry::set('config.storage.helpdesk_files', array(
     'prefix' => 'helpdesk_files',
