@@ -1,5 +1,5 @@
 {** block-description:block_vendor_logo **}
-<div class="ty-logo-container-vendor">
+<div class="ty-logo-container">
     {hook name="blocks:vendor_logo"}
     <a href="{""|fn_url}">
     {include file="common/image.tpl"

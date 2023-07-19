@@ -109,7 +109,7 @@ function fn_get_progress_promotions($cart) {
                 continue;
             }
             if ($period = fn_find_promotion_condition($promotion['conditions'], 'progress_period')) {
-                if (defined('API') && str_replace('month_', '', $period['value']) != date("n") ) continue;
+                if (str_replace('month_', '', $period['value']) != date("n") ) continue;
 
                 $progress_promotions[$period['value']] = $promotion;
             }
