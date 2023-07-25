@@ -1,6 +1,6 @@
 {if $products}
     {script src="js/tygh/exceptions.js"}
-    {script src="js/tygh/cart_content.js"}
+    {script src="js/addons/aurora/cart_content.js"}
     {if !$no_pagination}
         {include file="common/pagination.tpl"}
     {/if}
