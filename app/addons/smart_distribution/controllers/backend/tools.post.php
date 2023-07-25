@@ -3543,7 +3543,11 @@ fn_print_die($orders_wo_points);
 } elseif ($mode == 'cleanup_wishlist') {
     $res = db_query('DELETE FROM ?:user_session_products WHERE product_id NOT IN (SELECT product_id FROM ?:products)');
 
-    $user_ids = db_get_fields('SELECT distinct(user_id) FROM ?:user_session_products WHERE user_type = ?s AND type = ?s', 'R', 'W');
+    $iteration = empty($action) ? 1 : $action;
+    $step = 100;
+    $limit = ' LIMIT '. ($iteration - 1) * $step . ', ' . $step;
+    $user_ids = db_get_fields("SELECT distinct(user_id) FROM ?:user_session_products WHERE user_type = ?s AND type = ?s $limit", 'R', 'W');
+    if (empty($user_ids)) fn_print_die('done');
 
     foreach ($user_ids as $user_id) {
         $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $user_id);
@@ -3553,10 +3557,13 @@ fn_print_die($orders_wo_points);
         $avail_product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE product_id IN (?a) AND (' . fn_find_array_in_set($usergroup_ids, "?:products.usergroup_ids", true) . ')', $product_ids);
         if ($diff = array_diff($product_ids, $avail_product_ids)) {
             $res = db_query('DELETE FROM ?:user_session_products WHERE product_id IN (?a) AND user_id = ?i', $diff, $user_id);
-            fn_print_r($res, $user_id);
+            $cnt += 1;
         }
     }
-    fn_print_die('stop');
+
+    fn_print_r($iteration);
+    $iteration += 1;
+    fn_redirect('tools.cleanup_wishlist.' . $iteration);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
