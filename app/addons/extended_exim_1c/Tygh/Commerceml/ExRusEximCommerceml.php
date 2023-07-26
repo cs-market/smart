@@ -1930,6 +1930,116 @@ class ExRusEximCommerceml extends RusEximCommerceml
         return $array_order_xml;
     }
 
+    public function importProductsFile($data_products, $import_params, $import_pos = 0)
+    {
+        $old_features_commerceml = $this->db->getHash(
+            "SELECT a.external_id, a.feature_id as id, a.feature_type as type, b.description as name"
+            . " FROM ?:product_features as a"
+            . " LEFT JOIN ?:product_features_descriptions as b"
+                . " ON a.feature_id = b.feature_id"
+            . " WHERE external_id <> '' AND lang_code = ?s",
+            'external_id',
+            CART_LANGUAGE
+        );
+
+        if (!empty($old_features_commerceml)) {
+            $old_variants_commerceml = $this->db->getMultiHash(
+                "SELECT a.feature_id, a.external_id as id, b.variant as value"
+                . " FROM ?:product_feature_variants as a"
+                . " LEFT JOIN ?:product_feature_variant_descriptions as b"
+                    . " ON a.variant_id = b.variant_id"
+                . " WHERE external_id <> '' AND lang_code = ?s",
+                array('feature_id', 'id'),
+                CART_LANGUAGE
+            );
+
+            foreach ($old_features_commerceml as $external_id => $_feature_commerceml) {
+                if (!empty($old_variants_commerceml[$_feature_commerceml['id']])) {
+                    $old_features_commerceml[$external_id]['variants'] = $old_variants_commerceml[$_feature_commerceml['id']];
+                }
+            }
+        }
+
+        if (!empty($this->features_commerceml)) {
+            $this->features_commerceml = fn_array_merge($old_features_commerceml, $this->features_commerceml);
+        } else {
+            $this->features_commerceml = $old_features_commerceml;
+        }
+
+        if (!empty($this->categories_commerceml)) {
+            $categories_commerceml = $this->categories_commerceml;
+        } else {
+            $categories_commerceml = $this->db->getSingleHash(
+                "SELECT external_id, category_id"
+                . " FROM ?:categories"
+                . " WHERE external_id <> ''",
+                array('external_id', 'category_id')
+            );
+        }
+
+        list(, $product_pos_start) = $this->initProcessImportData('import_products', $import_params['service_exchange']);
+
+        $offers_pos = $import_pos;
+        $progress = false;
+        $last_product_guid = null;
+        $last_product_offers = [];
+        foreach ($data_products -> {$this->cml['product']} as $product) {
+            if ($import_params['service_exchange'] == '') {
+                $offers_pos++;
+
+                if ($offers_pos % COUNT_IMPORT_PRODUCT == 0) {
+                    fn_echo('imported: ' . COUNT_IMPORT_PRODUCT . "\n");
+                }
+
+                if ($offers_pos < $product_pos_start) {
+                    continue;
+                }
+
+                if (\Tygh::$app['session']['exim_1c']['f_count_imports'] >= COUNT_1C_IMPORT) {
+                    $progress = true;
+                    break;
+                }
+
+                list($product_guid, $combination_id) = $this->getProductIdByFile(strval($product -> {$this->cml['id']}));
+
+                if ($last_product_guid && $product_guid !== $last_product_guid) {
+                    $log_message = $this->addDataProductByFile($last_product_guid, $last_product_offers, $this->cml, $categories_commerceml, $import_params);
+                    \Tygh::$app['session']['exim_1c']['f_count_imports']++;
+                    $this->addMessageLog($log_message);
+                    $last_product_offers = [];
+                }
+
+                if (empty($combination_id)) {
+                    if (!empty($product-> {$this->cml['product_features']})) {
+                        $xml_features = $product -> {$this->cml['product_features']} -> {$this->cml['product_feature']};
+                        foreach ($xml_features as $xml_feature) {
+                            if (!empty($xml_feature -> {$this->cml['id']})) {
+                                $combination_id = strval($xml_feature -> {$this->cml['id']});
+                                $last_product_offers[$combination_id] = $product;
+                                $offers_pos++;
+                            }
+                        }
+                    }
+                }
+
+                $last_product_offers[$combination_id] = $product;
+                $last_product_guid = $product_guid;
+            }
+        }
+
+        if ($last_product_offers) {
+            $log_message = $this->addDataProductByFile($last_product_guid, $last_product_offers, $this->cml, $categories_commerceml, $import_params);
+            \Tygh::$app['session']['exim_1c']['f_count_imports']++;
+            $this->addMessageLog($log_message);
+        }
+
+        $this->finishImportData(true, 'import_products', $offers_pos - $import_pos, $import_params['service_exchange'], $import_params['manual']);
+
+        if (!$progress) {
+            //unset(\Tygh::$app['session']['exim_1c']['import_products']);
+        }
+    }
+
     public function getCompanyIdByLinkType($link_type, $_group)
     {
         if ($link_type == 'name') {
