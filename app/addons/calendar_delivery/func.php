@@ -165,6 +165,18 @@ function fn_calendar_get_nearest_delivery_day($shipping_params = [], $get_ts = f
         }
     }
 
+    if (!empty($shipping_params['holidays'])) {
+        $calendar_format = "d/m/Y";
+        if (Registry::get('settings.Appearance.calendar_date_format') == 'month_first') {
+            $calendar_format = "m/d/Y";
+        }
+        $nearest = date($calendar_format, strtotime("+$nearest_delivery day midnight"));
+        while (in_array($nearest, $shipping_params['holidays'])) {
+            $nearest_delivery++;
+            $nearest = date($calendar_format, strtotime("+$nearest_delivery day midnight"));
+        }
+    }
+
     return $nearest_delivery;
 }
 
@@ -384,9 +396,9 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                     fn_set_hook('calendar_delivery_service_params', $group, $shipping, $shipping_company_settings, $usergroup_working_time_till);
 
                     $shipping['service_params']['weekdays_availability'] = strrev($weekdays_availability);
-                    $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
-
                     if (!empty($shipping['service_params']['holidays']) && !is_array($shipping['service_params']['holidays'])) $shipping['service_params']['holidays'] = explode(',', $shipping['service_params']['holidays']);
+
+                    $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
                 }
             }
 
