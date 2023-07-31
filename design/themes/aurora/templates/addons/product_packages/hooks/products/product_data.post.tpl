@@ -10,7 +10,7 @@
         {else}
             {assign var="default_amount" value="1"}
         {/if}
-        <div class=""><span id="for_qty_count_{$obj_prefix}{$obj_id}" data-ca-box-contains="{$product.items_in_package}">{($default_amount/$product.items_in_package)|round:2}</span>&nbsp;{__('of_box')}</div>
+        <div class="ty-switcher-checkbox__label"><span id="for_qty_count_{$obj_prefix}{$obj_id}" data-ca-box-contains="{$product.items_in_package}">{($default_amount/$product.items_in_package)|round:2}</span>&nbsp;{__('of_box')}</div>
 
         <div class="ty-switcher-checkbox__controls">
             <input type="checkbox" class="hidden cm-packages-switcher" id="{"switch_checkbox_`$obj_prefix``$obj_id`"}" data-ca-step="{if $product.qty_step}{$product.qty_step}{else}1{/if}" data-ca-qty-input="qty_count_{$obj_prefix}{$obj_id}" name="product_data[{$obj_id}][shop_by_packages]" value="{if $product.items_in_package}{$product.items_in_package}{else}1{/if}">
