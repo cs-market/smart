@@ -184,10 +184,10 @@ if ($mode == 'manage') {
     fn_get_helpdesk_file($params);
     exit;
 } elseif ($mode == 'get_mail') {
-    fn_helpdesk_get_mail();
+    fn_helpdesk_get_mail($action);
     exit;
 } elseif ($mode == 'send_mail') {
-    fn_helpdesk_send_mail();
+    fn_helpdesk_send_mail($action);
     exit;
 } elseif ($mode == 'cron_job') {
     fn_helpdesk_get_mail();

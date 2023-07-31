@@ -44,6 +44,10 @@ msgctxt "SettingsOptions::helpdesk::appearance"
 msgid "Messages appearance"
 msgstr "Внешний вид сообщений"
 
+msgctxt "SettingsOptions::helpdesk::default_mailbox"
+msgid "Default mailbox"
+msgstr "Почтовый ящик по умолчанию"
+
 msgctxt "SettingsVariants::helpdesk::appearance::panel"
 msgid "Panel"
 msgstr "Панель"
@@ -58,15 +62,15 @@ msgstr "Служба поддержки"
 
 msgctxt "Languages::tickets"
 msgid "Tickets"
-msgstr "Диалоги"
+msgstr "Все обращения"
 
 msgctxt "Languages::tickets_menu_description"
 msgid "View all tickets"
-msgstr "Посмотреть все диалоги"
+msgstr "Посмотреть все обращения"
 
 msgctxt "Languages::new_tickets"
 msgid "New tickets"
-msgstr "Новые диалоги"
+msgstr "Непрочитанные сообщения"
 
 msgctxt "Languages::new_tickets_menu_description"
 msgid "View only new tickets"
@@ -74,11 +78,11 @@ msgstr "Просмотр диалогов с новыми сообщениями
 
 msgctxt "Languages::waiting_tickets"
 msgid "Waiting tickets"
-msgstr "В работе"
+msgstr "Ожидают ответа/в работе"
 
 msgctxt "Languages::waiting_tickets_menu_description"
 msgid "View only waiting tickets"
-msgstr "Просмотр диалогов, ожидающих ответа"
+msgstr "Просмотр обращений, ожидающих ответа"
 
 msgctxt "Languages::mailboxes"
 msgid "Mailboxes"
@@ -118,7 +122,7 @@ msgstr "#"
 
 msgctxt "Languages::move_to_another_ticket"
 msgid "Move to another ticket"
-msgstr "Переместить в другой тикет"
+msgstr "Переместить в другое обращение"
 
 msgctxt "Languages::closed"
 msgid "Closed"
@@ -146,7 +150,7 @@ msgstr "Дата последнего сообщения"
 
 msgctxt "Languages::close_ticket"
 msgid "Close ticket"
-msgstr "Закрыть тикет"
+msgstr "Закрыть обращение"
 
 msgctxt "Languages::delete_spam"
 msgid "Delete to spam"
@@ -158,7 +162,7 @@ msgstr "Имя почтового ящика"
 
 msgctxt "Languages::ticket_prefix"
 msgid "Ticket prefix"
-msgstr "Префикс тикета"
+msgstr "Префикс обращения"
 
 msgctxt "Languages::smtp_server"
 msgid "SMTP server"
@@ -194,11 +198,11 @@ msgstr "Новый шаблон"
 
 msgctxt "Languages::new_ticket"
 msgid "New ticket"
-msgstr "Новый тикет"
+msgstr "Новое обращение"
 
 msgctxt "Languages::editing_ticket"
 msgid "Editing ticket"
-msgstr "Редактирование тикета"
+msgstr "Редактирование обращения"
 
 msgctxt "Languages::text_no_tickets"
 msgid "No tickets"

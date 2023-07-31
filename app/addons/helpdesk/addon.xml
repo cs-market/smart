@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <addon scheme="3.0">
     <id>helpdesk</id>
-    <version>2.2.1</version>
+    <version>2.2.2</version>
     <priority>423190</priority>
     <position>0</position>
     <status>active</status>
@@ -37,6 +37,10 @@
                             <item id="panel"></item>
                             <item id="cloud"></item>
                         </variants>
+                    </item>
+                    <item id="default_mailbox">
+                        <type>selectbox</type>
+                        <default_value>0</default_value>
                     </item>
                 </items>
             </section>

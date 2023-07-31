@@ -9,11 +9,13 @@ class ImapReader implements IReader {
     private $charset = '';
     private $attachments = array();
     private $unread;
+    private $errors;
 
     public function setSettings($params) {
         $messages=array();
         $folder="INBOX";
         $this->unread = false;
+        $this->errors = false;
         imap_timeout( IMAP_OPENTIMEOUT, 3);
         $this->mbox = @imap_open("{$params['host']}{$folder}", $params['login'],$params['password']);
         if ($this->mbox) {
@@ -33,7 +35,7 @@ class ImapReader implements IReader {
                     $messages[]=array(
                         'from'=> $reply_to ? $reply_to : $headerArr->sender[0]->mailbox . "@" . $headerArr->sender[0]->host,
                         'to'=> $headerArr->to[0]->mailbox . "@" . $headerArr->to[0]->host,
-                        'name'=> ($from == 'manager@cs-market.com') ? $this->decode($headerArr->reply_to[0]->mailbox) : $this->decode($headerArr->sender[0]->personal) ,
+                        'name'=> ($from == $params['login']) ? $this->decode($headerArr->reply_to[0]->mailbox) : $this->decode($headerArr->sender[0]->personal) ,
                         'subject'=>$this->decode($headerArr->subject),
                         'charset'=>$this->charset,
                         'plain'=>$this->plainmsg,

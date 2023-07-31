@@ -24,7 +24,10 @@ function fn_get_mailboxes($params = array()) {
         $condition .= fn_get_company_condition('?:helpdesk_mailboxes.company_id', true, $params['company_id'], false, true);   
     }
     if (SiteArea::isStorefront(AREA)) {
-        $condition .= " AND status = 'A'";
+        $params['status'] = 'A';
+    }
+    if (isset($params['status'])) {
+        $condition .= db_quote(" AND status = ?s", $params['status']);
     }
 
     fn_set_hook('get_mailboxes_pre', $condition);
@@ -481,14 +484,36 @@ function fn_get_helpdesk_file($params) {
     Storage::instance('helpdesk_files')->get($file['ticket_id'] . '/' . $file['message_id'] . '/' . $file['filename']);
 }
 
-function fn_helpdesk_get_mail() {
-    $mailboxes = fn_get_mailboxes();
+function fn_helpdesk_get_mail($mailbox_id = 0) {
+    $params = ['status' => 'A'];
+
+    if (!empty($mailbox_id)) {
+        $params['mailbox_id'] = $mailbox_id;
+    } 
+
+    $default_mailbox = [];
+    $mailboxes = fn_get_mailboxes($params);
+
+    if ($default_mailbox_id = Registry::get('addons.helpdesk.default_mailbox')) {
+        if (!empty($mailbox_id)) {
+            $default_mailbox = fn_get_mailboxes(['mailbox_id' => $default_mailbox_id]);
+            $default_mailbox = reset($default_mailbox);
+        } elseif (!empty($mailboxes)) {
+            $default_mailbox = $mailboxes[$default_mailbox_id];
+        }
+    }
+
+
     $i = 0;
     $mails = array();
 
     foreach ($mailboxes as $settings) {
+        // мы соберем почту с общего ящика 
+        if (!empty($default_mailbox['email']) && !$mailbox_id && $settings['email'] == $default_mailbox['email'] && $settings['mailbox_id'] != $default_mailbox['mailbox_id']) continue;
+
         $mail_reader = Tygh::$app['addons.helpdesk.mail_reader'];
         $mail_reader->setSettings(['host' => "{" . $settings['host'] . "}", 'login' => $settings['email'], 'password' => $settings['password'] ] );
+
         if ($errors = $mail_reader->getErrors()) {
             fn_print_r($settings['mailbox_name'], $errors);
             continue;
@@ -509,6 +534,10 @@ function fn_helpdesk_get_mail() {
 
                         $user_data['firstname'] = $uname[0];
                         $user_data['lastname'] = $uname[1] ? $uname[1] : ' ';
+                        if (fn_allowed_for('MULTIVENDOR')) {
+                            $user_data['company_id'] = $settings['company_id'];
+                            $user_data['status'] = 'D';
+                        }
                         list($user_id, ) = fn_update_user(0, $user_data, Tygh::$app['session']['auth'], 'N', 'Y');
                     }
 
@@ -528,6 +557,15 @@ function fn_helpdesk_get_mail() {
                             'mailbox_id' => $settings['mailbox_id'],
                             'users' => [$user_id]
                         );
+
+                        if (fn_allowed_for('MULTIVENDOR') && $company_id = db_get_field('SELECT company_id FROM ?:users WHERE user_id = ?i', $user_id)) {
+                            $company_mailbox = fn_get_mailboxes(['company_id' => $company_id]);
+                            $company_mailbox = reset($company_mailbox);
+                            $ticket_data['mailbox_id'] = $company_mailbox['mailbox_id'];
+                        } elseif (!empty($default_mailbox['email']) && $settings['email'] == $default_mailbox['email']) {
+                            $ticket_data['mailbox_id'] = $default_mailbox['mailbox_id'];
+                        }
+
                         $ticket_id = fn_update_ticket($ticket_data, 0);
                     }
 
@@ -540,7 +578,7 @@ function fn_helpdesk_get_mail() {
                         'status' => 'N',
                     ];
 
-                    $message['message'] = mb_convert_encoding($message['message'], 'UTF-8', $mail['charset']);
+                    $message['message'] = fn_convert_encoding($mail['charset'], 'UTF-8', $message['message']);
 
                     if (!empty($message['message'])) fn_update_message($message);
                 }
@@ -673,4 +711,13 @@ function fn_helpdesk_get_predefined_statuses($type, &$statuses) {
 
 function fn_helpdesk_get_users($params, &$fields, $sortings, $condition, $join, $auth) {
     $fields['helpdesk_notification'] = '?:users.helpdesk_notification';
+}
+
+function fn_settings_variants_addons_helpdesk_default_mailbox() {
+    $variants = ['0' => '---'];
+    if ($mailboxes = fn_get_mailboxes()) {
+        $variants += array_column($mailboxes, 'mailbox_name', 'mailbox_id');
+    }
+
+    return $variants;
 }
