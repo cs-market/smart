@@ -16,6 +16,10 @@ $schema['banners']['templates']['addons/aurora/blocks/grid.tpl'] = [
         'number_of_columns' =>  array (
             'type' => 'input',
             'default_value' => 3
+        ),
+        'limit' =>  array (
+            'type' => 'input',
+            'default_value' => 0
         )
     )
 ];
