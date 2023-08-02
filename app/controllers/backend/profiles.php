@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $user_id = empty($_REQUEST['user_id']) ? $auth['user_id'] : $_REQUEST['user_id'];
 
-        fn_delete_user_profile($user_id, $_REQUEST['profile_id']);
+        fn_delete_user_profile($user_id, $_REQUEST['profile_id'], true);
 
         return array(CONTROLLER_STATUS_OK, 'profiles.update?user_id=' . $user_id);
 
