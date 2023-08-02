@@ -128,6 +128,10 @@ function fn_maintenance_mailer_create_message_before($_this, &$message, $area, $
     }
 }
 
+function fn_maintenance_get_user_short_info_pre($user_id, $fields, &$condition, $join, $group_by) {
+    $condition = str_replace("AND status = 'A'", ' ', $condition);
+}
+
 /* END HOOKS */
 
 function fn_maintenance_promotion_get_dynamic($promotion_id, $promotion, $condition, &$cart, &$auth = NULL) {
