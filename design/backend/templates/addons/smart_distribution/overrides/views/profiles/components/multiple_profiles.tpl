@@ -10,9 +10,9 @@
             <a href="{$config.current_url|fn_link_attach:"profile_id=`$up.profile_id`"|fn_url}#profiles_list">{$up.profile_name} (#{$up.profile_id})</a>
         {/if}
 
-        {if $up.profile_type != "P"}
+        {*if $up.profile_type != "P"*}
             {include file="buttons/button.tpl" but_meta="cm-confirm cm-post" but_icon="icon-trash" but_href="profiles.delete_profile?user_id=`$user_data.user_id`&profile_id=`$up.profile_id`" but_role="delete_item"}
-        {/if}
+        {*/if*}
 
         {if !$smarty.foreach.pfe.last}&nbsp;|&nbsp;{/if}
     {/foreach}
