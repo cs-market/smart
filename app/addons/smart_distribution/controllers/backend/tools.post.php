@@ -3565,6 +3565,68 @@ fn_print_die($orders_wo_points);
     fn_print_r($iteration);
     $iteration += 1;
     fn_redirect('tools.cleanup_wishlist.' . $iteration);
+} elseif ($mode == 'check_reward_points') {
+    $exclude_users = ['191070000000569','191090000000483','191090000001320','1911000758','1911006811','191120000000399','294520000098680','294520000143276','294520000274914','294520000348996','294520000785565','294520000872817','294520003799303','294520800833206','298790000830905','298790000907354','298790000925283','298790001077850','298790001194277'];
+    $exclude_users = db_get_fields('SELECT user_id FROM ?:users WHERE user_login IN (?a) AND company_id = ?i', $exclude_users, 45);
+    $db_orders = db_get_array('SELECT order_id, user_id FROM ?:orders WHERE company_id = 45 AND timestamp < ?i AND timestamp > ?i AND user_id NOT IN (?a)', 1688331600, 1682888400, $exclude_users);
+
+    $user_orders = $started = $not_started = [];
+    foreach ($db_orders as $data) {
+        $user_orders[$data['user_id']][] = $data['order_id'];
+    }
+
+    foreach ($user_orders as $user_id => $orders) {
+        $flag = 'not_started';
+        $tmp = false;
+        if ($reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i', $user_id)) {
+            foreach ($reward_point_changes as $change) {
+                if ($change['action'] == CHANGE_DUE_ORDER_PLACE) $flag = 'started';
+                $details = unserialize($change['reason']);
+
+                if (isset($details['order_id']) && in_array($details['order_id'], $orders)) {
+                    $tmp = true;
+                    $check[$user_id][] = $details['order_id'];
+                }
+            }
+        }
+        if ($tmp) $$flag[] = $user_id;
+    }
+
+    foreach ($check as $user_id => $orders) {
+        if (!in_array($user_id, $not_started)) continue;
+
+        $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i', $user_id);
+        foreach ($reward_point_changes as $change) {
+            $details = unserialize($change['reason']);
+            if (isset($details['order_id']) && in_array($details['order_id'], $orders)) {
+                // revert change
+                fn_revert_reward_points_change($change, true);
+                $change['order_id'] = $details['order_id'];
+                unset($change['reason']);
+                $corrections[] = $change;
+            }
+        }
+    }
+
+    
+    $params['filename'] = 'correct_reward_points_august.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($corrections, $params, '"');
+
+    fn_print_die('done');
+}
+
+function fn_revert_reward_points_change($change, $from_order = false) {
+    $user_id = $change['user_id'];
+    $current_value = (int) fn_get_user_additional_data(POINTS, $user_id);
+    fn_save_user_additional_data(POINTS, $current_value - $change['amount'], $user_id);
+    db_query('DELETE FROM ?:reward_point_changes WHERE change_id = ?i', $change['change_id']);
+    if ($from_order) {
+        $details = unserialize($change['reason']);
+        if ($details['order_id']) {
+            db_query('DELETE FROM ?:order_data WHERE order_id = ?i AND type = ?s', $details['order_id'], POINTS);
+        }
+    }
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
