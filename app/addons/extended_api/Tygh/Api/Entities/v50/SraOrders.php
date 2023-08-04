@@ -4,6 +4,7 @@ namespace Tygh\Api\Entities\v50;
 
 use Tygh\Api\Entities\v40\SraOrders as BaseSraOrders;
 use Tygh\Api\Response;
+use Tygh\Registry;
 
 /**
  * Class SraOrders
@@ -46,6 +47,12 @@ class SraOrders extends BaseSraOrders
             fn_update_user($this->auth['user_id'], $user_data, $this->auth, true, []);
         }
 
+        $points_to_use = $this->safeGet($params, 'points_to_use', false);
+        if (!empty($points_to_use)) {
+            Registry::set('runtime.controller', 'checkout');
+            Registry::set('runtime.mode', 'update');
+            $params['points_info']['in_use']['points'] = $points_to_use;
+        }
         return parent::create($params);
     }
 }

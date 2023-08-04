@@ -95,8 +95,8 @@ function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_produ
 }
 
 function fn_extended_reward_points_pre_place_order($cart, &$allow, $product_groups) {
-    if (fn_get_cart_points_in_use($cart)) {
-        $balance = Tygh::$app['session']['auth']['points'] - fn_get_cart_points_in_use($cart);
+    if ($points = fn_get_cart_points_in_use($cart)) {
+        $balance = Tygh::$app['session']['auth']['points'] - $points;
 
         if ($balance < 0) {
             $allow = false;
@@ -321,7 +321,7 @@ function fn_generate_reward_points_report($params) {
     if (isset($params['is_search'])) {
         $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
         $grant_reward_points_statuses = array_filter($order_statuses, function($v) {
-            return $v['params']['grant_reward_points'] == 'Y';
+            return (isset($v['params']['grant_reward_points']) && $v['params']['grant_reward_points'] == YesNo::YES);
         });
 
         list($orders, $c_params, $totals) = fn_get_orders($params);
@@ -333,7 +333,7 @@ function fn_generate_reward_points_report($params) {
         if ($orders) {
             foreach ($orders as $order) {
                 $output[] = [
-                    __('region') => $users_data[$order['user_id']]['s_state'],
+                    __('region') => $users_data[$order['user_id']]['s_state'] ?? '',
                     __('login') => $users_data[$order['user_id']]['user_login'],
                     __('order') => $order['order_id'],
                     __('order_date') => fn_date_format($order['timestamp'], Registry::get('settings.Appearance.date_format')),

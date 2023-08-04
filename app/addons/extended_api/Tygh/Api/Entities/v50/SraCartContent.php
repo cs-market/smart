@@ -5,9 +5,25 @@ namespace Tygh\Api\Entities\v50;
 use Tygh\Api\Entities\v40\SraCartContent as BaseSraCartContent;
 use Tygh\Api\Response;
 use Tygh\Common\OperationResult;
+use Tygh\Registry;
 
 class SraCartContent extends BaseSraCartContent
 {
+    protected function calculate(array $cart, array $params = [], $lang_code = DEFAULT_LANGUAGE) {
+        Registry::set('runtime.controller', 'checkout');
+        Registry::set('runtime.mode', 'update');
+        $points_to_use = $this->safeGet($params, 'points_to_use', false);
+        if ($points_to_use !== false) {
+            if (!empty($points_to_use)) {
+                $cart['points_info']['in_use']['points'] = $points_to_use;
+            } else {
+                unset($cart['points_info']['in_use']);
+            }
+        }
+
+        return parent::calculate($cart, $params, $lang_code);
+    }
+
     protected function addProducts(array $cart, array $cart_products, $is_update = false)
     {
         $old_cart_products = [];
