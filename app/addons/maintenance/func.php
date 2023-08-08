@@ -1,6 +1,7 @@
 <?php
 
 use Tygh\Registry;
+use Tygh\Settings;
 use Tygh\Enum\SiteArea;
 use Tygh\Enum\UsergroupTypes;
 use Tygh\Enum\YesNo;
@@ -9,6 +10,30 @@ use Tygh\Enum\UserTypes;
 use Tygh\Navigation\LastView\Backend;
 
 defined('BOOTSTRAP') or die('Access denied');
+
+function fn_maintenance_install()
+{
+    $setting = Settings::instance()->getSettingDataByName('log_type_general');
+
+    if (empty($setting['variants']['debug'])) {
+        $setting_id = $setting['setting_id'];
+        $variant_id = Settings::instance()->updateVariant(array(
+            'object_id'  => $setting_id,
+            'name'       => 'debug',
+            'position'   => 3,
+        ));
+
+        $description = array(
+            'object_id' => $variant_id,
+            'object_type' => Settings::VARIANT_DESCRIPTION,
+            'lang_code' => 'ru',
+            'value' => 'Отладка'
+        );
+        Settings::instance()->updateDescription($description);
+    }
+
+    return true;
+}
 
 /* ADDON SETTINGS */
 function fn_settings_variants_addons_maintenance_service_usergroups() {
@@ -132,7 +157,26 @@ function fn_maintenance_get_user_short_info_pre($user_id, $fields, &$condition, 
     $condition = str_replace("AND status = 'A'", ' ', $condition);
 }
 
+function fn_maintenance_save_log($type, $action, $data, $user_id, &$content, $event_type, $object_primary_keys) {
+    if ($type == 'general' && $action == 'debug') {
+        foreach ($data as $key => $value) {
+            if ($key == 'backtrace') continue;
+            if (is_array($value)) {
+                $content[$key] = serialize($value);
+            } else {
+                $content[$key] = $value;
+            }
+        }
+        $content = array_filter($content);
+    }
+}
+
 /* END HOOKS */
+
+function fn_debug_log_event($data) {
+    $data['backtrace'] = debug_backtrace();
+    fn_log_event('general', 'debug', $data);
+}
 
 function fn_maintenance_promotion_get_dynamic($promotion_id, $promotion, $condition, &$cart, &$auth = NULL) {
     if ($condition == 'catalog_once_per_customer') {

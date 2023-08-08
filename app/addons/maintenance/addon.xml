@@ -29,9 +29,13 @@
     <language_variables>
         <item lang="ru" id="promotion_cond_catalog_once_per_customer">Один раз для покупателя</item>
         <item lang="ru" id="export_found_orders">Экспортировать найденные заказы</item>
+        <item lang="ru" id="log_action_debug">Отладочная информация</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:promotions` ADD `external_id` VARCHAR(255) NOT NULL DEFAULT '';</item> 
         <item for="uninstall">ALTER TABLE `?:promotions` DROP `external_id`;</item>
     </queries>
+    <functions>
+        <item for="install">fn_maintenance_install</item>
+    </functions>
 </addon>

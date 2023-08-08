@@ -16,5 +16,6 @@ fn_register_hooks(
     'mailer_create_message_before',
     'get_payments_pre',
     'shippings_get_shippings_list_conditions',
-    'get_user_short_info_pre'
+    'get_user_short_info_pre',
+    'save_log'
 );

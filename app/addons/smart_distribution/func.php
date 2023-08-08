@@ -547,6 +547,9 @@ function fn_smart_distribution_pre_update_order(&$cart, $order_id) {
 
 // fix qty_discounts update by API for product wo price
 function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $lang_code, $can_update) {
+
+    if ($product_data['is_pbp'] == 'Y' && in_array($product_data['company_id'], [1810, 2058]) && $product_data['is_oper'] != 'Y') fn_debug_log_event(['type' => 'Обновление товара', 'request' => $product_data, 'user' => Tygh::$app['session']['user_id']]);
+
     if (!isset($product_data['price'])) {
         $price = db_get_field('SELECT price FROM ?:product_prices WHERE product_id = ?i AND usergroup_id = ?i AND lower_limit = ?i', $product_id, 0, 1);
         $qty_price = 0;
