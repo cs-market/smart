@@ -38,6 +38,10 @@ $schema['export_fields']['Delivery days'] = [
     'db_field' => 'delivery_date',
 ];
 
+$schema['export_fields']['Monday rule'] = [
+    'db_field' => 'monday_rule',
+];
+
 if (Registry::get('addons.storages.status') == 'A') {
     $schema['export_fields']['Ignore exception days'] = [
         'db_field' => 'ignore_exception_days',

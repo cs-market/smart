@@ -16,7 +16,7 @@ function fn_maintenance_install()
     $setting = Settings::instance()->getSettingDataByName('log_type_general');
 
     if (empty($setting['variants']['debug'])) {
-        $setting_id = $setting['setting_id'];
+        $setting_id = $setting['object_id'];
         $variant_id = Settings::instance()->updateVariant(array(
             'object_id'  => $setting_id,
             'name'       => 'debug',
