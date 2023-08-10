@@ -568,10 +568,11 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
 
 // for update order products content by back sync from 1c
 function fn_smart_distribution_shippings_get_shippings_list_conditions($group, $shippings, $fields, $join, &$condition, $order_by) {
-    if (Registry::get('runtime.controller') == 'sd_exim_1c') {
-        $remove = " AND (" . fn_find_array_in_set(\Tygh::$app['session']['auth']['usergroup_ids'], '?:shippings.usergroup_ids', true) . ")";
-        $condition = str_replace($remove, '', $condition);
-    }
+// replaced by customer_auth & ORDER_MANAGEMENT
+//     if (Registry::get('runtime.controller') == 'sd_exim_1c') {
+//         $remove = " AND (" . fn_find_array_in_set(\Tygh::$app['session']['auth']['usergroup_ids'], '?:shippings.usergroup_ids', true) . ")";
+//         $condition = str_replace($remove, '', $condition);
+//     }
 }
 
 function fn_smart_distribution_place_order($order_id, $action, $order_status, $cart, $auth) {

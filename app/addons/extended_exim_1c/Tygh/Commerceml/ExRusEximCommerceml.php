@@ -1025,13 +1025,27 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 $order_id = $order_info['order_id'];
                 foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
                     if ($product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml)) {
-                        $xml_products[$product_data['product_id']] = $xml_products[$product_data['product_id']] ?? 0;
-                        $xml_products[$product_data['product_id']] += $func(strval($xml_product->{$cml['amount']}));
+                        $xml_products[$product_data['product_id']]['amount'] = $xml_products[$product_data['product_id']]['amount'] ?? 0;
+                        $xml_products[$product_data['product_id']]['amount'] += $func(strval($xml_product->{$cml['amount']}));
+                        $xml_products[$product_data['product_id']]['price'] = $func(strval($xml_product->{$cml['price_per_item']}));
                     }
                 }
-                $order_products = array_filter(fn_array_column($order_info['products'], 'amount', 'product_id'));
 
-                if (!empty(array_diff_assoc($xml_products, $order_products) + array_diff_assoc($order_products, $xml_products))) {
+                foreach ($order_info['products'] as $p) {
+                    if (empty($p['amount'])) continue;
+                    $order_products[$p['product_id']] = [
+                        'amount' => $p['amount'],
+                        'price' => $p['price'],
+                    ];
+                }
+
+                $diff = array_udiff_assoc($xml_products, $order_products, function($a, $b) {
+                    return array_diff_assoc($a, $b);
+                }) + array_udiff_assoc($order_products, $xml_products, function($a, $b) {
+                    return array_diff_assoc($a, $b);
+                });
+
+                if (!empty($diff)) {
                     if (!empty($order_info['user_id'])) {
                         $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $order_info['user_id']);
                     }
@@ -1065,10 +1079,13 @@ class ExRusEximCommerceml extends RusEximCommerceml
                             $cart['delivery_date'] = strtotime(strval($data_field->{$cml['value']}));
                         }
                     }
+
+                    // может это уже не надо если есть customer_auth ?
                     $backup_auth = Tygh::$app['session']['auth'];
-                    Tygh::$app['session']['auth'] = $customer_auth;
+                    Tygh::$app['session']['customer_auth'] = Tygh::$app['session']['auth'] = $customer_auth;
 
                     fn_calculate_cart_content($cart, $customer_auth);
+
                     if (!fn_cart_is_empty($cart)) {
                         fn_place_order($cart, $customer_auth, 'save');
                     }
