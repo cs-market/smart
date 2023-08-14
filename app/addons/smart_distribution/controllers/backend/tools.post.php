@@ -3614,6 +3614,20 @@ fn_print_die($orders_wo_points);
     $export = fn_exim_put_csv($corrections, $params, '"');
 
     fn_print_die('done');
+} elseif ($mode == 'change_balt_order_statuses') {
+
+    list($orders, ) = fn_get_orders([
+        'time_to' => '13/08/2023',
+        'time_from' => '14/07/2023',
+        'period' => 'C',
+        'company_id' => 45,
+        'status' => array('L')
+    ]);
+
+    foreach ($orders as $order) {
+        fn_change_order_status($order['order_id'], 'H');
+    }
+    fn_print_die('done');
 }
 
 function fn_revert_reward_points_change($change, $from_order = false) {
