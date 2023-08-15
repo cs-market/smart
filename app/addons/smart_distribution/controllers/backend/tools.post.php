@@ -3628,6 +3628,256 @@ fn_print_die($orders_wo_points);
         fn_change_order_status($order['order_id'], 'H');
     }
     fn_print_die('done');
+} elseif ($mode == 'correct_reward_points_august1') {
+    $add_field = db_quote(", DATE_FORMAT(FROM_UNIXTIME(timestamp), '%m') as `interval`, timestamp");
+    $group_condition = ' GROUP BY `interval`';
+    $time_condition = db_quote(" timestamp BETWEEN ?i AND ?i", fn_parse_date('01/06/2023'), fn_parse_date('1/09/2023')-1);
+
+    $exclude_condition = db_quote(" AND ?:orders.status != 'T' AND ?:orders.status != 'I' AND ?:orders.is_parent_order != 'Y'");
+
+    $periods = db_get_hash_multi_array("SELECT count(order_id) as count, user_id $add_field FROM ?:orders WHERE company_id IN (?a) AND $time_condition $exclude_condition GROUP BY user_id, `interval`", ['interval', 'user_id', 'count'], [1810, 2058]);
+
+    // $test_periods = db_get_array("SELECT count(order_id) as count, order_id, user_id $add_field FROM ?:orders WHERE company_id IN (?a) AND $time_condition $exclude_condition AND user_id = ?i GROUP BY user_id, `interval`", [1810, 2058], 53950);
+
+    foreach ($periods as &$orders) {
+        $orders = array_filter($orders, function($v) {
+            return $v == 1;
+        });
+        $orders = array_keys($orders);
+    }
+
+    foreach ($periods as $month => $users) {
+
+        foreach ($users as $user_id) {
+            $next_month = $month + 1;
+            $order_id = db_get_fields("SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp BETWEEN ?i AND ?i $exclude_condition", $user_id, fn_parse_date(date("01/$month/Y")), fn_parse_date(date("01/$next_month/Y")) - 1);
+
+            if (count($order_id) > 1) {
+                fn_print_die('check_here 1',$order_id, $user_id);
+            } elseif (count($order_id) == 1) {
+                $order_id = reset($order_id);
+                $next_next_month = $next_month + 1;
+                $next_order_id = db_get_fields("SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp BETWEEN ?i AND ?i AND order_id > ?i $exclude_condition ORDER BY order_id LIMIT 1", $user_id, fn_parse_date(date("01/$next_month/Y")), fn_parse_date(date("01/$next_next_month/Y")) - 1, $order_id);
+                if (count($next_order_id) > 1) {
+                    fn_print_die('check_here 2', $order_id, $user_id, $next_order_id);
+                } elseif (empty($next_order_id)) {
+                    // need to add usergroup here;
+                    if ($month == 6) continue; //уже не актуально
+
+                    $ugroups = [/*розница*/14776, 13858, /*опт*/ 13360, 13361];
+                    $ug_id = db_get_field('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND usergroup_id IN (?a) AND status = ?s', $user_id, $ugroups, 'A');
+                    
+                    if (empty($ug_id)) continue; // что ты такое??
+                    $company_id = db_get_field('SELECT company_id FROM ?:users WHERE user_id = ?i', $user_id);
+                    if (!in_array($company_id, [1810, 2058])) continue;
+
+                    if ($month == 7) {
+                        // Промо июля, Начисление ЮГ Самара август:
+
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36320 круп 80к-1%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36321 круп 150к-1.5%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36322 круп 250к-2%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36207 розн 0к-0.5%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36317 розн 20к-1%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36318 розн 50к-2%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36319 розн 80к-2.5%
+
+                        // Промо июля, Начисление ЮГ Тольятти август:
+
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36324 круп 80к-1%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36328 круп 150к-1.5%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36329 круп 250к-2%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36323 розн 0к-0.5%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36324 розн 20к-1%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36325 розн 50к-2%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=36326 розн 80к-2.5%
+                     
+                        // Вега_Самара_Розничные
+                        $promotions[1810][13858] = [36319, 36318, 36317, 36207];
+                        // Вега_Самара_Крупнооптовые_клиенты
+                        $promotions[1810][13360] = [36322, 36321, 36320];
+
+                        // Вега_Тольятти_Розничные клиенты
+                        $promotions[2058][14776] = [36326, 36325, 36324, 36323];
+                        // Вега_Тольятти_Крупный ОПТ
+                        $promotions[2058][13361] = [36329, 36328, 36324];
+                    }
+                    
+                    if ($month == 8) {
+                        // Промо августа, Начисление ЮГ Самара сентябрь:
+
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39984 круп 80к-1%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39985 круп 150к-1.5%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39986 круп 250к-2%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39976 розн 0к-0.5%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39977 розн 20к-1%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39978 розн 50к-2%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39979 розн 80к-2.5%
+
+                        // Промо августа, Начисление ЮГ Тольятти сентябрь:
+
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39987 круп 80к-1%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39988 круп 150к-1.5%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39989 круп 250к-2%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39980 розн 0к-0.5%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39981 розн 20к-1%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39982 розн 50к-2%
+                        // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=39983 розн 80к-2.5%
+                     
+                        // Вега_Самара_Розничные
+                        $promotions[1810][13858] = [39979, 39978, 39977, 39976];
+                        // Вега_Самара_Крупнооптовые_клиенты
+                        $promotions[1810][13360] = [39986, 39985, 39984];
+
+                        // Вега_Тольятти_Розничные клиенты
+                        $promotions[2058][14776] = [39983, 39982, 39981, 39980];
+                        // Вега_Тольятти_Крупный ОПТ
+                        $promotions[2058][13361] = [39989, 39988, 39987];
+                    }
+
+                    if (!isset($promotions[$company_id][$ug_id])) continue;
+
+                    foreach ($promotions[$company_id][$ug_id] as $promotion_id) {
+                        $promotion = fn_get_promotion_data($promotion_id);
+                        $progress_condition = fn_find_promotion_condition($promotion['conditions'], 'progress_total_paid');
+                        $val = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, ['user_id' => $user_id], $promotion);
+
+                        if ($val > $progress_condition['value']) {
+                        
+                            foreach($promotion['bonuses'] as $bonus) {
+                                if ($bonus['bonus'] == 'give_usergroup') {
+                                    $already_granted = db_get_field('SELECT link_id FROM ?:usergroup_links WHERE user_id = ?i AND usergroup_id = ?i AND status = ?s', $user_id, $bonus['value'], 'A');
+                                    if (!$already_granted) {
+                                        $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
+                                        db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
+                                        $user_info = fn_get_user_info($user_id);
+                                        $insert['user_login'] = $user_info['user_login'];
+                                        $insert['firstname'] = $user_info['firstname'];
+                                        $insert['usergroup'] = fn_get_usergroup_name($bonus['value']);
+                                        $insert['total_sales'] = $val;
+                                        $insert['promo'] = $promotion['name'];
+                                        $insert['vendor'] = ($company_id == 1810) ? 'вега' : 'вегаТ';
+                                        $insert['user_type'] = fn_get_usergroup_name($ug_id);
+
+                                        $result[] = $insert;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            } else {
+                $order_id2 = db_quote("SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp BETWEEN ?i AND ?i $exclude_condition", $user_id, fn_parse_date(date("01/$month/Y")), fn_parse_date(date("t/$month/Y", true)) );
+
+                fn_print_die('check_here 6', $order_id2, $month, $user_id);
+            }
+        }
+    }
+
+    fn_print_die('stop', $result);
+} elseif ($mode == 'correct_reward_points_august2') {
+    $add_field = db_quote(", DATE_FORMAT(FROM_UNIXTIME(timestamp), '%m') as `interval`, timestamp");
+    $group_condition = ' GROUP BY `interval`';
+    $time_condition = db_quote(" timestamp BETWEEN ?i AND ?i", fn_parse_date('01/06/2023'), fn_parse_date('1/09/2023')-1);
+
+    $exclude_condition = db_quote(" AND ?:orders.status != 'T' AND ?:orders.status != 'I' AND ?:orders.is_parent_order != 'Y'");
+
+    $periods = db_get_hash_multi_array("SELECT count(order_id) as count, user_id $add_field FROM ?:orders WHERE company_id IN (?a) AND $time_condition $exclude_condition GROUP BY user_id, `interval`", ['interval', 'user_id', 'count'], [1810, 2058]);
+
+    // $test_periods = db_get_array("SELECT count(order_id) as count, order_id, user_id $add_field FROM ?:orders WHERE company_id IN (?a) AND $time_condition $exclude_condition AND user_id = ?i GROUP BY user_id, `interval`", [1810, 2058], 53950);
+
+    foreach ($periods as &$orders) {
+        $orders = array_filter($orders, function($v) {
+            return $v == 1;
+        });
+        $orders = array_keys($orders);
+    }
+
+    foreach ($periods as $month => $users) {
+
+        foreach ($users as $user_id) {
+            $next_month = $month + 1;
+            $order_id = db_get_fields("SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp BETWEEN ?i AND ?i $exclude_condition", $user_id, fn_parse_date(date("01/$month/Y")), fn_parse_date(date("01/$next_month/Y")) - 1);
+
+            if (count($order_id) > 1) {
+                fn_print_die('check_here 1',$order_id, $user_id);
+            } elseif (count($order_id) == 1) {
+                $order_id = reset($order_id);
+                $next_next_month = $next_month + 1;
+                $next_order_id = db_get_fields("SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp BETWEEN ?i AND ?i AND order_id > ?i $exclude_condition ORDER BY order_id LIMIT 1", $user_id, fn_parse_date(date("01/$next_month/Y")), fn_parse_date(date("01/$next_next_month/Y")) - 1, $order_id);
+                if (count($next_order_id) > 1) {
+                    fn_print_die('check_here 2', $order_id, $user_id, $next_order_id);
+                } elseif (!empty($next_order_id)) {
+                    // check one order 
+                    $next_order_id = reset($next_order_id);
+                    $total = db_get_field('SELECT total FROM ?:orders WHERE order_id = ?i', $order_id);
+                    $is_rozn = db_get_field('SELECT link_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s AND usergroup_id IN (?a)', $user_id, 'A', [13858,14776]);
+                    $cb = 0;
+                    if (!empty($is_rozn)) {
+                        if ($total < 20000 ) {
+                            $cb = 0.5;
+                        } elseif ($total < 50000) {
+                            $cb = 1;
+                        } elseif ($total < 80000) {
+                            $cb = 2;
+                        } else {
+                            $cb = 2.5;
+                        }
+                    } elseif (db_get_field('SELECT link_id FROM ?:usergroup_links WHERE user_id = ?i AND status = ?s AND usergroup_id IN (?a)', $user_id, 'A', [13360, 13361])) {
+                        if ($total < 80000 ) {
+                            $cb = 0;
+                        } elseif ($total < 150000) {
+                            $cb = 1;
+                        } elseif ($total < 250000) {
+                            $cb = 1.5;
+                        } else {
+                            $cb = 2;
+                        }
+
+                    } else {
+                        // что ты такое?
+                        continue;
+                    }
+                    if (!empty($cb)) {
+                        $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s', $user_id, CHANGE_DUE_ORDER);
+
+                        $is_corrected = false;
+                        foreach ($reward_point_changes as $change) {
+                            $details = unserialize($change['reason']);
+                            if (!empty($details['order_id']) && $details['order_id'] == $next_order_id && $details['correction'] == 'correct_reward_points_august2') {
+                                $is_corrected = true;
+                                break;
+                            }
+                        }
+                        if ($is_corrected) continue;
+
+                        $order_info = db_get_row('SELECT total, timestamp, status FROM ?:orders WHERE order_id = ?i', $next_order_id);
+
+                        if (empty((int) $order_info['total'])) continue;
+
+                        if ($order_info['status'] != 'H') {
+                            $out_of_status[] = $next_order_id;
+                            continue;
+                        }
+
+                        $reason = array('order_id' => $next_order_id, 'to' => $order_info['status'], 'correction' => 'correct_reward_points_august2');
+                        fn_change_user_points(round($order_info['total']*$cb/100), $user_id, serialize($reason), CHANGE_DUE_ORDER, $order_info['timestamp']);
+
+                        $reason['amount'] = round($order_info['total']*$cb/100);
+                        $reason['user_id'] = $user_id;
+                        $corrections[] = $reason;
+                    }
+                }
+            } else {
+                $order_id2 = db_quote("SELECT order_id FROM ?:orders WHERE user_id = ?i AND timestamp BETWEEN ?i AND ?i $exclude_condition", $user_id, fn_parse_date(date("01/$month/Y")), fn_parse_date(date("t/$month/Y", true)) );
+
+                fn_print_die('check_here 6', $order_id2, $month, $user_id);
+            }
+        }
+    }
+
+    fn_print_die('Done', $corrections, array_sum(array_column($corrections, 'amount')), 'Orders out of status:', $out_of_status);
 }
 
 function fn_revert_reward_points_change($change, $from_order = false) {
