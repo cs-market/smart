@@ -22,7 +22,7 @@ function fn_promotion_progress_pre_promotion_validate($promotion_id, $promotion,
     }
 }
 
-function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, $promo_original = null) {
+function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, $promo_original = null, $cart = null) {
     if ($auth['user_id']) {
         $join = '';
         if ($promo['condition'] == 'progress_total_paid') {
@@ -80,6 +80,12 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
 
             $value = db_get_field("SELECT $field FROM ?:orders AS o $join WHERE $condition");
 
+            // add curent cart
+            if ($promo['condition'] == 'progress_total_paid' && !empty($month) && $month == date('n')) {
+                if (empty($cart)) $cart = Tygh::$app['session']['cart'];
+                $value += $cart['subtotal'];  
+            } 
+
             return $value ?? 0;
         }
     }
@@ -100,7 +106,7 @@ function fn_get_progress_promotions($cart) {
             }
 
             $promotion['goal_value'] = $progress_condition['value'];
-            $promotion['current_value'] = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, Tygh::$app['session']['auth'], $promotion);
+            $promotion['current_value'] = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, Tygh::$app['session']['auth'], $promotion, $cart);
             if (in_array($progress_condition['condition'], ['progress_total_paid', 'progress_average_paid'])) {
                 $promotion['modify_values_to_price'] = true;
             }
