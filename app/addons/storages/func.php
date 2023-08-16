@@ -187,13 +187,20 @@ function fn_delete_storages($storage_ids) {
 function fn_storages_update_product_post($product_data, $product_id, $lang_code, $create) {
     if (isset($product_data['storages'])) {
         db_query('DELETE FROM ?:storages_products WHERE product_id = ?i', $product_id);
-        $product_data['storages'] = array_filter($product_data['storages'], function($v) { 
+        $product_data['storages'] = array_filter($product_data['storages'], function($v) {
+
             return (array_filter($v));
         });
 
-        array_walk($product_data['storages'], function(&$storage, $id) use ($product_id) {
+        $fields = fn_get_table_fields('storages_products');
+
+        array_walk($product_data['storages'], function(&$storage, $id) use ($product_id, $fields) {
             $storage['storage_id'] = $storage['storage_id'] ?? $id;
             $storage['product_id'] = $product_id;
+            foreach($fields as $field) { // for ?m
+                $storage[$field] = $storage[$field] ?? '';
+            }
+            ksort($storage); // for ?m
         });
 
         if (!empty($product_data['storages'])) db_query('INSERT INTO ?:storages_products ?m', $product_data['storages']);
