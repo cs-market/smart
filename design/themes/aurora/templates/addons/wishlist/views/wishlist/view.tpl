@@ -7,6 +7,8 @@
     {assign var="location" value="cart"}
 {/if}
 {if $products}
+    {foreach from=$categories item="category" key="category_id"}
+    {include file="common/subheader.tpl" title=$category.category}
     {include file="blocks/list_templates/grid_list.tpl" 
         columns=$columns
         show_empty=true
@@ -20,7 +22,11 @@
         show_add_to_cart=true
         is_wishlist=true
         hide_qty_label=true
-        but_role="action"}
+        but_role="action"
+        wrapper_class="ty-grid-list ty-grid-list__wishlist"
+        products=$categories_products.$category_id
+    }
+    {/foreach}
 {else}
     {math equation="100 / x" x=$columns|default:"2" assign="cell_width"}
     <div class="ty-grid-list{if $wishlist_is_empty} ty-wish-list-empty{/if}">

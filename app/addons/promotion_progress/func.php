@@ -84,7 +84,7 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
             if ($promo['condition'] == 'progress_total_paid' && !empty($month) && $month == date('n')) {
                 if (empty($cart)) $cart = Tygh::$app['session']['cart'];
                 $value += $cart['subtotal'];  
-            } 
+            }
 
             return $value ?? 0;
         }

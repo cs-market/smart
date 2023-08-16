@@ -1,5 +1,7 @@
 <?php
 
+defined('BOOTSTRAP') or die('Access denied');
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return;
 }

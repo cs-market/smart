@@ -19,7 +19,15 @@
     {if $settings.Appearance.enable_quick_view == 'Y'}
         {$quick_nav_ids = $products|fn_fields_from_multi_level:"product_id":"product_id"}
     {/if}
-    {if !$item_class}<div class="ty-grid-list" {if $products|count < $settings.Appearance.columns_in_products_list}style="--grid-columns: {$products|count}"{/if}>{/if}
+    {if $products|count < $settings.Appearance.columns_in_products_list}
+        {$grid_columns = $products|count}
+    {elseif $columns}
+        {$grid_columns = $columns}
+    {/if}
+
+    {$wrapper_class=$wrapper_class|default:"ty-grid-list"}
+
+    {if !$item_class}<div class="{$wrapper_class}" {if $grid_columns}style="--grid-columns: {$grid_columns}"{/if}>{/if}
         {strip}
             {$cart_products = $smarty.session.cart.products|array_column:'product_id'}
             {foreach from=$products item="product" name="sproducts"}
