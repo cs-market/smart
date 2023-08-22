@@ -19,5 +19,6 @@ fn_register_hooks(
     'send_form',
     //'update_ticket_pre',
     'helpdesk_get_ticket_users_post',
-    'sales_reports_dynamic_conditions'
+    'sales_reports_dynamic_conditions',
+    'sw_telegram_get_vendor_chats_get_params'
 );

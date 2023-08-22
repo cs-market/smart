@@ -3044,6 +3044,11 @@ fn_print_die($orders_wo_points);
         fn_print_die($session);
     }
     fn_print_die();
+} elseif ($mode == 'extract_ip') {
+    if ($ip = $_REQUEST['ip']) {
+        fn_print_die(fn_ip_from_db($ip));
+    }
+    fn_print_die();
 } elseif ($mode == 'remove_storages') {
     $empty_storages = db_get_fields('SELECT storage_id FROM ?:storages WHERE company_id = 0');
     fn_delete_storages($empty_storages);

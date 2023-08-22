@@ -306,3 +306,10 @@ function fn_managers_sales_reports_dynamic_conditions($type, $condition, $users)
         $condition = array_combine($users, $users);
     }
 }
+
+function fn_managers_sw_telegram_get_vendor_chats_get_params(&$params, $customer_id) {
+    if (!empty($customer_id)) {
+        $params['user_managers'] = $customer_id;
+        $params['user_role'] = [UserRoles::manager(), UserRoles::supervisor(), UserRoles::operator()];
+    }
+}

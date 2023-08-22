@@ -160,7 +160,7 @@ function fn_sw_telegram_add_discussion_post_post($post_data, $send_notifications
                 'sticker' => REVIEW_STICKER,
                 'parse_mode' => 'json'
             );
-            $vendor_chats = fn_sw_telegram_get_vendor_chats($product_data['company_id']);
+            $vendor_chats = fn_sw_telegram_get_vendor_chats($product_data['company_id'], $post_data['user_id']);
             if (!empty($vendor_chats)) {
                 foreach ($vendor_chats as $vendor_chat_id) {
 
@@ -232,7 +232,7 @@ function fn_sw_telegram_place_order($order_id, $action, $order_status, $cart, $a
             fn_allowed_for('MULTIVENDOR')
             && $addon_settings['tg_allow_for_vendor'] == 'Y'
         ) {
-            $vendor_chats = fn_sw_telegram_get_vendor_chats($order['company_id']);
+            $vendor_chats = fn_sw_telegram_get_vendor_chats($order['company_id'], $order['user_id']);
             if (!empty($vendor_chats)) {
                 foreach ($vendor_chats as $vendor_chat_id) {
 

@@ -1008,7 +1008,7 @@ function fn_sw_telegram_get_status_order($order)
  * @param (int) $company_id
  * @return (array) $chat_list
 */
-function fn_sw_telegram_get_vendor_chats($company_id)
+function fn_sw_telegram_get_vendor_chats($company_id, $customer_id = false)
 {
     $chat_ids = array();
     $params = array(
@@ -1017,9 +1017,15 @@ function fn_sw_telegram_get_vendor_chats($company_id)
         'user_type' => 'V',
     );
 
+    fn_set_hook('sw_telegram_get_vendor_chats_get_params', $params, $customer_id);
+
     if (fn_sw_telegram_allow_for_tarif($company_id) == true) {
         list($users_vendor,) = fn_get_users($params, $_SESSION['auth']);
     }
+
+    if (!empty($users_vendor)) $users_vendor = array_filter($users_vendor, function($u) {
+        return $u['noty_tg'] == 'Y' && !empty($u['chat_id']);
+    });
 
     if (empty($users_vendor)) {
         return '';
@@ -1027,16 +1033,12 @@ function fn_sw_telegram_get_vendor_chats($company_id)
 
     $chat_list = [];
     foreach ($users_vendor as $vendor) {
-
-        if ($vendor['noty_tg'] == "N") {
-            continue;
-        }
-
         $chat_id_vendors = fn_explode(',', $vendor['chat_id']);
         if (empty($chat_id_vendors)) {
             continue;
         }
-        $chat_list += $chat_id_vendors;
+
+        $chat_list = fn_array_merge($chat_list, $chat_id_vendors, false);
     }
 
     return $chat_list;
