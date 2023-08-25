@@ -522,17 +522,21 @@ function fn_sd_add_product_to_wishlist($product_data, &$wishlist, &$auth) {
 }
 
 function fn_smart_distribution_pre_update_order(&$cart, $order_id) {
-    $wishlist = & Tygh::$app['session']['wishlist'];
-    $auth = & Tygh::$app['session']['auth'];
-    $product_data = array();
-    foreach ($cart['products'] as $product) {
-        $product_data[$product['product_id']] = array(
-            'product_id' => $product['product_id'],
-            'amount' => $product['amount']
-        );
+    if (!defined('ORDER_MANAGEMENT')) {
+        $wishlist = & Tygh::$app['session']['wishlist'];
+        $auth = & Tygh::$app['session']['auth'];
+        $product_data = array();
+        foreach ($cart['products'] as $product) {
+            $product_data[$product['product_id']] = array(
+                'product_id' => $product['product_id'],
+                'amount' => $product['amount']
+            );
+        }
+
+        $product_ids = fn_sd_add_product_to_wishlist($product_data, $wishlist, $auth);
+
+        fn_save_cart_content($wishlist, $auth['user_id'], 'W');
     }
-    $product_ids = fn_sd_add_product_to_wishlist($product_data, $wishlist, $auth);
-    fn_save_cart_content($wishlist, $auth['user_id'], 'W');
 
     //  original products
     if (isset($cart['original_products'])) {

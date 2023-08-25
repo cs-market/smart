@@ -600,7 +600,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
             }
             if (empty($cart['delivery_period'])) unset($cart['delivery_period']);
 
-            if (!$res && SiteArea::isStorefront(AREA)) {
+            if (!$res && SiteArea::isStorefront(AREA) && !defined('ORDER_MANAGEMENT')) {
                 $result = false;
                 fn_set_notification('E', __('error'), __('calendar_delivery.choose_another_day'));
                 return;

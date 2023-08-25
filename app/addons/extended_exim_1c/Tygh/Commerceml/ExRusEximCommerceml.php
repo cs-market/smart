@@ -1035,7 +1035,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                     if (empty($p['amount'])) continue;
                     $order_products[$p['product_id']] = [
                         'amount' => $p['amount'],
-                        'price' => $p['price'],
+                        'price' => $func($p['price']),
                     ];
                 }
 
