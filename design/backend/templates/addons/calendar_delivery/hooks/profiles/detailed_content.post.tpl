@@ -5,6 +5,13 @@
         {include file="addons/calendar_delivery/components/weekdays_table.tpl" name="user_data[delivery_date]" value=$user_data.delivery_date|default:"1111111"}
     </div>
 </div>
+<div class="control-group">
+    <label for="elm_user_data_monday_rule" class="control-label">{__("calendar_delivery.monday_rule")}:</label>
+    <div class="controls">
+        <input type="hidden" name="user_data[monday_rule]" value="N">
+        <input type="checkbox" name="user_data[monday_rule]" id="elm_storage_monday_rule" value="Y" {if $user_data.monday_rule != 'N'} checked="checked" {/if} />
+    </div>
+</div>
 {if $storages}
 <div class="control-group">
     <label class="control-label" for="ignore_exception_days">{__("calendar_delivery.ignore_exception_days")}</label>

@@ -88,6 +88,9 @@
         <item>ALTER TABLE `?:users` ADD `ignore_exception_days` VARCHAR(1) NOT NULL DEFAULT 'N';</item>
         <item for="uninstall">ALTER TABLE `?:users` DROP `ignore_exception_days`;</item>
 
+        <item>ALTER TABLE `?:users` ADD `monday_rule` VARCHAR(1) NOT NULL DEFAULT 'Y';</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP `monday_rule`;</item>
+
         <item>ALTER TABLE `?:usergroups` ADD `working_time_till` varchar(8)  NOT NULL default '';</item>
         <item for="uninstall">ALTER TABLE `?:usergroups` DROP `working_time_till`;</item>
 

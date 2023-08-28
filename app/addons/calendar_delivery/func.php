@@ -314,6 +314,7 @@ function fn_calendar_delivery_get_user_info($user_id, $get_profile, $profile_id,
 
 function fn_calendar_delivery_get_user_short_info_pre($user_id, &$fields, $condition, $join, $group_by) {
     $fields[] = 'delivery_date';
+    $fields[] = 'monday_rule';
     if (Registry::get('addons.storages.status') == 'A') $fields[] = 'ignore_exception_days';
 }
 
@@ -380,6 +381,11 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                     if (!empty($group['storage_id'])) {
                         $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
                         $storage_weekdays = $storage_settings['delivery_date'];
+                    }
+
+                    // если у пользователя понедельник выключен при заказе в выходные, значит понедельник надо выколоть, этот флаг главный!
+                    if (!YesNo::toBool($user_info['monday_rule'])) {
+                        $storage_settings['monday_rule'] = $user_info['monday_rule'];
                     }
 
                     $weekdays_availability = $general_weekdays & $user_weekdays & $storage_weekdays;
