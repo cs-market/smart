@@ -3907,31 +3907,52 @@ fn_print_die($orders_wo_points);
     fn_redirect('tools.cleanup_wishlist_2.' . $iteration);
 } elseif ($mode == 'cleanup_wishlist_3') {
     $iteration = empty($action) ? 1 : $action;
+
+    if ($iteration == 1) unset($_SESSION['delete_session']);
     
-    $step = 100;
+    $step = 1000;
     $limit = ' LIMIT '. ($iteration - 1) * $step . ', ' . $step;
 
-    $user_ids = db_get_fields("SELECT distinct(user_id) FROM ?:user_session_products WHERE user_type = ?s AND type = ?s $limit", 'R', 'W');
+    $sessions = db_get_array("SELECT * FROM ?:sessions $limit");
+    if (empty($sessions)) {
+        db_query('DELETE FROM ?:sessions WHERE session_id IN (?a)', $_SESSION['delete_session']);
+        unset($_SESSION['delete_session']);
+    }
 
-    foreach ($user_ids as $user_id) {
-        $array = [
-            'auth' => [
-                'area' => 'C',
-                'user_id' => "$user_id"
-            ],
-        ];
-        $str = serialize($array);
-        $search = str_replace(['a:1:{s:4:"auth";a:2:{', '}}'], ['', ''], $str);
-        $sessions = db_get_array('SELECT data, session_id FROM ?:sessions WHERE data LIKE ?l', '%' . $search . '%');
-        foreach ($sessions as $session) {
-            $data = Tygh::$app['session']->decode($session['data']);
-            $data['wishlist']['products'] = array_filter($data['wishlist']['products'], function($p) use ($user_id) {
+    foreach ($sessions as &$data) {
+        $decode = Tygh::$app['session']->decode($data['data']);
+        $user_id = $decode['auth']['user_id'];
+        if (empty($user_id)) {
+            $_SESSION['delete_session'][] = $data['session_id'];
+        } elseif (!empty($decode['wishlist']['products'])) {
+            $decode['wishlist']['products'] = array_filter($decode['wishlist']['products'], function($p) use ($user_id) {
                 return $p['user_id'] == $user_id;
             });
-            $session['data'] = Tygh::$app['session']->encode($data);
-            db_query('UPDATE ?:sessions SET data = ?s WHERE session_id = ?s', $session['data'], $session['session_id']);
+            $data['data'] = Tygh::$app['session']->encode($decode);
+            db_query('UPDATE ?:sessions SET data = ?s WHERE session_id = ?s', $data['data'], $data['session_id']);
         }
     }
+
+    //$user_ids = db_get_fields("SELECT distinct(user_id) FROM ?:user_session_products WHERE user_type = ?s AND type = ?s $limit", 'R', 'W');
+    // foreach ($user_ids as $user_id) {
+    //     $array = [
+    //         'auth' => [
+    //             'area' => 'C',
+    //             'user_id' => "$user_id"
+    //         ],
+    //     ];
+    //     $str = serialize($array);
+    //     $search = str_replace(['a:1:{s:4:"auth";a:2:{', '}}'], ['', ''], $str);
+    //     $sessions = db_get_array('SELECT data, session_id FROM ?:sessions WHERE data LIKE ?l', '%' . $search . '%');
+    //     foreach ($sessions as $session) {
+    //         $data = Tygh::$app['session']->decode($session['data']);
+    //         $data['wishlist']['products'] = array_filter($data['wishlist']['products'], function($p) use ($user_id) {
+    //             return $p['user_id'] == $user_id;
+    //         });
+    //         $session['data'] = Tygh::$app['session']->encode($data);
+    //         db_query('UPDATE ?:sessions SET data = ?s WHERE session_id = ?s', $session['data'], $session['session_id']);
+    //     }
+    // }
 
     fn_print_r($iteration);
     $iteration += 1;
