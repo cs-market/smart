@@ -628,8 +628,8 @@ function fn_render_xml_from_array($data, $parent_tag = '', $parent_attributes = 
             if (!is_array($value)) {
                 $rendered .= fn_render_xml_from_array($value, $tag, $attributes);
             } else {
+                $attributes = '';
                 if (isset($value['@attributes'])) {
-                    $attributes = '';
                     foreach ($value['@attributes'] as $attr_name => $attr) {
                         $attributes .= ' ' . $attr_name . '="' . $attr . '"';
                     }
