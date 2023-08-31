@@ -5,7 +5,7 @@ use Tygh\Addons\AdvancedImport\Exceptions\FileNotFoundException;
 use Tygh\Addons\AdvancedImport\Exceptions\ReaderNotFoundException;
 use Tygh\Exceptions\PermissionsException;
 use Tygh\Enum\Addons\AdvancedImport\ImportStatuses;
-use Tygh\Commerceml\SDRusEximCommerceml;
+use Tygh\Commerceml\ExRusEximCommerceml;
 use Tygh\Commerceml\Logs;
 use Tygh\Addons\AdvancedImport\ServiceProvider;
 use Tygh\Settings;
@@ -143,7 +143,7 @@ function fn_auto_exim_send_order_notification($order, $edp_data, $force_notifica
         $log = new Logs('', $path_commerceml);
         Registry::set('runtime.company_id', $company_id);
 
-        $exim_commerceml = new SDRusEximCommerceml(Tygh::$app['db'], $log, $path_commerceml);
+        $exim_commerceml = new ExRusEximCommerceml(Tygh::$app['db'], $log, $path_commerceml);
         $manual = true;
         //unset($_SESSION['exim_1c']);
         $lang_code = (!empty($s_commerceml['exim_1c_lang'])) ? $s_commerceml['exim_1c_lang'] : CART_LANGUAGE;
@@ -320,7 +320,7 @@ function fn_auto_exim_run_import($imports, $company_id) {
             $log = new Logs('', $path_commerceml);
             Registry::set('runtime.company_id', $company_id);
 
-            $exim_commerceml = new SDRusEximCommerceml(Tygh::$app['db'], $log, $path_commerceml);
+            $exim_commerceml = new ExRusEximCommerceml(Tygh::$app['db'], $log, $path_commerceml);
             $manual = true;
             //unset($_SESSION['exim_1c']);
             $lang_code = (!empty($s_commerceml['exim_1c_lang'])) ? $s_commerceml['exim_1c_lang'] : CART_LANGUAGE;

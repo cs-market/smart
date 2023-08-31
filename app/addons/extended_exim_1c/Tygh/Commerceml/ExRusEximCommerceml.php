@@ -1083,6 +1083,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                     // может это уже не надо если есть customer_auth ?
                     $backup_auth = Tygh::$app['session']['auth'];
                     Tygh::$app['session']['customer_auth'] = Tygh::$app['session']['auth'] = $customer_auth;
+                    $customer_auth['area'] = 'A';
 
                     fn_calculate_cart_content($cart, $customer_auth);
 
