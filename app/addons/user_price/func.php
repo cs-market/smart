@@ -20,39 +20,41 @@ function fn_user_price_get_product_data_post(&$product_data, $auth, $preview, $l
 }
 
 function fn_user_price_get_products($params, &$fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, &$having) {
-    $auth = Tygh::$app['session']['auth'];
+    if (SiteArea::isStorefront(AREA)) {
+        $auth = Tygh::$app['session']['auth'];
 
-    // handle with fn_ult_get_products
-    if (in_array('prices', $params['extend']) && !empty($auth['user_id']) && isset($fields['price'])) {
-        $extra_join = db_quote(' LEFT JOIN ?:user_price AS up ON up.product_id = products.product_id AND up.user_id = ?i', $auth['user_id']);
-        
-        $regular_price_field = str_replace(' as price', '', $fields['price']);
+        // handle with fn_ult_get_products
+        if (in_array('prices', $params['extend']) && !empty($auth['user_id']) && isset($fields['price'])) {
+            $extra_join = db_quote(' LEFT JOIN ?:user_price AS up ON up.product_id = products.product_id AND up.user_id = ?i', $auth['user_id']);
+            
+            $regular_price_field = str_replace(' as price', '', $fields['price']);
 
-        if (!empty($regular_price_field)) {
+            if (!empty($regular_price_field)) {
+                fn_set_hook('user_price_get_products', $params, $join, $condition, $extra_join);
+                // по складам добавить
+                $join .= $extra_join;
 
-            // по складам добавить
-            $join .= $extra_join;
-
-            $fields['price'] = db_quote(
-                'IF(up.price IS NOT NULL, up.price, ' . $regular_price_field . ') as price'
-            );
+                $fields['price'] = db_quote(
+                    'IF(MIN(up.price) IS NOT NULL, MIN(up.price), ' . $regular_price_field . ') as price'
+                );
+            }
         }
-    }
 
-    if (isset($params['price_from']) && fn_is_numeric($params['price_from'])) {
-        $remove_condition = db_quote(' AND prices.price >= ?d', fn_convert_price(trim($params['price_from'])));
-        $condition = str_replace($remove_condition, '', $condition);
-        $having['price_from'] = db_quote(' price >= ?d', fn_convert_price(trim($params['price_from'])));
-        $params['extend'][] = 'prices2';
-        $params['extend'][] = 'prices';
-    }
+        if (isset($params['price_from']) && fn_is_numeric($params['price_from'])) {
+            $remove_condition = db_quote(' AND prices.price >= ?d', fn_convert_price(trim($params['price_from'])));
+            $condition = str_replace($remove_condition, '', $condition);
+            $having['price_from'] = db_quote(' price >= ?d', fn_convert_price(trim($params['price_from'])));
+            $params['extend'][] = 'prices2';
+            $params['extend'][] = 'prices';
+        }
 
-    if (isset($params['price_to']) && fn_is_numeric($params['price_to'])) {
-        $remove_condition = db_quote(' AND prices.price <= ?d', fn_convert_price(trim($params['price_to'])));
-        $condition = str_replace($remove_condition, '', $condition);
-        $having['price_to'] = db_quote(' price <= ?d', fn_convert_price(trim($params['price_to'])));
-        $params['extend'][] = 'prices2';
-        $params['extend'][] = 'prices';
+        if (isset($params['price_to']) && fn_is_numeric($params['price_to'])) {
+            $remove_condition = db_quote(' AND prices.price <= ?d', fn_convert_price(trim($params['price_to'])));
+            $condition = str_replace($remove_condition, '', $condition);
+            $having['price_to'] = db_quote(' price <= ?d', fn_convert_price(trim($params['price_to'])));
+            $params['extend'][] = 'prices2';
+            $params['extend'][] = 'prices';
+        }
     }
 }
 

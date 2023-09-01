@@ -40,33 +40,4 @@ if ($mode == 'manage') {
     if (defined('AJAX_REQUEST')) {
         Tygh::$app['view']->assign('in_popup', true);
     }
-}/* elseif ($mode == 'get_groups_list') {
-
-    $params = $_REQUEST;
-    $condition = '';
-    $pattern = !empty($params['pattern']) ? $params['pattern'] : '';
-    $start = !empty($params['start']) ? $params['start'] : 0;
-    $limit = (!empty($params['limit']) ? $params['limit'] : 10) + 1;
-    if (isset($params['status']) && !empty($params['status'])) {
-        $condition .= db_quote(" AND status = ?s", $params['status']);
-    }
-    if (Registry::get('runtime.company_id')) {
-        $condition .= db_quote(" AND company_id = ?i", Registry::get('runtime.company_id'));
-    }
-
-    $groups = db_get_hash_array("SELECT ?:storages.group_id as value, ?:storages.group as name FROM ?:storages WHERE 1 ?p AND ?:storages.group LIKE ?l ORDER BY ?:storages.group LIMIT ?i, ?i", 'value', $condition, $pattern . '%', $start, $limit);
-    if (!$start) {
-        array_unshift($groups, array('value' => 0, 'name' => '-' . __('none') . '-'));
-    }
-
-    if (defined('AJAX_REQUEST') && sizeof($groups) < $limit) {
-        Tygh::$app['ajax']->assign('completed', true);
-    } else {
-        array_pop($groups);
-    }
-
-    Tygh::$app['view']->assign('objects', $groups);
-    Tygh::$app['view']->assign('id', $params['result_ids']);
-    Tygh::$app['view']->display('common/ajax_select_object.tpl');
-    exit;
-}*/
+}

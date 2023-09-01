@@ -739,9 +739,22 @@ function fn_smart_distribution_get_products(&$params, &$fields, $sortings, &$con
 
         //for sorting by price
         $auth = Tygh::$app['session']['auth'];
+        $regular_price_field = str_replace(' as price', '', $fields['price']);
+        if (!empty($regular_price_field)) {
+            $remove_join = " LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1";
+            $add_join = db_quote(" LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1 AND usergroup_id IN (?a)",  array_filter($auth['usergroup_ids']));
+            $join .= 'LEFT JOIN ?:product_prices as reg_prices ON reg_prices.product_id = products.product_id AND reg_prices.lower_limit = 1 AND reg_prices.usergroup_id = 0';
+            $join = str_replace($remove_join, $add_join, $join);
+            
+            $fields['price'] = db_quote(
+                'IF('.$regular_price_field.' IS NOT NULL, '.$regular_price_field .', reg_prices.price) as price'
+            );
+        }
+
         $remove_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
-        $add_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
-        $condition = str_replace($remove_condition, $add_condition, $condition);
+        //need to move to join
+        //$add_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
+        $condition = str_replace($remove_condition, ''/*$add_condition*/, $condition);
     }
 
     if (!empty($params['current_cart_products']) && $params['user_id']) {
