@@ -37,6 +37,9 @@ if ($mode == 'manage') {
     $params = $_REQUEST;
     list($storage, ) = fn_get_storages($params);
     Tygh::$app['view']->assign('storage', reset($storage));
+    if (defined('AJAX_REQUEST')) {
+        Tygh::$app['view']->assign('in_popup', true);
+    }
 }/* elseif ($mode == 'get_groups_list') {
 
     $params = $_REQUEST;

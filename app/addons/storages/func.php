@@ -124,7 +124,9 @@ function fn_get_storages($params = [], $items_per_page = 0) {
 
 function fn_update_storage($storage_data, $storage_id = 0) {
     unset($storage_data['storage_id']);
-
+    if (empty($storage_id) && empty($storage_data['code'])) {
+        fn_debug_log_event(['type' => 'Создание склада', 'request' => $_REQUEST, 'user' => Tygh::$app['session']['auth']['user_id']]);
+    }
     if (fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id')) {
         $storage_data['company_id'] = Registry::get('runtime.company_id');
         if (!empty($storage_id) && !(db_get_field('SELECT storage_id FROM ?:storages WHERE storage_id = ?i AND company_id = ?i', $storage_id, $storage_data['company_id']))) {

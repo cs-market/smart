@@ -1,3 +1,4 @@
+{capture name="mainbox"}
 {if $storage}
     {assign var="id" value=$storage.storage_id|lower}
 {else}
@@ -15,6 +16,12 @@
 <div id="content_storage{$st}">
 
 <form action="{""|fn_url}" enctype="multipart/form-data" method="post" name="update_status_{$st}_form" class="form-horizontal">
+{if $in_popup}
+    {$redirect_url = "storages.manage"|fn_url}
+{else}
+    {$redirect_url = $config.current_url}
+{/if}
+<input type="hidden" class="cm-no-hide-input" name="redirect_url" value="{$smarty.request.return_url|default:$redirect_url}" />
 <input type="hidden" name="storage_id" value="{$id}">
 
 <div class="tabs cm-j-tabs">
@@ -68,3 +75,10 @@
 
 </form>
 <!--content_storage{$id}--></div>
+{/capture}
+
+{if $in_popup}
+    {$smarty.capture.mainbox nofilter}
+{else}
+    {include file="common/mainbox.tpl" title="{__("storages.storage")}: `$storage.storage`" content=$smarty.capture.mainbox buttons=$smarty.capture.buttons}
+{/if}
