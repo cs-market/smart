@@ -3044,9 +3044,14 @@ fn_print_die($orders_wo_points);
         fn_print_die($session);
     }
     fn_print_die();
-} elseif ($mode == 'extract_ip') {
+} elseif ($mode == 'decode_ip') {
     if ($ip = $_REQUEST['ip']) {
         fn_print_die(fn_ip_from_db($ip));
+    }
+    fn_print_die();
+} elseif ($mode == 'encode_ip') {
+    if ($ip = $_REQUEST['ip']) {
+        fn_print_die(fn_ip_to_db($ip));
     }
     fn_print_die();
 } elseif ($mode == 'remove_storages') {

@@ -736,6 +736,12 @@ function fn_smart_distribution_get_products(&$params, &$fields, $sortings, &$con
     if (SiteArea::isStorefront(AREA)) {
         // do not show products for unlogged users
         $condition .= db_quote(' AND products.usergroup_ids != ?s', '');
+
+        //for sorting by price
+        $auth = Tygh::$app['session']['auth'];
+        $remove_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
+        $add_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
+        $condition = str_replace($remove_condition, $add_condition, $condition);
     }
 
     if (!empty($params['current_cart_products']) && $params['user_id']) {
@@ -803,12 +809,12 @@ function fn_smart_distribution_get_product_data($product_id, $field_list, &$join
     }
 }
 
-function fn_smart_distribution_get_usergroups_price($product_id, $usergroup_ids = array()) {
-    $usergroup_ids = empty($usergroup_ids) ? Tygh::$app['session']['auth']['usergroup_ids'] : $usergroup_ids;
-    $usergroup_ids = array_filter($usergroup_ids);
+// function fn_smart_distribution_get_usergroups_price($product_id, $usergroup_ids = array()) {
+//     $usergroup_ids = empty($usergroup_ids) ? Tygh::$app['session']['auth']['usergroup_ids'] : $usergroup_ids;
+//     $usergroup_ids = array_filter($usergroup_ids);
 
-    return db_get_field("SELECT min(IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100)) as price FROM ?:product_prices prices WHERE prices.product_id = ?i AND prices.usergroup_id IN (?n) ORDER BY lower_limit", $product_id, $usergroup_ids);
-}
+//     return db_get_field("SELECT min(IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100)) as price FROM ?:product_prices prices WHERE prices.product_id = ?i AND prices.usergroup_id IN (?n) ORDER BY lower_limit", $product_id, $usergroup_ids);
+// }
 
 function fn_smart_distribution_get_product_data_post(&$product_data, $auth, $preview, $lang_code) {
     // buy together for mobile application
