@@ -48,7 +48,7 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
 
 function fn_smart_distribution_get_order_info(&$order, $additional_data) {
     if (!empty($order)) {
-        if (SiteArea::isAdmin(AREA)) {
+        if (SiteArea::isAdmin(AREA) || Registry::get('runtime.controller') == 'ex_exim_1c') {
             if (!($order['profile_id'])) {
                 $user_profiles = fn_get_user_profiles($order['user_id']);
                 if (count($user_profiles) == 1) {
