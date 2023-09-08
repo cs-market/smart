@@ -1,5 +1,6 @@
 <?php
 
+use Tygh\Enum\SiteArea;
 use Tygh\Registry;
 use Tygh\Http;
 
@@ -399,5 +400,21 @@ function fn_monolith_update_product_post(&$product_data, $product_id, $lang_code
                 $product_data['storages'] = array_merge($product_data['storages'], array_values($diff));
             }
         }
+    }
+}
+
+function fn_monolith_get_products($params, $fields, $sortings, &$condition, $join, $sorting, $group_by, $lang_code, $having) {
+    if (SiteArea::isStorefront(AREA)) {
+        $condition .= db_quote('AND IF (products.company_id = 45, prices.price IS NOT NULL, 1)');
+    }
+}
+
+function fn_monolith_get_product_data($product_id, &$field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup){
+    // если у товара балтики нет прайсов, то не достаем его
+    if (SiteArea::isStorefront(AREA)) {
+        $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
+
+        $price_usergroup .= db_quote(' AND IF (?:products.company_id = ?i, ?:product_prices.usergroup_id IN (?a), 1) ', 45, array_filter($usergroup_ids));
+        $condition .= db_quote(" AND IF (?:products.company_id = ?i, ?:product_prices.price IS NOT NULL, '') ", 45);
     }
 }

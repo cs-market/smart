@@ -4,7 +4,7 @@ defined('BOOTSTRAP') or die('Access denied');
 
 fn_register_hooks(
     'update_product_post',
-    ['get_product_data', 27000000],
+    ['get_product_data', 4290000000],
     'get_product_data_post',
     ['get_products', 27000000],
     ['load_products_extra_data', 27000000],

@@ -739,13 +739,14 @@ function fn_smart_distribution_get_products(&$params, &$fields, $sortings, &$con
 
         //for sorting by price
         $auth = Tygh::$app['session']['auth'];
+
+        $remove_join = " LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1";
+        $add_join = db_quote(" LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1 AND usergroup_id IN (?a)",  array_filter($auth['usergroup_ids']));
+        $join = str_replace($remove_join, $add_join, $join);
+
         $regular_price_field = str_replace(' as price', '', $fields['price']);
         if (!empty($regular_price_field)) {
-            $remove_join = " LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1";
-            $add_join = db_quote(" LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1 AND usergroup_id IN (?a)",  array_filter($auth['usergroup_ids']));
             $join .= 'LEFT JOIN ?:product_prices as reg_prices ON reg_prices.product_id = products.product_id AND reg_prices.lower_limit = 1 AND reg_prices.usergroup_id = 0';
-            $join = str_replace($remove_join, $add_join, $join);
-            
             $fields['price'] = db_quote(
                 'IF('.$regular_price_field.' IS NOT NULL, '.$regular_price_field .', reg_prices.price) as price'
             );
@@ -811,14 +812,13 @@ function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fie
 }
 
 function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
-    // overrided by storages add-on
-    $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
     if (SiteArea::isStorefront(AREA)) {
+        $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
         $price_usergroup = db_quote(' 
             AND CASE WHEN 
             (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
             THEN ?:product_prices.usergroup_id IN (?a) 
-            ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_diff($usergroup_ids, [USERGROUP_ALL]), array_diff($usergroup_ids, [USERGROUP_ALL]), USERGROUP_ALL);
+            ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_filter($usergroup_ids), array_filter($usergroup_ids), USERGROUP_ALL);
     }
 }
 

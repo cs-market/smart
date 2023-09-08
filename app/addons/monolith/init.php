@@ -9,5 +9,7 @@ fn_register_hooks(
     'get_logos_post',
     'before_dispatch',
     'api_exec',
-    'update_product_post'
+    'update_product_post',
+    'get_products',
+    ['get_product_data', 4300000000],
 );

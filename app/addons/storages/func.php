@@ -221,22 +221,18 @@ function fn_get_storages_amount($product_id) {
 function fn_storages_get_product_data($product_id, &$field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
 
     if ($storage = Registry::get('runtime.current_storage')) {
-        $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
-        
         // мы не ставим юзергруппы к складу совсем так как склад не определяет цену товара так как цену товара определяет прайсовая юзергруппа.
         if (!empty($storage['usergroup_ids'])) {
             // но в перспективе может быть и таки да.
-            $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
+            $auth_usergroups_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
+            $usergroup_ids = array_intersect($auth_usergroups_ids, $storage['usergroup_ids']);
+            $price_usergroup = preg_replace('/usergroup_id IN \(.*\)/', db_quote('usergroup_id IN (?a)', $usergroup_ids), $price_usergroup);
         }
 
         $field_list .= db_quote(', ?:storages_products.amount, ?:storages_products.min_qty as storage_min_qty, ?:storages_products.qty_step as storage_qty_step');
 
         // если товара на складе быть не может, не достаем его = right join 
         $join .= db_quote(' RIGHT JOIN ?:storages_products ON ?:storages_products.product_id = ?i AND ?:storages_products.storage_id = ?i', $product_id, $storage['storage_id']);
-
-        // если у товара нет прайсов, то тоже не достаем его
-        $price_usergroup = db_quote('AND ?:product_prices.usergroup_id IN (?a)', array_diff($usergroup_ids, [USERGROUP_ALL]));
-        $condition .= db_quote("AND ?:product_prices.price IS NOT NULL");
 
         // заменим условие наличия товара
         // TODO штатно поля show_out_of_stock_product нет!
