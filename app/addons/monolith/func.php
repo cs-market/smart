@@ -415,6 +415,6 @@ function fn_monolith_get_product_data($product_id, &$field_list, &$join, $auth, 
         $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
 
         $price_usergroup .= db_quote(' AND IF (?:products.company_id = ?i, ?:product_prices.usergroup_id IN (?a), 1) ', 45, array_filter($usergroup_ids));
-        $condition .= db_quote(" AND IF (?:products.company_id = ?i, ?:product_prices.price IS NOT NULL, '') ", 45);
+        $condition .= db_quote(" AND IF (?:products.company_id = ?i, ?:product_prices.price IS NOT NULL, 1) ", 45);
     }
 }
