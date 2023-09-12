@@ -237,6 +237,10 @@ function fn_product_groups_place_suborders($cart, &$suborder_cart, $key_group) {
         if (!empty($promo_data['bonuses'])) {
             $found = false;
             foreach ($promo_data['bonuses'] as $bonus) {
+                if ($bonus['bonus'] == 'give_usergroup') {
+                    $found = true;
+                    break;
+                }
                 if (in_array($bonus['bonus'], ['free_products', 'promotion_step_free_products'])) {
                     $products = array_column($bonus['value'], 'product_id');
                     $cart_products = array_filter($suborder_cart['products'], function($v) {
