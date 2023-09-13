@@ -3,6 +3,7 @@
 namespace Tygh;
 
 use Tygh\Api\ExtendedResponse as Response;
+use Tygh\Enum\SiteArea;
 
 class ExtendedAPI extends Api
 {
@@ -122,6 +123,12 @@ class ExtendedAPI extends Api
             } else {
                 $response = new Response(Response::STATUS_METHOD_NOT_ALLOWED, __('api_not_need_id'), $accept_type);
             }
+        }
+
+        if (SiteArea::isStorefront($this->area) && $notifications = fn_get_notifications()) {
+            $body = $response->getBody();
+            $body['notifications'] = $notifications;
+            $response->setBody($body);
         }
 
         fn_set_hook('api_exec', $this, $entity, $entity_properties, $response);
