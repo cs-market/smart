@@ -171,6 +171,10 @@ function fn_maintenance_save_log($type, $action, $data, $user_id, &$content, $ev
     }
 }
 
+function fn_maintenance_pre_get_orders($params, &$fields, $sortings, $get_totals, $lang_code) {
+    $fields[] = 'tracking_link';
+}
+
 /* END HOOKS */
 
 function fn_debug_log_event($data) {
