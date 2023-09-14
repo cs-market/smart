@@ -1,3 +1,3 @@
 {if $orders|array_column:'tracking_link'|array_filter}
-    <th>{__("maintenance.tracking_link")}</th>
+    <th>{__("maintenance.track_order")}</th>
 {/if}

@@ -30,7 +30,8 @@
         <item lang="ru" id="promotion_cond_catalog_once_per_customer">Один раз для покупателя</item>
         <item lang="ru" id="export_found_orders">Экспортировать найденные заказы</item>
         <item lang="ru" id="log_action_debug">Отладочная информация</item>
-        <item lang="ru" id="maintenance.tracking_link">Отследить заказ</item>
+        <item lang="ru" id="maintenance.tracking_link">Ссылка для отслеживания</item>
+        <item lang="ru" id="maintenance.tracking_order">Отследить заказ</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:promotions` ADD `external_id` VARCHAR(255) NOT NULL DEFAULT '';</item> 
