@@ -18,5 +18,6 @@ fn_register_hooks(
     'shippings_get_shippings_list_conditions',
     'get_user_short_info_pre',
     'save_log',
-    'pre_get_orders'
+    'pre_get_orders',
+    'development_show_stub'
 );

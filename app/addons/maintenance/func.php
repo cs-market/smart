@@ -497,3 +497,7 @@ function fn_maintenance_shippings_get_shippings_list_conditions($group, $shippin
         $condition .= " AND (" . fn_find_array_in_set(\Tygh::$app['session']['customer_auth']['usergroup_ids'], '?:shippings.usergroup_ids', true) . ")";
     }
 }
+
+function fn_maintenance_development_show_stub($placeholders, $append, &$content, $is_error) {
+    $content = '<img style="margin: 40px auto; display: block;" src="design/themes/responsive/media/images/addons/maintenance/stub.jpg">';
+}
