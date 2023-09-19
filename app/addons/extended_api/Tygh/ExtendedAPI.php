@@ -126,9 +126,9 @@ class ExtendedAPI extends Api
         }
 
         if (SiteArea::isStorefront($this->area) && $notifications = fn_get_notifications()) {
-            $body = $response->getBody();
-            $body['notifications'] = $notifications;
-            $response->setBody($body);
+            // $body = $response->getBody();
+            // $body['notifications'] = $notifications;
+            // $response->setBody($body);
         }
 
         fn_set_hook('api_exec', $this, $entity, $entity_properties, $response);
