@@ -934,6 +934,12 @@ class ExRusEximCommerceml extends RusEximCommerceml
         $address1 = $this->getContactInfoFromAddress($order_data, 'address');
         $address2 = $this->getContactInfoFromAddress($order_data, 'address_2');
 
+        // иногда в заказе нет адреса, хотя в пользователе он есть
+        if ($address1 == '-' && $address2 == '-') {
+            $user_info = fn_get_user_info($user_id);
+            $address1 = $user_info['s_address'];
+        }
+
         $user_xml = array(
             $cml['id'] => $user_id,
             $cml['unregistered'] => $unregistered,
