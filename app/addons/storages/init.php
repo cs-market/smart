@@ -35,4 +35,4 @@ fn_register_hooks(
     'api_runtime_handle_delete_request'
 );
 
-fn_init_stack(array('fn_init_storages', &$_REQUEST));
+if (!isset($_REQUEST['skey'])) fn_init_stack(array('fn_init_storages', &$_REQUEST));
