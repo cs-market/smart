@@ -19,5 +19,6 @@ fn_register_hooks(
     'get_user_short_info_pre',
     'save_log',
     'pre_get_orders',
-    'development_show_stub'
+    'development_show_stub',
+    'get_carts'
 );

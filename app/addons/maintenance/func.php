@@ -501,3 +501,9 @@ function fn_maintenance_shippings_get_shippings_list_conditions($group, $shippin
 function fn_maintenance_development_show_stub($placeholders, $append, &$content, $is_error) {
     $content = '<img style="margin: 40px auto; display: block;" src="design/themes/responsive/media/images/addons/maintenance/stub.jpg">';
 }
+
+function fn_maintenance_get_carts($type_restrictions, $params, $condition, &$join, $fields, $group) {
+    if (fn_allowed_for('MULTIVENDOR') && $company_id = Registry::get('runtime.company_id')) {
+        $join .= db_quote(' RIGHT JOIN ?:users AS u ON u.user_id = ?:user_session_products.user_id AND ?:user_session_products.user_type = ?s AND u.company_id = ?i', 'R', $company_id);
+    }
+}
