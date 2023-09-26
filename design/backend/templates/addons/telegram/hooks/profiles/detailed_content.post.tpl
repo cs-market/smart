@@ -4,7 +4,7 @@
         <label class="control-label" for="chat_id">{__("telegram.chat_id")}</label>
         <div class="controls">
             <input type="text" name="user_data[chat_id]" value="{$user_data.chat_id}">
-            {if !$user_data.chat_id}{include file="buttons/button.tpl" but_text=__('telegram.assign_chat') but_href="telegram.assign_user" but_role="action" but_target="_blank" but_meta="cm-post"}{/if}
+            {if !$user_data.chat_id}{include file="buttons/button.tpl" but_text=__('telegram.assign_chat') but_href="telegram.assign_user&user_id=`$user_data.user_id`" but_role="action" but_target="_blank" but_meta="cm-post"}{/if}
         </div>
     </div>
     <div class="control-group">

@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $response = $messenger->send('getMe');
         $data = $response->getData();
-        Settings::instance()->updateValue('bot', $data['result']['username'], 'telegram', false, false);
+        Settings::instance()->updateValue('bot_name', $data['result']['username'], 'telegram', false, false);
     }
 
     return array(CONTROLLER_STATUS_OK);
