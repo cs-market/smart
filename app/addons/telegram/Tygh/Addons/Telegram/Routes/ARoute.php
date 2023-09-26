@@ -30,7 +30,7 @@ abstract class ARoute
 
         if (is_array($privileges)) {
             $type = 'anonymous';
-            if ($this->area == 'A') {
+            if (in_array($this->area, ['A', 'V'])) {
                 $type = 'backend';
             } elseif (!empty($this->auth['user_id'])) {
                 $type = 'frontend';

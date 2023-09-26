@@ -21,12 +21,8 @@ class Telegram extends AEntity
     {
         $area = 'C';
         // when authenticating a user with auth token, force area to customer
-        if ($auth && !$auth['is_token_auth']) {
-            if ($auth['user_type'] == 'A') {
-                $area = 'A';
-            } elseif ($user_data['user_type'] == 'V') {
-                $area = 'A';
-            }
+        if (!empty($auth) && !$auth['is_token_auth']) {
+            $area = $auth['user_type'];
         }
         $this->area = $area;
         parent::__construct($auth, $area);
