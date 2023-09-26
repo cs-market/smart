@@ -313,3 +313,10 @@ function fn_managers_sw_telegram_get_vendor_chats_get_params(&$params, $customer
         $params['user_role'] = [UserRoles::manager(), UserRoles::supervisor(), UserRoles::operator()];
     }
 }
+
+function fn_managers_telegram_get_vendor_chats_get_params(&$params, $order) {
+    if (!empty($order['user_id'])) {
+        $params['user_managers'] = $order['user_id'];
+        $params['user_role'] = [UserRoles::manager(), UserRoles::supervisor(), UserRoles::operator()];
+    }
+}

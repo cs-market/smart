@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>telegram</id>
+    <name>Интеграция с Telegram</name>
+    <description>Реализация бота для Telegram. Новый интерфейс взаимодействия с покупателем.</description>
+    <status>active</status>
+    <version>1.0.1</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>en</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <settings>
+        <sections>
+            <section id="settings">
+                <items>
+                    <item id="token">
+                        <name>Token</name>
+                        <type>input</type>
+                        <translations>
+                            <item lang="ru">Токен</item>
+                        </translations>
+                    </item>
+                    <item id="bot_name">
+                        <type>hidden</type>
+                    </item>
+                    <item id="webhook">
+                        <type>template</type>
+                        <default_value>webhook.tpl</default_value>
+                    </item>
+                    <item id="tg_events_subscribed">
+                        <name>Events notifications</name>
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                        <translations>
+                            <item lang="ru">Уведомлять о новых событиях</item>
+                        </translations>
+                    </item>
+                    <item id="chat_ids">
+                        <name>Chat IDs</name>
+                        <type>textarea</type>
+                        <tooltip>List of chats that should be considered as admins</tooltip>
+                        <translations>
+                            <item lang="ru">ID чатов</item>
+                            <item lang="ru" for="tooltip">Список чатов которые будут считаться как админские</item>
+                        </translations>
+                    </item>
+                    <item id="disable_anonymous_checkout">
+                        <name>Authorized shopping only</name>
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                        <translations>
+                            <item lang="ru">Только авторизованные покупатели</item>
+                        </translations>
+                    </item>
+                    <item id="tg_items_per_page">
+                        <name>Items per page</name>
+                        <type>input</type>
+                        <translations>
+                            <item lang="ru">Элементов на страницу</item>
+                        </translations>
+                        <default_value>6</default_value>
+                    </item>
+                    <item id="tg_orders_per_row">
+                        <name>Orders per row</name>
+                        <type>input</type>
+                        <translations>
+                            <item lang="ru">Заказов в строке</item>
+                        </translations>
+                        <default_value>2</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+    <language_variables>
+        <item lang="en" id="telegram.telegram">Telegram</item>
+        <item lang="ru" id="telegram.telegram">Telegram</item>
+
+        <item lang="en" id="telegram.register_webhook">Register webhook</item>
+        <item lang="ru" id="telegram.register_webhook">Зарегистрировать webhook</item>
+
+        <item lang="en" id="telegram.change_order_status">Change order status</item>
+        <item lang="ru" id="telegram.change_order_status">Изменить статус заказа</item>
+
+        <item lang="en" id="telegram.order_not_found">Order not found</item>
+        <item lang="ru" id="telegram.order_not_found">Заказ не найден</item>
+
+        <item lang="en" id="telegram.chat_id">Chat ID</item>
+        <item lang="ru" id="telegram.chat_id">ID чата</item>
+
+        <item lang="en" id="telegram.assign_chat">Assign with chat</item>
+        <item lang="ru" id="telegram.assign_chat">Подключить учетную запись telegram</item>
+
+        <item lang="en" id="telegram.events_subscribed">Events subscribed</item>
+        <item lang="ru" id="telegram.events_subscribed">Подписаться на уведомления о событиях</item>
+
+        <item lang="en" id="telegram.change_order_status">Change order status</item>
+        <item lang="ru" id="telegram.change_order_status">Изменить статус заказа</item>
+
+        <item lang="en" id="telegram.tg_enabled">Allow to assing telegram to accounts</item>
+        <item lang="ru" id="telegram.tg_enabled">Позволить связывать учетную запись с telegram</item>
+    </language_variables>
+    <queries>
+<!--        <item>ALTER TABLE `?:users` ADD `chat_id` varchar(32) NOT NULL default ''</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP `chat_id`;</item>-->
+
+        <item>ALTER TABLE `?:users` ADD `tg_events_subscribed` varchar(1) NOT NULL default 'Y'</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP `tg_events_subscribed`</item>
+
+        <item editions="MULTIVENDOR">ALTER TABLE `?:companies` ADD `tg_enabled` varchar(1) NOT NULL default 'N'</item>
+        <item editions="MULTIVENDOR" for="uninstall">ALTER TABLE `?:companies` DROP `tg_enabled`</item>
+    </queries>
+</addon>

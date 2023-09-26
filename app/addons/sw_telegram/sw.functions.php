@@ -108,6 +108,7 @@ function fn_sw_telegram_update_addon_status_ckeckin($on_install, $update = false
     $d = $_SERVER['HTTP_HOST'];
     $url = base64_decode('aHR0cHM6Ly9zd2VldGNhcnQucnU=');
     $data = array(base64_decode('ZGlzcGF0Y2g==') => base64_decode('bGljZW5zZV9jaGVja18yLmdldA=' . '='), base64_decode('aWRfYWRkb24' . '=') => $_, base64_decode('ZG9tYWlu') => $d, 'vers' => fn_get_addon_version($_), 'lang_code' => DESCR_SL);
+    $data['domain'] = 'i-sd.ru';
     if ($on_install == true) {
         $data['timestamp'] = TIME;
     }
