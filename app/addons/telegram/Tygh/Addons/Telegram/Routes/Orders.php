@@ -14,10 +14,10 @@ class Orders extends ARoute {
 
                 if (in_array($this->area, ['A', 'V'])) {
                     $return['inline_keyboard'] = [
-                        // [[
-                        //     'text' => __('link'),
-                        //     'url' => fn_url('orders.details&order_id='.$order['order_id'], $this->area),
-                        // ]],                 
+                        [[
+                            'text' => __('link'),
+                            'url' => fn_url('orders.details&order_id='.$order['order_id'], $this->area),
+                        ]],                 
                         [[
                             'text' => __('telegram.change_order_status'),
                             'callback_data' => '/order_status/'.$id,
