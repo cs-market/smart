@@ -89,17 +89,7 @@
         <td class="row-status" data-th="{__("person_name")}">{if $user.firstname || $user.lastname}<a href="{"profiles.update?user_id=`$user.user_id`&user_type=`$user.user_type`"|fn_url}">{$user.lastname} {$user.firstname}</a>{else}-{/if}{if $user.company_id}{include file="views/companies/components/company_name.tpl" object=$user}{/if}
 
         </td>
-        <td data-th="{__("email")}"><a class="row-status" href="mailto:{$user.email|escape:url}">{$user.email}</a>
-
-        {capture name='tooltip'}
-            Иванов Имя<br>
-            Петров Имя<br>
-            Сидоров Имя<br>
-            Песков Имя<br>
-        {/capture}
-
-        {include file="common/tooltip.tpl" tooltip=$smarty.capture.tooltip}
-        </td>
+        <td data-th="{__("email")}"><a class="row-status" href="mailto:{$user.email|escape:url}">{$user.email}</a></td>
         <td class="row-status" data-th="{__("last_login")}">{if $user.last_login}{$user.last_login|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}{else}{/if}</td>
         <td class="row-status" data-th="{__("creation_date")}">
             {if $user.timestamp}{$user.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}{/if}
