@@ -31,9 +31,9 @@
 
     var $cartBtn = $('.ty-btn--recalculate-cart', $this.closest('form'));
 
-    if (!$cartBtn.length) {
-      $cartBtn = $('.ty-btn--recalculate-cart');
-    }
+//     if (!$cartBtn.length) {
+//        $cartBtn = $('.ty-btn--recalculate-cart');
+//     }
 
     $cartBtn.click();
   }

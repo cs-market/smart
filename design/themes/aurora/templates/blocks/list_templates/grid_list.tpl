@@ -1,8 +1,7 @@
 {if $products}
     {script src="js/tygh/exceptions.js"}
-    {if !($runtime.controller == 'checkout' && $runtime.mode == 'cart')}
-        {script src="js/addons/aurora/cart_content.js"}
-    {/if}
+    {script src="js/addons/aurora/cart_content.js"}
+
     {if !$no_pagination}
         {include file="common/pagination.tpl"}
     {/if}
@@ -110,7 +109,7 @@
                                                 {$smarty.capture.$qty nofilter}
                                             </div>
                                             {include file="buttons/update_cart.tpl"
-                                                 but_id="button_cart"
+                                                 but_id="button_cart_`$obj_id`"
                                                  but_meta="ty-btn--recalculate-cart hidden hidden-phone hidden-tablet"
                                                  but_name="dispatch[checkout.update_qty]"
                                             }
