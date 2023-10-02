@@ -1,6 +1,8 @@
 {if $products}
     {script src="js/tygh/exceptions.js"}
-    {script src="js/addons/aurora/cart_content.js"}
+    {if !($runtime.controller == 'checkout' && $runtime.mode == 'cart')}
+        {script src="js/addons/aurora/cart_content.js"}
+    {/if}
     {if !$no_pagination}
         {include file="common/pagination.tpl"}
     {/if}

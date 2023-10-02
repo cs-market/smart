@@ -5,31 +5,31 @@ use Tygh\Tools\DateTimeHelper;
 $schema['conditions']['progress_total_paid'] = array (
     'operators' => array ('gte', 'gt'),
     'type' => 'input',
-    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth'),
+    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth', '@cart'),
     'zones' => array('cart')
 );
 $schema['conditions']['progress_order_amount'] = array (
     'operators' => array ('gte', 'gt'),
     'type' => 'input',
-    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth'),
+    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth', '@cart'),
     'zones' => array('cart')
 );
 $schema['conditions']['progress_average_paid'] = array (
     'operators' => array ('gte', 'gt'),
     'type' => 'input',
-    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth'),
+    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth', '@cart'),
     'zones' => array('cart')
 );
 $schema['conditions']['progress_purchased_unique_sku'] = array (
     'operators' => array ('gte', 'gt'),
     'type' => 'input',
-    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth'),
+    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth', '@cart'),
     'zones' => array('cart')
 );
 $schema['conditions']['progress_purchased_total_amount'] = array (
     'operators' => array ('gte', 'gt'),
     'type' => 'input',
-    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth'),
+    'field_function' => array('fn_promotion_validate_promotion_progress', '#id', '#this', '@auth', '@cart'),
     'zones' => array('cart')
 );
 $schema['conditions']['progress_period'] = array (
