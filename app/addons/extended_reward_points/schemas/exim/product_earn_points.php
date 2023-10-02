@@ -17,8 +17,11 @@ $schema = array(
     'references' => array(
         'reward_points' => array(
             'reference_fields' => array('object_id' => '#key', 'object_type' => 'P', 'usergroup_id' => '$usergroup_id'),
-            'join_type' => 'INNER',
+            'join_type' => 'LEFT',
         ),
+    ),
+    'condition' => array(
+        'use_company_condition' => true,
     ),
     'options' => array(
         'remove_reward_points' => array(
@@ -65,6 +68,14 @@ $schema = array(
             'args' => array('$primary_object_id', '@remove_reward_points'),
             'import_only' => true,
         ),
+    ),
+);
+
+$schema['pre_export_process'] = array(
+    'set_zero_amount_condition' => array(
+        'function' => 'fn_extended_reward_points_exim_set_zero_amount_condition',
+        'args' => array('$conditions', '$joins'),
+        'export_only' => true,
     ),
 );
 

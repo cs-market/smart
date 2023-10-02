@@ -13,3 +13,8 @@ function fn_extended_reward_points_exim_cleanup_reward_points($object_id, $clean
         }
     }
 }
+
+function fn_extended_reward_points_exim_set_zero_amount_condition(&$conditions, &$joins) {
+    $conditions[] = db_quote('reward_points.amount != 0');
+    $joins = str_replace(' AND reward_points.usergroup_id = ', '', $joins);
+}
