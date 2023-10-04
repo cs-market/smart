@@ -1215,11 +1215,15 @@ function fn_promotion_post_processing($status_to, $status_from, $order_info, $fo
                                     }
                                 }
                                 if (!$is_ug_already_assigned) {
-                                    db_query("REPLACE INTO ?:usergroup_links SET user_id = ?i, usergroup_id = ?i, status = 'A'", $order_info['user_id'], $bonus['value']);
+                                    // [cs-market] add extra checks
+                                    fn_change_usergroup_status("A", $order_info['user_id'], $bonus['value']);
+                                    // db_query("REPLACE INTO ?:usergroup_links SET user_id = ?i, usergroup_id = ?i, status = 'A'", $order_info['user_id'], $bonus['value']);
                                     $activated = true;
                                 }
                             } else {
-                                db_query("UPDATE ?:usergroup_links SET status = 'F' WHERE user_id = ?i AND usergroup_id = ?i", $order_info['user_id'], $bonus['value']);
+                                // [cs-market] add extra checks
+                                fn_change_usergroup_status("F", $order_info['user_id'], $bonus['value']);
+                                // db_query("UPDATE ?:usergroup_links SET status = 'F' WHERE user_id = ?i AND usergroup_id = ?i", $order_info['user_id'], $bonus['value']);
                                 $activated = false;
                             }
 

@@ -7,6 +7,7 @@ use Tygh\Enum\UsergroupTypes;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\UserTypes;
+use Tygh\Enum\UsergroupStatuses;
 use Tygh\Navigation\LastView\Backend;
 
 defined('BOOTSTRAP') or die('Access denied');
@@ -505,5 +506,31 @@ function fn_maintenance_development_show_stub($placeholders, $append, &$content,
 function fn_maintenance_get_carts($type_restrictions, $params, $condition, &$join, $fields, $group) {
     if (fn_allowed_for('MULTIVENDOR') && $company_id = Registry::get('runtime.company_id')) {
         $join .= db_quote(' RIGHT JOIN ?:users AS u ON u.user_id = ?:user_session_products.user_id AND ?:user_session_products.user_type = ?s AND u.company_id = ?i', 'R', $company_id);
+    }
+}
+
+/**
+ * TODO
+ * 
+ * add to core function fn_change_usergroup_status after $is_available_status 
+ * fn_set_hook('change_usergroup_status_pre', $status, $user_id, $usergroup_id, $force_notification, $is_available_status);
+ * 
+ * replace in function fn_promotion_post_processing near $is_ug_already_assigned 
+ * db_query("REPLACE INTO ?:usergroup_links SET user_id = ?i, usergroup_id = ?i, status = 'A'", $order_info['user_id'], $bonus['value']);
+ * by
+ * fn_change_usergroup_status("A", $order_info['user_id'], $bonus['value']);
+ * and
+ * db_query("UPDATE ?:usergroup_links SET status = 'F' WHERE user_id = ?i AND usergroup_id = ?i", $order_info['user_id'], $bonus['value']);
+ * by
+ * fn_change_usergroup_status("F", $order_info['user_id'], $bonus['value']);
+ * 
+ */
+
+function fn_maintenance_change_usergroup_status_pre($status, &$user_id, $usergroup_id, $force_notification, &$is_available_status) {
+    $service_usergroups = Registry::get('addons.maintenance.service_usergroups');
+
+    if (!empty($service_usergroups) && array_key_exists($usergroup_id, $service_usergroups) && $status != UsergroupStatuses::ACTIVE) {
+        $is_available_status = false;
+        $user_id = false; // in order to fn_check_usergroup_available_for_user return false
     }
 }

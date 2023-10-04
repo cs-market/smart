@@ -20,5 +20,6 @@ fn_register_hooks(
     'save_log',
     'pre_get_orders',
     'development_show_stub',
-    'get_carts'
+    'get_carts',
+    'change_usergroup_status_pre'
 );

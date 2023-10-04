@@ -7,7 +7,7 @@ defined('BOOTSTRAP') or die('Access denied');
 function fn_maintenance_exim_set_usergroups($user_id, $data, $cleanup = true) {
 
     $service_usergroups = Registry::get('addons.maintenance.service_usergroups');
-    if ($service_usergroups) {
+    if (!empty($service_usergroups)) {
         $existed_service_usergroups = db_get_array("SELECT usergroup_id, status FROM ?:usergroup_links WHERE user_id = ?i AND usergroup_id IN (?a)", $user_id, array_keys($service_usergroups));
     }
 

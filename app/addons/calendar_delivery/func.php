@@ -597,7 +597,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                     $weekdays_availability = $group['shippings'][$chosen_shipping_id]['service_params']['weekdays_availability'];
                     $weekday = 1 << getdate($chosen_ts)['wday'];
                     if (!(bindec($weekdays_availability) & $weekday)) {
-                        $res = false;   
+                        $res = false;
                     }
                 } else {
                     $res = false;
