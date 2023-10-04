@@ -2973,6 +2973,9 @@ function fn_update_usergroup($usergroup_data, $usergroup_id = 0, $lang_code = DE
 function fn_change_usergroup_status($status, $user_id, $usergroup_id, $force_notification = array())
 {
     $is_available_status = $status === 'F';
+
+    fn_set_hook('change_usergroup_status_pre', $status, $user_id, $usergroup_id, $force_notification, $is_available_status);
+
     if (!$is_available_status && !fn_check_usergroup_available_for_user($user_id, $usergroup_id)) {
         return false;
     }

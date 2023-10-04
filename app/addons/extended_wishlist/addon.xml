@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>extended_wishlist</id>
+    <name>Расширенное избранное</name>
+    <description>Изменяет механики работы избранного</description>
+    <status>active</status>
+    <version>1.0.1</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <compatibility>
+        <dependencies>wishlist</dependencies>
+    </compatibility>
+    <settings>
+        <sections>
+            <section id="general">
+                <name>Главная</name>
+                <items>
+                    <item id="add_order_to_wl" edition_type="ULT:ROOT">
+                        <type>checkbox</type>
+                        <name>Добавлять товары заказа в избранное</name>
+                    </item>
+                    <item id="remove_wl_notifications">
+                        <type>checkbox</type>
+                        <name>Убрать уведомления о добавлении в избранное</name>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+    <language_variables>
+        <item lang="ru" id="extended_wishlist.extended_wishlist">Расширенное избранное</item>
+        <item lang="ru" id="extended_wishlist.add_order_to_wl">Добавлять товары заказа в избранное</item>
+    </language_variables>
+    <queries>
+        <item editions="MULTIVENDOR">ALTER TABLE `?:companies` ADD `add_order_to_wl` VARCHAR(1) NOT NULL DEFAULT 'Y';</item>
+        <item editions="MULTIVENDOR" for="uninstall">ALTER TABLE `?:companies` DROP `add_order_to_wl`;</item>
+    </queries>
+</addon>
