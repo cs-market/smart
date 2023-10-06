@@ -83,12 +83,18 @@ function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_produ
             }
             unset($product);
 
-            $max_products_discount = round($cart['subtotal'] - $min_subtotal);
+            $max_products_discount = max(round($cart['subtotal'] - $min_subtotal), 0);
 
             $cart['points_info']['max_reward_points'] = min($max_rp, $max_products_discount);
             if (isset($cart['points_info']['in_use']['points']) && $cart['points_info']['in_use']['points'] > $cart['points_info']['max_reward_points']) {
-                $cart['points_info']['in_use']['points'] = $cart['points_info']['max_reward_points'];
-                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('extended_reward_points.points_amount_reduced'));
+                if ($cart['points_info']['max_reward_points']) {
+                    $coeff = $cart['points_info']['in_use']['cost'] / $cart['points_info']['in_use']['points'];
+                    $cart['points_info']['in_use']['points'] = $cart['points_info']['max_reward_points'];
+                    $cart['points_info']['in_use']['cost'] = $cart['points_info']['in_use']['points'] * $coeff;
+                    if (empty($cart['parent_order_id'])) fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('extended_reward_points.points_amount_reduced'));
+                } else {
+                    unset($cart['points_info']['in_use']);
+                }
             }
         }
     }
