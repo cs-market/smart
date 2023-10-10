@@ -16,6 +16,9 @@ $schema['extra_user_data'] = array (
     'cache' => array(
         'update_handlers' => array(
             'user_data'
+        ),
+        'auth_handlers' => array(
+            'user_id'
         )
     ),
 );
