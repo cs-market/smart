@@ -100,13 +100,13 @@ class Orders extends ARoute {
         $info['end_customer'] = '';
 
         // products table
-        $info['ordered_products'] = '<b>' . __('ordered_products') . '</b>';
-        foreach($order['products'] as $id => $product) {
-            $info["ordered_products_name.$id"] = $product['product'];
-            $info["ordered_products_code.$id"] = __('product_code') . ': ' . $product['product_code'];
-            $info["ordered_products_data.$id"] = __('amount') . ': ' . $product['amount'] . ' * ' . $formatter->asPrice($product['price']);
-            $info["ordered_products_nl.$id"] = '';
-        }
+        // $info['ordered_products'] = '<b>' . __('ordered_products') . '</b>';
+        // foreach($order['products'] as $id => $product) {
+        //     $info["ordered_products_name.$id"] = $product['product'];
+        //     $info["ordered_products_code.$id"] = __('product_code') . ': ' . $product['product_code'];
+        //     $info["ordered_products_data.$id"] = __('amount') . ': ' . $product['amount'] . ' * ' . $formatter->asPrice($product['price']);
+        //     $info["ordered_products_nl.$id"] = '';
+        // }
 
         return str_replace('&nbsp;', ' ', implode($nl, $info));
     }

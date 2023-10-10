@@ -1086,7 +1086,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                         }
                     }
 
-                    // может это уже не надо если есть customer_auth ?
+                    // может это уже не надо если есть customer_auth ? НЕТ, в getShippingsList используется сессия 
                     $backup_auth = Tygh::$app['session']['auth'];
                     Tygh::$app['session']['customer_auth'] = Tygh::$app['session']['auth'] = $customer_auth;
                     $customer_auth['area'] = 'A';
