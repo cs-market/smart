@@ -12,7 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-namespace Tygh\Api\Entities;
+namespace Tygh\Api\Entities\v40;
 
 use Tygh\Api\Entities\v40\SraCartContent;
 use Tygh\Api\Response;
