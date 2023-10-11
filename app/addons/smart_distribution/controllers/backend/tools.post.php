@@ -3625,19 +3625,70 @@ fn_print_die($orders_wo_points);
 
     fn_print_die('done');
 } elseif ($mode == 'change_balt_order_statuses') {
+    // сначала убери в reward_points/func.php text_order_status_has_not_been_changed
+    if (!$action) $action = 1;
+    $safe_update_status_data = function($params) {
+        $status_data = fn_get_status_data($params['status'], 'O');
+        $old_status_id = $status_data['status_id'];
+        if ($temp_id = fn_get_status_id($params['temp_status'], 'O')) {
+            $status_data['status_id'] = $temp_id;
+        } else {
+            unset($status_data['status_id']);
+        }
 
-    list($orders, ) = fn_get_orders([
-        'time_to' => '13/08/2023',
-        'time_from' => '14/07/2023',
-        'period' => 'C',
-        'company_id' => 45,
-        'status' => array('L')
-    ]);
+        $status_data['status'] = $params['temp_status'];
+        $status_data['description'] .= ' временный';
 
-    foreach ($orders as $order) {
-        fn_change_order_status($order['order_id'], 'H');
+        $temp_status = fn_update_status((empty($status_data['status_id']) ? null : 'S'), $status_data, 'O');
+
+        list($orders, ) = fn_get_orders([
+            'time_from' => $params['time_from'],
+            'time_to' => $params['time_to'],
+            'period' => 'C',
+            'company_id' => $params['company_id'],
+            'status' => array($params['status'])
+        ]);
+
+        $orders = array_column($orders, 'order_id');
+
+        if (in_array('inventory', array_keys($params['update_data']))) {
+            // wasted points
+            $orders = db_get_fields('SELECT order_id FROM ?:order_data WHERE type = ?s AND order_id IN (?a)', 'I', $orders);
+        } elseif (in_array('grant_reward_points', array_keys($params['update_data']))) {
+            // earned points
+            fn_print_die('grant_reward_points grant_reward_points');
+        }
+
+        foreach ($orders as $order_id) {
+            fn_change_order_status($order_id, $temp_status, '', false);
+        }
+
+        foreach ($params['update_data'] as $param => $value) {
+            db_query('UPDATE ?:status_data SET value = ?s WHERE status_id = ?i AND param = ?s', $value, $old_status_id, $param);
+        }
+
+        foreach ($orders as $order_id) {
+            fn_change_order_status($order_id, $params['status'], '', false);
+        }
+    };
+
+    // stage 1
+    if ($action == 1) {
+        list($orders, ) = fn_get_orders([
+            'time_from' => '14/07/2023',
+            'time_to' => '17/09/2023',
+            'period' => 'C',
+            'company_id' => 45,
+            'status' => array('L')
+        ]);
+
+        // foreach ($orders as $order) {
+        //     fn_change_order_status($order['order_id'], 'H');
+        // }
+        db_query('UPDATE ?:orders SET status = ?s WHERE order_id IN (?a)', 'H', array_column($orders, 'order_id'));
+
+        fn_print_die('done stage 1');
     }
-    fn_print_die('done');
 } elseif ($mode == 'correct_reward_points_august1') {
     $add_field = db_quote(", DATE_FORMAT(FROM_UNIXTIME(timestamp), '%m') as `interval`, timestamp");
     $group_condition = ' GROUP BY `interval`';
