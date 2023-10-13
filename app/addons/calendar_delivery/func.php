@@ -644,7 +644,7 @@ function fn_calendar_delivery_get_shipping_params() {
     $shippings = array_filter($shippings, function ($v) {return $v['module'] == 'calendar_delivery';});
 
     if ($shippings) {
-        $product_groups = [['shippings' => &$shippings, 'company_id' => Tygh::$app['session']['auth']['company_id']]];
+        $product_groups = [['shippings' => &$shippings, 'company_id' => Tygh::$app['session']['auth']['company_id'], 'storage_id' => Registry::get('runtime.current_storage.storage_id')]];
 
         fn_calendar_delivery_calculate_cart_taxes_pre([], [], $product_groups, false, Tygh::$app['session']['auth']);
         $shipping = reset($shippings);
