@@ -5,6 +5,7 @@ use Tygh\Languages\Values;
 use Tygh\Registry;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\SiteArea;
+use Tygh\Shippings\Shippings;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -636,4 +637,33 @@ function fn_calendar_delivery_delete_storages($storage_ids) {
 
 function fn_calendar_delivery_post_delete_user($user_id, $user_data, $result) {
     if ($result) db_query("DELETE FROM ?:user_storages WHERE user_id = ?i", $user_id);
+}
+
+function fn_calendar_delivery_get_shipping_params() {
+    $shippings = Shippings::getShippingsList([], DESCR_SL, AREA, ['get_images' => true]);
+    $shippings = array_filter($shippings, function ($v) {return $v['module'] == 'calendar_delivery';});
+
+    if ($shippings) {
+        $product_groups = [['shippings' => &$shippings, 'company_id' => Tygh::$app['session']['auth']['company_id']]];
+
+        fn_calendar_delivery_calculate_cart_taxes_pre([], [], $product_groups, false, Tygh::$app['session']['auth']);
+        $shipping = reset($shippings);
+
+        if ($shipping['service_params']['nearest_delivery_day'] == 0) {
+            $shipping['service_params']['nearest_delivery_day_text'] = __('today');
+        } elseif ($shipping['service_params']['nearest_delivery_day'] == 1) {
+            $shipping['service_params']['nearest_delivery_day_text'] = __('tomorrow');
+        } elseif ($shipping['service_params']['nearest_delivery_day'] == 2) {
+            $shipping['service_params']['nearest_delivery_day_text'] = __('day_after_tomorow');
+        } else {
+            $days = array(
+                'Воскресенье', 'Понедельник', 'Вторник', 'Среда',
+                'Четверг', 'Пятница', 'Суббота'
+            );
+            $ts = strtotime("+".$shipping['service_params']['nearest_delivery_day']." days");
+            $shipping['service_params']['nearest_delivery_day_text'] = $days[(date('w', $ts))];
+        }
+
+        return $shipping;
+    }
 }
