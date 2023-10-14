@@ -654,7 +654,7 @@ function fn_calendar_delivery_get_shipping_params() {
         } elseif ($shipping['service_params']['nearest_delivery_day'] == 1) {
             $shipping['service_params']['nearest_delivery_day_text'] = __('tomorrow');
         } elseif ($shipping['service_params']['nearest_delivery_day'] == 2) {
-            $shipping['service_params']['nearest_delivery_day_text'] = __('day_after_tomorow');
+            $shipping['service_params']['nearest_delivery_day_text'] = __('day_after_tomorrow');
         } else {
             $days = array(
                 'Воскресенье', 'Понедельник', 'Вторник', 'Среда',
