@@ -38,7 +38,7 @@ class SraWishList extends BaseSraWishList
                 $product = fn_get_product_data($product['product_id'], $this->auth, CART_LANGUAGE, '', true, true, true, false, false, true, false, true);
                 foreach ($fields as $field) {
                     if (isset($product[$field])) {
-                        $product[$field] = (float) ($product[$field]);
+                        $product[$field] = fn_format_price($product[$field], CART_PRIMARY_CURRENCY, null, false);
                     }
                 }
             }
