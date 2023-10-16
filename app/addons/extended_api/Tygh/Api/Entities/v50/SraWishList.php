@@ -21,8 +21,26 @@ class SraWishList extends BaseSraWishList
             $response['data'] = array(
                 'products' => $response['data']['products'],
             );
+
+            $fields = array(
+                'list_price',
+                'price',
+                'base_price',
+                'original_price',
+                'display_price',
+                'discount',
+                'subtotal',
+                'display_subtotal',
+                'taxed_price',
+                'clean_price'
+            );
             foreach($response['data']['products'] as &$product) {
                 $product = fn_get_product_data($product['product_id'], $this->auth, CART_LANGUAGE, '', true, true, true, false, false, true, false, true);
+                foreach ($fields as $field) {
+                    if (isset($product[$field])) {
+                        $product[$field] = (float) ($product[$field]);
+                    }
+                }
             }
         }
 
