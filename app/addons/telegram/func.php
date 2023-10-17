@@ -43,7 +43,7 @@ function fn_telegram_api_check_access($api, $entity, $method_name, &$can_access)
 }
 
 function fn_telegram_place_order_post($cart, $auth, $action, $issuer_id, $parent_order_id, $order_id, $order_status, $short_order_data, $notification_rules) {
-    if ($parent_order_id) return;
+    if (count($cart['product_groups']) > 1) return;
 
     $order = fn_get_order_info($order_id);
 
