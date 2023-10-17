@@ -405,7 +405,7 @@ function fn_monolith_update_product_post(&$product_data, $product_id, $lang_code
 
 function fn_monolith_get_products($params, $fields, $sortings, &$condition, $join, $sorting, $group_by, $lang_code, $having) {
     if (SiteArea::isStorefront(AREA) && in_array('prices', $params['extend'])) {
-        $condition .= db_quote('AND IF (products.company_id = 45, prices.price IS NOT NULL, 1)');
+        $condition .= db_quote(' AND IF (products.company_id = 45, prices.price IS NOT NULL, 1)');
     }
 }
 

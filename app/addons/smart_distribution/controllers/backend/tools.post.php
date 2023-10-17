@@ -4135,6 +4135,102 @@ fn_print_die($orders_wo_points);
     }
 
     fn_print_die('Текущая корректировка', $add_points, 'Заказы вне статуса:', $out_of_status);
+} elseif ($mode == 'correct_reward_points_october') {
+    $promotions[1810][8] = [36335, 36334, 36333, 36332, 36331];
+    $promotions[1810][9] = [39994, 39993, 39992, 39991, 39990];
+    $promotions[1810][10] = [43350, 43349, 43348, 43347, 43346];
+
+    $promotions[2058][8] = [36340, 36339, 36338, 36337, 36336];
+    $promotions[2058][9] = [39999, 39998, 39997, 39996, 39995];
+    $promotions[2058][10] = [43355, 43354, 43353, 43352, 43351];
+
+    foreach ($promotions as $company_id => &$company_promotions) {
+        foreach ($company_promotions as &$ps) {
+            foreach ($ps as &$p) {
+                $p = fn_get_promotion_data($p);
+            }
+        }
+    }
+
+    $months = ['08','09','10'];
+    //432165
+    //$months = ['09'];
+
+    foreach ($months as $month) {
+        $add_points = [];
+        $next_month = $month+1;
+        $time_condition = db_quote(" timestamp BETWEEN ?i AND ?i", fn_parse_date('01/' . $month . '/2023'), fn_parse_date('01/' . $next_month . '/2023')-1);
+        $orders = db_get_fields("SELECT order_id FROM ?:orders WHERE company_id IN (?a) AND $time_condition AND is_parent_order = ?s AND group_id NOT IN (?a)", [1810, 2058], 'N', [17,18]);
+
+        foreach ($orders as $order_id) {
+            if ($order_id == 455927) continue;
+            $order_info = fn_get_order_info($order_id);
+            if ($order_info['status'] == 'H') {
+                if($order_info['points_info']['reward']) continue;
+
+                $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s', $order_info['user_id'], CHANGE_DUE_ORDER);
+
+                $is_corrected = false;
+                $is_once_granted = false;
+                $is_group_order = false;
+                foreach ($reward_point_changes as $change) {
+                    $details = unserialize($change['reason']);
+                    if (!empty($details['order_id']) && $details['order_id'] == $order_info['order_id']) {
+                        $is_once_granted = true;
+                    }
+                    if (!empty($details['order_id']) && $details['order_id'] == $order_info['order_id'] && strpos($details['correction'], 'correct_reward_points_') !== false) {
+                        $is_corrected = true;
+                        break;
+                    }
+                }
+                if ($is_corrected) continue;
+
+                // $product_ids = array_column($order_info['products'], 'product_id');
+                // $group_ids = db_get_fields('SELECT group_id FROM ?:products WHERE product_id IN (?a)', $product_ids);
+                // if (array_sum($group_ids)) continue;
+
+                $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $order_info['user_id']);
+                $customer_auth = fn_fill_auth($_data, array(), false, 'C');
+                foreach ($promotions[$order_info['company_id']][(int) $month] as $promotion) {
+                    $res = fn_check_promotion_conditions($promotion, $order_info, $customer_auth, $order_info['products']);
+                    $points = round($order_info['total']*$percent/100);
+                    if ($res) {
+                        $percent = reset($promotion['bonuses'])['value'];
+                        $points = round($order_info['total']*$percent/100);
+                        if (empty($points)) break;
+                        $add_points[] = [
+                            'user_id' => $order_info['user_id'],
+                            'company_id' => $order_info['company_id'],
+                            'order_id' => $order_info['order_id'],
+                            'status' => $order_info['status'],
+                            'order_total' => $order_info['total'],
+                            'percent' => $percent,
+                            'points' => $points,
+                            'timestamp' => $order_info['timestamp'],
+                            'is_once_granted' => $is_once_granted,
+                            'is_group_order' => $is_group_order,
+                        ];
+                        break;
+                    }
+                }
+            } else {
+                $out_of_status[] = $order_info['order_id'];
+            }
+        }
+
+        foreach ($add_points as $add) {
+            $reason = array('order_id' => $add['order_id'], 'to' => $add['status'], 'correction' => 'correct_reward_points_october');
+            fn_change_user_points($add['points'], $add['user_id'], serialize($reason), CHANGE_DUE_ORDER, $add['timestamp']);
+        }
+
+        fn_print_r('Текущая корректировка ' . $month, $add_points, 'Заказы вне статуса:', $out_of_status);
+
+        // $params['filename'] = "points_to_correct_$month.csv";
+        // $params['force_header'] = true;
+        // $export = fn_exim_put_csv($add_points, $params, '"');
+    }
+
+    fn_print_die('done. Out of status:', $out_of_status);
 }
 
 function fn_revert_reward_points_change($change, $from_order = false) {
