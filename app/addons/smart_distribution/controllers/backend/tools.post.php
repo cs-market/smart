@@ -4223,7 +4223,7 @@ fn_print_die($orders_wo_points);
             fn_change_user_points($add['points'], $add['user_id'], serialize($reason), CHANGE_DUE_ORDER, $add['timestamp']);
         }
 
-        fn_print_r('Текущая корректировка ' . $month, $add_points, 'Заказы вне статуса:', $out_of_status);
+        fn_print_r('Текущая корректировка ' . $month, $add_points);
 
         // $params['filename'] = "points_to_correct_$month.csv";
         // $params['force_header'] = true;
