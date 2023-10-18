@@ -2,15 +2,14 @@
 
 use Tygh\Registry;
 use Tygh\Settings;
-use Tygh\Enum\SiteArea;
 use Tygh\Enum\UsergroupTypes;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\ObjectStatuses;
-use Tygh\Enum\UserTypes;
-use Tygh\Enum\UsergroupStatuses;
 use Tygh\Navigation\LastView\Backend;
 
 defined('BOOTSTRAP') or die('Access denied');
+
+include_once(__DIR__ . '/hooks.php');
 
 function fn_maintenance_install()
 {
@@ -42,141 +41,6 @@ function fn_settings_variants_addons_maintenance_service_usergroups() {
 }
 /* /ADDON SETTINGS */
 
-/* HOOKS */
-function fn_maintenance_pre_add_to_cart($product_data, &$cart, $auth, $update) {
-    $cart['skip_notification'] = true;
-}
-
-function fn_maintenance_update_storage_usergroups_pre(&$storage_data) {
-    $storage_data['usergroup_ids'] = fn_maintenance_get_usergroup_ids($storage_data['usergroup_ids']);
-}
-
-function fn_maintenance_update_product_prices($product_id, &$_product_data, $company_id, $skip_price_delete, $table_name, $condition) {
-    foreach ($_product_data['prices'] as &$v) {
-        $v['product_id'] = $product_id;
-        $v['lower_limit'] = $v['lower_limit'] ?? 1;
-        if (isset($v['usergroup_id']) && !is_numeric($v['usergroup_id'])) {
-            list($v['usergroup_id']) = fn_maintenance_get_usergroup_ids($v['usergroup_id']);
-        }
-    }
-}
-
-function fn_maintenance_update_product_pre(&$product_data) {
-    if (isset($product_data['usergroup_ids']) && !empty($product_data['usergroup_ids'])) {
-        $product_data['usergroup_ids'] = fn_maintenance_get_usergroup_ids($product_data['usergroup_ids']);
-    }
-}
-
-function fn_maintenance_update_profile($action, $user_data, $current_user_data) {
-    if ((($action == 'add' && SiteArea::isStorefront(AREA)) || defined('API')) && !empty($user_data['usergroup_ids'])) {
-        $user_data['usergroup_ids'] = fn_maintenance_get_usergroup_ids($user_data['usergroup_ids']);
-        db_query('DELETE FROM ?:usergroup_links WHERE user_id = ?i', $user_data['user_id']);
-        foreach ($user_data['usergroup_ids'] as $ug_id) {
-            fn_change_usergroup_status(ObjectStatuses::ACTIVE, $user_data['user_id'], $ug_id);
-        }
-    }
-}
-
-function fn_maintenance_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
-    if (defined('ORDER_MANAGEMENT') && !empty($params['promotion_id'])) {
-        return;
-    }
-    if (!empty($params['fields'])) {
-        if (!is_array($params['fields'])) {
-            $params['fields'] = explode(',', $params['fields']);
-        }
-        $fields = $params['fields'];
-    }
-    if (!empty($params['exclude_promotion_ids'])) {
-        if (!is_array($params['exclude_promotion_ids'])) $params['exclude_promotion_ids'] = [$params['exclude_promotion_ids']];
-        $condition .= db_quote(' AND ?:promotions.promotion_id NOT IN (?a)', $params['exclude_promotion_ids']);
-    }
-}
-
-function fn_maintenance_dispatch_assign_template($controller, $mode, $area, &$controllers_cascade) {
-    $root_dir = Registry::get('config.dir.root') . '/app';
-    $addon_dir = Registry::get('config.dir.addons');
-    $addons = (array) Registry::get('addons');
-    $area_name = fn_get_area_name($area);
-    foreach ($controllers_cascade as &$ctrl) {
-        $path = str_replace([$root_dir, '/controllers'], ['', ''], $ctrl);
-        foreach ($addons as $addon_name => $data) {
-            if ($data['status'] == 'A') {
-                $dir = $addon_dir . $addon_name . '/controllers/overrides';
-                if (is_readable($dir . $path)) {
-                    $ctrl = $dir . $path;
-                }
-            }
-        }
-    }
-    unset($crtl);
-}
-
-function fn_maintenance_check_permission_manage_profiles(&$result, $user_type) {
-    $can_manage_profiles = true;
-
-    if (Registry::get('runtime.company_id')) {
-        $can_manage_profiles = (in_array($user_type, [UserTypes::CUSTOMER, UserTypes::VENDOR])) && Registry::get('runtime.company_id');
-    }
-
-    $result = $can_manage_profiles;
-}
-
-function fn_maintenance_check_rights_delete_user($user_data, $auth, &$result) {
-    $result = true;
-
-    if (
-        ($user_data['is_root'] == 'Y' && !$user_data['company_id']) // root admin
-        || (!empty($auth['user_id']) && $auth['user_id'] == $user_data['user_id']) // trying to delete himself
-        || (Registry::get('runtime.company_id') && $user_data['is_root'] == 'Y') // vendor root admin
-        || (Registry::get('runtime.company_id') && fn_allowed_for('ULTIMATE') && $user_data['company_id'] != Registry::get('runtime.company_id')) // user from other store
-    ) {
-        $result = false;
-    }
-}
-
-function fn_maintenance_get_users($params, $fields, $sortings, &$condition, $join, $auth) {
-    if ((!isset($params['user_type']) || UserTypes::isAdmin($params['user_type'])) && fn_is_restricted_admin(['user_type' => $auth['user_type']])) {
-        $condition['wo_root_admins'] .= db_quote(' AND is_root != ?s ', YesNo::YES);
-    }
-}
-
-function fn_maintenance_mailer_create_message_before($_this, &$message, $area, $lang_code, $transport, $builder) {
-    // DO NOT TRY TO SEND EMAILS TO @example.com
-    if (!empty($message['to'])) {
-        if (is_array($message['to'])) {
-            $message['to'] = array_filter($message['to'], function($v) {
-                return strpos($v, '@example.com') === false;
-            });
-        } elseif (is_string($message['to'])) {
-            $message['to'] = (strpos($v, '@example.com') === false) ? $message['to'] : '';
-        }
-    }
-}
-
-function fn_maintenance_get_user_short_info_pre($user_id, $fields, &$condition, $join, $group_by) {
-    $condition = str_replace("AND status = 'A'", ' ', $condition);
-}
-
-function fn_maintenance_save_log($type, $action, $data, $user_id, &$content, $event_type, $object_primary_keys) {
-    if ($type == 'general' && $action == 'debug') {
-        foreach ($data as $key => $value) {
-            if ($key == 'backtrace') continue;
-            if (is_array($value)) {
-                $content[$key] = serialize($value);
-            } else {
-                $content[$key] = $value;
-            }
-        }
-        $content = array_filter($content);
-    }
-}
-
-function fn_maintenance_pre_get_orders($params, &$fields, $sortings, $get_totals, $lang_code) {
-    $fields[] = 'tracking_link';
-}
-
-/* END HOOKS */
 
 function fn_debug_log_event($data) {
     $data['backtrace'] = debug_backtrace();
@@ -314,8 +178,7 @@ function fn_delete_notification_by_message($message) {
     }
 }
 
-function fn_init_addon_override_controllers($controller, $area = AREA)
-{
+function fn_init_addon_override_controllers($controller, $area = AREA) {
     $controllers = array();
     static $addons = array();
 
@@ -485,52 +348,4 @@ function fn_exim_get_last_view_users_count()
     }
 
     return $last_view_results['total_items'];
-}
-
-function fn_maintenance_get_payments_pre(&$params) {
-    if (defined('ORDER_MANAGEMENT')) {
-        $params['status'] = 'A';
-    }
-}
-
-function fn_maintenance_shippings_get_shippings_list_conditions($group, $shippings, $fields, $join, &$condition, $order_by) {
-    if (defined('ORDER_MANAGEMENT')) {
-        $condition .= " AND (" . fn_find_array_in_set(\Tygh::$app['session']['customer_auth']['usergroup_ids'], '?:shippings.usergroup_ids', true) . ")";
-    }
-}
-
-function fn_maintenance_development_show_stub($placeholders, $append, &$content, $is_error) {
-    $content = '<img style="margin: 40px auto; display: block;" src="design/themes/responsive/media/images/addons/maintenance/stub.jpg">';
-}
-
-function fn_maintenance_get_carts($type_restrictions, $params, $condition, &$join, $fields, $group) {
-    if (fn_allowed_for('MULTIVENDOR') && $company_id = Registry::get('runtime.company_id')) {
-        $join .= db_quote(' RIGHT JOIN ?:users AS u ON u.user_id = ?:user_session_products.user_id AND ?:user_session_products.user_type = ?s AND u.company_id = ?i', 'R', $company_id);
-    }
-}
-
-/**
- * TODO
- * 
- * add to core function fn_change_usergroup_status after $is_available_status 
- * fn_set_hook('change_usergroup_status_pre', $status, $user_id, $usergroup_id, $force_notification, $is_available_status);
- * 
- * replace in function fn_promotion_post_processing near $is_ug_already_assigned 
- * db_query("REPLACE INTO ?:usergroup_links SET user_id = ?i, usergroup_id = ?i, status = 'A'", $order_info['user_id'], $bonus['value']);
- * by
- * fn_change_usergroup_status("A", $order_info['user_id'], $bonus['value']);
- * and
- * db_query("UPDATE ?:usergroup_links SET status = 'F' WHERE user_id = ?i AND usergroup_id = ?i", $order_info['user_id'], $bonus['value']);
- * by
- * fn_change_usergroup_status("F", $order_info['user_id'], $bonus['value']);
- * 
- */
-
-function fn_maintenance_change_usergroup_status_pre($status, &$user_id, $usergroup_id, $force_notification, &$is_available_status) {
-    $service_usergroups = Registry::get('addons.maintenance.service_usergroups');
-
-    if (!empty($service_usergroups) && array_key_exists($usergroup_id, $service_usergroups) && $status != UsergroupStatuses::ACTIVE) {
-        $is_available_status = false;
-        $user_id = false; // in order to fn_check_usergroup_available_for_user return false
-    }
 }

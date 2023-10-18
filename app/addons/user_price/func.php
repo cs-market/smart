@@ -25,7 +25,7 @@ function fn_user_price_get_products($params, &$fields, $sortings, &$condition, &
 
         // handle with fn_ult_get_products
         if (in_array('prices', $params['extend']) && !empty($auth['user_id']) && isset($fields['price'])) {
-            $extra_join = db_quote(' LEFT JOIN ?:user_price AS up ON up.product_id = products.product_id AND up.user_id = ?i', $auth['user_id']);
+            $extra_join = db_quote(' LEFT JOIN ?:user_price AS up ON up.product_id = products.product_id AND up.user_id = ?i ', $auth['user_id']);
             
             $regular_price_field = str_replace(' as price', '', $fields['price']);
 

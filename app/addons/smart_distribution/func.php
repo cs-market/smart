@@ -686,6 +686,7 @@ function fn_smart_distribution_get_products_pre(&$params, $items_per_page, $lang
     if (isset($params['pfull']) && YesNo::toBool($params['pfull'])) unset($params['pfull']);
 
     if (SiteArea::isStorefront(AREA)) {
+        // hide lost products
         $params['exclude_cid'] = 1056;
     }
 
@@ -696,53 +697,11 @@ function fn_smart_distribution_get_products_pre(&$params, $items_per_page, $lang
 }
 
 function fn_smart_distribution_get_products(&$params, &$fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
-    // fix product variations: free space should be into condition
-    if (strpos($condition, 'AND 1 != 1')) {
-        $condition = str_replace('AND 1 != 1', ' AND 1 != 1', $condition);
-    }
-
-    if (SiteArea::isAdmin(AREA)) {
-        $fields['timestamp'] = "products.timestamp";
-        if (isset($params['product_code']) && !empty($params['product_code'])) {
-            $condition .= db_quote(" AND products.product_code LIKE ?l", trim($params['product_code']));
-        }
-    }
-
-    if (SiteArea::isStorefront(AREA)) {
-        // do not show products for unlogged users
-        $condition .= db_quote(' AND products.usergroup_ids != ?s', '');
-
-        //for sorting by price
-        $auth = Tygh::$app['session']['auth'];
-
-        $remove_join = " LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1";
-        $add_join = db_quote(" LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1 AND usergroup_id IN (?a)",  array_filter($auth['usergroup_ids']));
-        $join = str_replace($remove_join, $add_join, $join);
-
-        $regular_price_field = str_replace(' as price', '', $fields['price']);
-        if (!empty($regular_price_field)) {
-            $join .= 'LEFT JOIN ?:product_prices as reg_prices ON reg_prices.product_id = products.product_id AND reg_prices.lower_limit = 1 AND reg_prices.usergroup_id = 0';
-            $fields['price'] = db_quote(
-                'IF('.$regular_price_field.' IS NOT NULL, '.$regular_price_field .', reg_prices.price) as price'
-            );
-        }
-
-        $remove_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
-        //need to move to join
-        //$add_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
-        $condition = str_replace($remove_condition, ''/*$add_condition*/, $condition);
-    }
-
     if (!empty($params['current_cart_products']) && $params['user_id']) {
         $params['current_cart_products'] = array_column($params['current_cart_products']['products'], 'product_id');
 
         $products = db_get_array('SELECT ?:order_details.product_id, SUM(?:order_details.amount) AS amnt FROM ?:order_details LEFT JOIN ?:orders ON ?:order_details.order_id = ?:orders.order_id WHERE ?:orders.user_id = ?i AND ?:order_details.product_id NOT IN (?a) GROUP BY ?:order_details.product_id ORDER BY SUM(?:order_details.amount) DESC', $params['user_id'], $params['current_cart_products']);
         $condition .= db_quote(' AND products.product_id IN (?a)', !empty($products) ? array_column($products, 'product_id') : []);
-    }
-
-    if (!empty($params['exclude_cid'])) {
-        if (!is_array($params['exclude_cid'])) $params['exclude_cid'] = explode(',', $params['exclude_cid']);
-        $condition .= db_quote(" AND ?:categories.category_id NOT IN (?n)", $params['exclude_cid']);
     }
 }
 
