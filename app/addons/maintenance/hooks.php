@@ -5,6 +5,8 @@ use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
 use Tygh\Enum\UsergroupStatuses;
 use Tygh\Enum\ProductFilterProductFieldTypes;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\YesNo;
 
 defined('BOOTSTRAP') or die('Access denied');
 
