@@ -59,8 +59,8 @@ if ($mode == 'base_price' && $action) {
     $unexist_products = array_diff($sku, $products);
     fn_print_die($sku, $products, $unexist_products, count($unexist_products), count($products));
     //fn_print_die('here');
-} elseif ($mode == 'delete_pinta') {
-    $pids = db_get_fields("SELECT product_id FROM ?:products WHERE 1 AND company_id in (?a)", array('41', '46'));
+} elseif ($mode == 'delete_znatok') {
+    $pids = db_get_fields("SELECT product_id FROM ?:products WHERE 1 AND company_id in (?a)", array('2192'));
     $counter = 0;
     foreach ($pids as $pid) {
         if (fn_delete_product($pid)) {
