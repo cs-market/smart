@@ -327,7 +327,7 @@ function fn_storages_get_products(array &$params, array &$fields, array &$sortin
         $condition = str_replace($old_condition, $new_condition, $condition );
     } elseif (!empty(Registry::get('runtime.storages'))) {
         // if we have not selected storage we cannot buy
-        $condition .= db_quote('AND 0');
+        $condition .= db_quote(' AND 0 ');
     }
 }
 

@@ -98,7 +98,7 @@ function fn_managers_get_orders($params, $fields, $sortings, &$condition, &$join
         if ($users) {
             $condition .= db_quote(' AND ?:orders.user_id IN (?a)', array_column($users, 'user_id'));
         } else {
-            $condition .= db_quote(' AND 0');
+            $condition .= db_quote(' AND 0 ');
         }
     }
 }
