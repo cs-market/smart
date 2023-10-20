@@ -87,7 +87,8 @@ function fn_maintenance_get_usergroup_ids($data, $without_status = true) {
     $set_delimiter = ',';
     $return = [];
     static $usergroup_cache = [];
-    $_cache_key = md5($data);
+    $_cache_str = is_array($data) ? serialize($data) : $data;
+    $_cache_key = md5($_cache_str);
     if (empty($usergroup_cache[$_cache_key])) {
         if (is_array($data)) {
             $usergroups = $data;

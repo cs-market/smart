@@ -7,7 +7,7 @@ defined('BOOTSTRAP') or die('Access denied');
 
 function fn_telegram_api_get_user_data_pre($api, &$user_data) {
     $data = $api->getRequest()->getData();
-    $chat_id = isset($data['callback_query']['message']['chat']['id']) ? $data['callback_query']['message']['chat']['id'] : $data['message']['chat']['id'];
+    $chat_id = $data['callback_query']['message']['chat']['id'] ?? $data['message']['chat']['id'] ?? false;
 
     if (!empty($chat_id)) {
         // is root admins

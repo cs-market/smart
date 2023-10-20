@@ -344,6 +344,7 @@ function fn_category_promotion_pre_add_to_cart(&$product_data, $cart, $auth, $up
 }
 
 function fn_category_promotion_apply_cart_rule($bonus, &$cart, &$auth, &$cart_products) {
+    if (fn_cart_is_empty($cart)) return;
     if (in_array($bonus['bonus'], ['discount_on_products_from_conditions', 'static_discount_on_products_from_conditions'])) {
         static $promotions = [];
 

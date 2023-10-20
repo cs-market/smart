@@ -99,29 +99,31 @@ function fn_get_progress_promotions($cart) {
 
         list($promotions) = fn_get_promotions(['progressed_promotions' => true, 'active' => true, 'sort_by' => 'stop_other_rules_and_priority']);
 
-        foreach($promotions as $key => &$promotion) {
-            $promotion['conditions'] = unserialize($promotion['conditions']);
-            foreach (['progress_total_paid', 'progress_order_amount', 'progress_average_paid', 'progress_purchased_unique_sku', 'progress_purchased_total_amount'] as $progress) {
-                if ($progress_condition = fn_find_promotion_condition($promotion['conditions'], $progress)) break;
-            }
+        if (!empty($promotions)) {
+            foreach($promotions as $key => &$promotion) {
+                $promotion['conditions'] = unserialize($promotion['conditions']);
+                foreach (['progress_total_paid', 'progress_order_amount', 'progress_average_paid', 'progress_purchased_unique_sku', 'progress_purchased_total_amount'] as $progress) {
+                    if ($progress_condition = fn_find_promotion_condition($promotion['conditions'], $progress)) break;
+                }
 
-            $promotion['goal_value'] = $progress_condition['value'];
-            $promotion['current_value'] = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, Tygh::$app['session']['auth'], $cart, $promotion);
-            if (in_array($progress_condition['condition'], ['progress_total_paid', 'progress_average_paid'])) {
-                $promotion['modify_values_to_price'] = true;
-            }
-            if ($promotion['current_value'] > $promotion['goal_value']) {
-                unset($promotions[$key]);
-                continue;
-            }
-            if ($period = fn_find_promotion_condition($promotion['conditions'], 'progress_period')) {
-                if (str_replace('month_', '', $period['value']) != date("n") ) continue;
+                $promotion['goal_value'] = $progress_condition['value'];
+                $promotion['current_value'] = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, Tygh::$app['session']['auth'], $cart, $promotion);
+                if (in_array($progress_condition['condition'], ['progress_total_paid', 'progress_average_paid'])) {
+                    $promotion['modify_values_to_price'] = true;
+                }
+                if ($promotion['current_value'] > $promotion['goal_value']) {
+                    unset($promotions[$key]);
+                    continue;
+                }
+                if ($period = fn_find_promotion_condition($promotion['conditions'], 'progress_period')) {
+                    if (str_replace('month_', '', $period['value']) != date("n") ) continue;
 
-                $progress_promotions[$period['value']] = $promotion;
+                    $progress_promotions[$period['value']] = $promotion;
+                }
             }
         }
     }
-    if (defined('API')) {
+    if (defined('API') && !empty($progress_promotions)) {
         foreach($progress_promotions AS &$promotion) {
             if ($promotion['modify_values_to_price']) {
                 $promotion['start_value_formatted'] = fn_storefront_rest_api_format_price(0, CART_PRIMARY_CURRENCY);

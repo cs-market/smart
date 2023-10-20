@@ -374,7 +374,7 @@ function fn_smart_distribution_gather_additional_product_data_post(&$product, $a
             }
             if (!isset($product['list_discount'])) {
                 $product['list_discount'] = $product['discount'];
-                $product['list_discount_prc'] = $product['discount_prc'];
+                if (isset($product['discount_prc'])) $product['list_discount_prc'] = $product['discount_prc'];
             }
         }
         // for in_stock | out_of_stock in mobile application
@@ -526,8 +526,7 @@ function fn_smart_distribution_pre_update_order(&$cart, $order_id) {
 
 // fix qty_discounts update by API for product wo price
 function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $lang_code, $can_update) {
-
-    if ($product_data['is_pbp'] == 'Y' && in_array($product_data['company_id'], [1810, 2058]) && $product_data['is_oper'] != 'Y') fn_debug_log_event(['type' => 'Обновление товара', 'request' => $product_data, 'user' => Tygh::$app['session']['auth']['user_id']]);
+    if (isset($product_data['is_pbp']) && YesNo::toBool($product_data['is_pbp']) && in_array($product_data['company_id'], [1810, 2058]) && !YesNo::toBool($product_data['is_oper'])) fn_debug_log_event(['type' => 'Обновление товара', 'request' => $product_data, 'user' => Tygh::$app['session']['auth']['user_id']]);
 
     if (!isset($product_data['price'])) {
         $price = db_get_field('SELECT price FROM ?:product_prices WHERE product_id = ?i AND usergroup_id = ?i AND lower_limit = ?i', $product_id, 0, 1);
@@ -712,24 +711,25 @@ function fn_smart_distribution_get_products_before_select(&$params, $join, $cond
             return;
         }
         $product = fn_get_product_data($params['main_product_id'], Tygh::$app['session']['auth']);
+        if (!empty($product)) {
+            $params['exclude_pid'] = $params['main_product_id'];
 
-        $params['exclude_pid'] = $params['main_product_id'];
+            if (!empty($params['similar_category']) && $params['similar_category'] == 'Y') {
+                $params['cid'] = $product['main_category'];
 
-        if (!empty($params['similar_category']) && $params['similar_category'] == 'Y') {
-            $params['cid'] = $product['main_category'];
-
-            if (!empty($params['similar_subcats']) && $params['similar_subcats'] == 'Y') {
-                $params['subcats'] = 'Y';
+                if (!empty($params['similar_subcats']) && $params['similar_subcats'] == 'Y') {
+                    $params['subcats'] = 'Y';
+                }
             }
-        }
 
-        if (!empty($product['price'])) {
+            if (!empty($product['price'])) {
 
-            if (!empty($params['percent_range'])) {
-                $range = $product['price'] / 100 * $params['percent_range'];
+                if (!empty($params['percent_range'])) {
+                    $range = $product['price'] / 100 * $params['percent_range'];
 
-                $params['price_from'] = $product['price'] - $range;
-                $params['price_to'] = $product['price'] + $range;
+                    $params['price_from'] = $product['price'] - $range;
+                    $params['price_to'] = $product['price'] + $range;
+                }
             }
         }
     }

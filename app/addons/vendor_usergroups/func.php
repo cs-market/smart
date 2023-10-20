@@ -50,7 +50,7 @@ function fn_vendor_usergroups_update_product_pre(&$product_data, $product_id, $l
     if ($cid = (isset($product_data['company_id'])) ? $product_data['company_id'] : db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id)) {
         $company = Vendor::model()->find($cid);
         if (!empty($company) && !empty($company->usergroups)) {
-            if (!$product_id && !$product_data['usergroup_ids']) {
+            if (!$product_id && empty($product_data['usergroup_ids'])) {
                 $product_data['usergroup_ids'] = $company->usergroups;
             } elseif (isset($product_data['usergroup_ids'])) {
                 $product_data['usergroup_ids'] = array_intersect($product_data['usergroup_ids'], $company->usergroups);

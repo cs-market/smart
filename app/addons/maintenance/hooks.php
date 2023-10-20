@@ -243,7 +243,7 @@ function fn_maintenance_get_products(&$params, &$fields, $sortings, &$condition,
         $add_join = db_quote(" LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1 AND usergroup_id IN (?a)",  array_filter($auth['usergroup_ids']));
         $join = str_replace($remove_join, $add_join, $join);
 
-        $regular_price_field = str_replace(' as price', '', $fields['price']);
+        $regular_price_field = isset($fields['price']) ? str_replace(' as price', '', $fields['price']) : false;
 
         if (!empty($regular_price_field)) {
             $join .= ' LEFT JOIN ?:product_prices as reg_prices ON reg_prices.product_id = products.product_id AND reg_prices.lower_limit = 1 AND reg_prices.usergroup_id = 0 ';

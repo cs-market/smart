@@ -4444,7 +4444,7 @@ function fn_get_products_amount($cart, $cart_products, $type = 'S')
 function fn_exclude_from_shipping_calculate($product)
 {
     $exclude = ($product['is_edp'] == 'Y' && $product['edp_shipping'] != 'Y')
-        || $product['free_shipping'] == 'Y';
+        || (isset($product['free_shipping']) && $product['free_shipping'] == 'Y');
 
     fn_set_hook('exclude_from_shipping_calculation', $product, $exclude);
 

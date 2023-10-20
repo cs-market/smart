@@ -38,6 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $cart['recalculate'] = true;
 
-        return [CONTROLLER_STATUS_OK, 'checkout.' . $_REQUEST['redirect_mode']];
+        return [CONTROLLER_STATUS_OK];
     }
 }

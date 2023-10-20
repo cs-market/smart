@@ -140,7 +140,7 @@ function fn_extended_reward_points_add_product_to_cart_get_price($product_data, 
     if (RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics']) && $allow_add) {
         if (!empty($cart['products'][$_id])) {
             $data['is_pbp'] = $cart['products'][$_id]['is_pbp'];
-            $data['extra']['point_price'] = $cart['products'][$_id]['extra']['point_price'];
+            if (isset($cart['products'][$_id]['extra']['point_price'])) $data['extra']['point_price'] = $cart['products'][$_id]['extra']['point_price'];
         } else {
             $data = fn_array_merge($data, db_get_row('SELECT is_pbp, is_op, is_oper FROM ?:products WHERE product_id = ?i', $product_id));
         }
