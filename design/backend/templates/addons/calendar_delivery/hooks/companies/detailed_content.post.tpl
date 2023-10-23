@@ -1,13 +1,6 @@
 {include file="common/subheader.tpl" title=__("calendar_delivery")}
 
-<div class="control-group">
-    <label for="elm_company_nearest_delivery" class="control-label">{__("calendar_delivery.nearest_delivery")}:</label>
-    <div class="controls">
-        <label class="radio inline" for="company_data_nearest_delivery_today"><input type="radio" name="company_data[nearest_delivery]" id="company_data_nearest_delivery_today" {if $company_data.nearest_delivery == '0'}checked="checked"{/if} value="0">{__('today')}</label>
-        <label class="radio inline" for="company_data_nearest_delivery_tomorrow"><input type="radio" name="company_data[nearest_delivery]" id="company_data_nearest_delivery_tomorrow" {if $company_data.nearest_delivery == '1'}checked="checked"{/if} value="1">{__('tomorrow')}</label>
-        <label class="radio inline" for="company_data_nearest_delivery_aftertomorrow"><input type="radio" name="company_data[nearest_delivery]" id="company_data_nearest_delivery_aftertomorrow" {if $company_data.nearest_delivery == '2'}checked="checked"{/if} value="2">{__('after_tomorrow')}</label>
-    </div>
-</div>
+{include file="addons/calendar_delivery/components/nearest_delivery.tpl" id='company_nearest_delivery' name='company_data[nearest_delivery]' params=$company_data}
 
 <div class="control-group">
     <label for="elm_company_working_time_till" class="control-label cm-regexp" data-ca-regexp="^(([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?)*$" data-ca-message="__('working_time_till_error_message')">{__("calendar_delivery.working_time_till")}:</label>
@@ -42,20 +35,20 @@
 <div class="control-group">
     <label for="elm_company_period_start" class="control-label cm-regexp" data-ca-regexp="^(([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?)*$" data-ca-message="{__('period_start_error_message')}">{__("calendar_delivery.period_start")}:</label>
     <div class="controls">
-        <input class="input-time cm-trim" id="elm_company_period_start" size="5" maxlength="5" type="text" name="company_data[period_start]" value="{$company_data.period_start}" placeholder="00:00" />
+        <input class="input-mini cm-trim" id="elm_company_period_start" size="5" maxlength="5" type="text" name="company_data[period_start]" value="{$company_data.period_start}" placeholder="00:00" />
     </div>
 </div>
 
 <div class="control-group">
     <label for="elm_company_period_finish" class="control-label cm-regexp" data-ca-regexp="^(([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?)*$" data-ca-message="{__('period_finish_error_message')}">{__("calendar_delivery.period_finish")}:</label>
     <div class="controls">
-        <input class="input-time cm-trim" id="elm_company_period_finish" size="5" maxlength="5" type="text" name="company_data[period_finish]" value="{$company_data.period_finish}" placeholder="00:00" />
+        <input class="input-mini cm-trim" id="elm_company_period_finish" size="5" maxlength="5" type="text" name="company_data[period_finish]" value="{$company_data.period_finish}" placeholder="00:00" />
     </div>
 </div>
 
 <div class="control-group">
     <label for="elm_company_period_step" class="control-label">{__("calendar_delivery.period_step")}:</label>
     <div class="controls">
-        <input class="cm-trim" id="elm_company_period_step" size="2" maxlength="2" type="text" name="company_data[period_step]" value="{$company_data.period_step}" placeholder="2" />
+        <input class="input-micro cm-trim" id="elm_company_period_step" size="2" maxlength="2" type="text" name="company_data[period_step]" value="{$company_data.period_step}" placeholder="2" />
     </div>
 </div>

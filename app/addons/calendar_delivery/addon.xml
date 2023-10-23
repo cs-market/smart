@@ -44,6 +44,7 @@
         <item lang="ru" id="calendar_delivery.settings_depends_on_parent">Настройки зависят от общих настроек</item>
         <item lang="ru" id="calendar_delivery.holidays">Выходные дни</item>
         <item lang="ru" id="calendar_delivery.ignore_exception_days">Игнорировать дни-исключения</item>
+        <item lang="ru" id="calendar_delivery.other">Другой</item>
 
         <item lang="ru" id="weekday_exim_1">Monday</item>
         <item lang="ru" id="weekday_exim_2">Tuesday</item>
@@ -62,7 +63,7 @@
         <item for="uninstall">ALTER TABLE `?:orders` DROP `delivery_period`;</item>
 
         <item >ALTER TABLE `?:companies`
-            ADD `nearest_delivery` VARCHAR(1) NOT NULL DEFAULT '1',
+            ADD `nearest_delivery` TINYINT UNSIGNED NOT NULL DEFAULT '1',
             ADD `working_time_till` VARCHAR(8) NOT NULL DEFAULT '17:00',
             ADD `saturday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y',
             ADD `sunday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y',
@@ -84,6 +85,9 @@
 
         <item>ALTER TABLE `?:users` ADD `delivery_date` VARCHAR(7) NOT NULL default '1111111';</item>
         <item for="uninstall">ALTER TABLE `?:users` DROP `delivery_date`;</item>
+
+        <item>ALTER TABLE `?:users` ADD `nearest_delivery` TINYINT UNSIGNED NOT NULL DEFAULT '0';</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP `nearest_delivery`;</item>
 
         <item>ALTER TABLE `?:users` ADD `ignore_exception_days` VARCHAR(1) NOT NULL DEFAULT 'N';</item>
         <item for="uninstall">ALTER TABLE `?:users` DROP `ignore_exception_days`;</item>

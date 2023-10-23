@@ -38,6 +38,10 @@ $schema['export_fields']['Delivery days'] = [
     'db_field' => 'delivery_date',
 ];
 
+$schema['export_fields']['Nearest delivery'] = [
+    'db_field' => 'nearest_delivery',
+];
+
 $schema['export_fields']['Monday rule'] = [
     'db_field' => 'monday_rule',
 ];

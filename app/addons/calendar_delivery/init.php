@@ -27,6 +27,7 @@ fn_register_hooks(
     'get_storages',
     'delete_storages',
     'post_delete_user',
+    'fill_user_fields',
 );
 
 // backward compatibility

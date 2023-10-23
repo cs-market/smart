@@ -1,4 +1,7 @@
 {include file="common/subheader.tpl" title=__("delivery_date")}
+
+{include file="addons/calendar_delivery/components/nearest_delivery.tpl" id='user_nearest_delivery' name='user_data[nearest_delivery]' params=$user_data}
+
 <div class="control-group">
     <label class="control-label" for="delivery_date">{__("delivery_date")}</label>
     <div class="controls">
