@@ -13,7 +13,8 @@ function fn_settings_variants_addons_locked_users_usergroup_id() {
 }
 
 function fn_locked_users_update_user_pre($user_id, $user_data, $auth, $ship_to_another, $notify_user, &$can_update) {
-    fn_locked_users_api_disable_user($can_update, $user_id, $user_data['user_type']);
+    $type = $user_data['user_type'] ?? 'C';
+    fn_locked_users_api_disable_user($can_update, $user_id, $type);
     if (!$can_update && SiteArea::isStorefront(AREA)) {
         if (isset($_POST['user_data'])) unset($_POST['user_data']);
     }

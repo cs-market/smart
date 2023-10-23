@@ -8,7 +8,7 @@ defined('BOOTSTRAP') or die('Access denied');
 
 function fn_promotion_step_check_amount_in_stock_before_check($product_id, $amount, $product_options, $cart_id, $is_edp, $original_amount, $cart, $update_id, &$product, $current_amount){
     foreach ($cart['products'] as $key => $products) {
-        if(isset($products['extra']['bonus']) && $products['product'] == $product['product'] && $products['extra']['bonus'] == 'apply_bonus'){
+        if(isset($products['extra']['bonus']) && isset($product['extra']['amount_bonus']) && $products['product'] == $product['product'] && $products['extra']['bonus'] == 'apply_bonus'){
             $product['min_qty'] = $product['extra']['amount_bonus'];
         }
     }
@@ -138,7 +138,7 @@ function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_produc
                 $promotion_step_limit = fn_find_promotion_condition($promotion['conditions'], 'promotion_step_limit');
 
                 foreach ($promotion['conditions']['conditions'] as $key => $condition) {
-                    if($condition['operator'] == 'gte' && in_array($condition['condition'], ['promotion_step', 'promotion_package_step']) && $condition['value']){
+                    if(isset($condition['operator']) && $condition['operator'] == 'gte' && in_array($condition['condition'], ['promotion_step', 'promotion_package_step']) && $condition['value']){
                         $step = floor($amount/$condition['value']);
                         if ($promotion_step_limit && $step > $promotion_step_limit['value']) $step = $promotion_step_limit['value'];
 

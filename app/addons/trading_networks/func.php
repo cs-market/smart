@@ -23,7 +23,7 @@ function fn_init_network($request) {
     if (SiteArea::isAdmin(AREA)) {
         return array(INIT_STATUS_OK);
     }
-    if (isset($request['switch_user_id']) && in_array($request['switch_user_id'], array_keys(Tygh::$app['session']['auth']['network_users']))) {
+    if (!empty($request['switch_user_id']) && !empty(Tygh::$app['session']['auth']['network_users']) && in_array($request['switch_user_id'], array_keys(Tygh::$app['session']['auth']['network_users']))) {
         $network_id = Tygh::$app['session']['auth']['user_id'];
         Tygh::$app['session']->regenerateID();
         fn_login_user($request['switch_user_id'], true);

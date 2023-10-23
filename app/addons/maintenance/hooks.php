@@ -116,7 +116,7 @@ function fn_maintenance_mailer_create_message_before($_this, &$message, $area, $
                 return strpos($v, '@example.com') === false;
             });
         } elseif (is_string($message['to'])) {
-            $message['to'] = (strpos($v, '@example.com') === false) ? $message['to'] : '';
+            $message['to'] = (strpos($message['to'], '@example.com') === false) ? $message['to'] : '';
         }
     }
 }

@@ -227,7 +227,7 @@ function fn_exim_get_product_group($group_id) {
 }
 
 function fn_product_groups_place_suborders_pre($order_id, $cart, $auth, $action, $issuer_id, &$suborder_cart, $key_group, $group) {
-    $suborder_cart['group_id'] = $group['group_id'] ? : 0;
+    $suborder_cart['group_id'] = $group['group_id'] ?? 0;
 }
 
 function fn_product_groups_place_suborders($cart, &$suborder_cart, $key_group) {

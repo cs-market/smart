@@ -139,7 +139,7 @@ function fn_orders_with_items_get_company_name($field, $key, $company_id, $zero_
 {
 	static $orders;
 
-	if (in_array($key, (array)$orders[$field])) {
+	if (!empty($field) && in_array($key, (array)$orders[$field])) {
 		return '';
 	} else {
 		$orders[$field][] = $key;

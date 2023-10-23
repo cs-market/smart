@@ -137,7 +137,7 @@ function fn_extended_reward_points_fill_auth(&$auth, $user_data, $area, $origina
 // vega
 function fn_extended_reward_points_add_product_to_cart_get_price($product_data, $cart, $auth, $update, $_id, &$data, $product_id, $amount, $price, $zero_price_action, &$allow_add) {
 
-    if (RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics']) && $allow_add) {
+    if (isset($auth['extended_reward_points']) && RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics']) && $allow_add) {
         if (!empty($cart['products'][$_id])) {
             $data['is_pbp'] = $cart['products'][$_id]['is_pbp'];
             if (isset($cart['products'][$_id]['extra']['point_price'])) $data['extra']['point_price'] = $cart['products'][$_id]['extra']['point_price'];

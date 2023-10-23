@@ -96,7 +96,7 @@ function fn_get_storages($params = [], $items_per_page = 0) {
     $limit = '';
     if (!empty($params['items_per_page'])) {
         $params['total_items'] = db_get_field(
-            'SELECT COUNT(*) FROM ?:storages ?p WHERE 1 ?p ?p',
+            'SELECT COUNT(*) FROM ?:storages ?p WHERE 1 ?p',
             $join,
             $condition
         );

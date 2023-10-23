@@ -747,6 +747,8 @@ class ExRusEximCommerceml extends RusEximCommerceml
                     $product['status'] = self::PRODUCT_STATUS_HIDDEN;
                 } elseif ($product_status == $cml['active']) {
                     $product['status'] = self::PRODUCT_STATUS_ACTIVE;
+                } else {
+                    $product['status'] = self::PRODUCT_STATUS_ACTIVE;
                 }
                 \Tygh::$app['session']['ex_exim_1c']['status_commerceml'][$product_id] = ['ttl' => TIME + SECONDS_IN_HOUR, 'status' => $product['status']];
             }

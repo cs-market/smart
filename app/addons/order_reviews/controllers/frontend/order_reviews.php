@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (fn_discussion_check_thread_permissions($_data, $auth)) {
 
-            $discussion = fn_get_discussion($_REQUEST['object_id'], DiscussionObjectTypes::ORDER);
+            $discussion = fn_get_discussion($_data['object_id'], DiscussionObjectTypes::ORDER);
 
             if (!empty($discussion['thread_id'])) {
                 db_query('UPDATE ?:discussion SET ?u WHERE thread_id = ?i', $_data, $discussion['thread_id']);

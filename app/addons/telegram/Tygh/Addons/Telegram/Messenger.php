@@ -23,7 +23,7 @@ class Messenger {
             $operation_result->setData($response);
             if ($response['ok'] == 'true') {
                 $operation_result->setSuccess(true);
-                if (!empty(trim($response['description'])))$operation_result->addMessage('', trim($response['description']));
+                if (!empty($response['description'])) $operation_result->addMessage('', trim($response['description']));
             } else {
                 $operation_result->addError($response['error_code'], $response['description']);
             }

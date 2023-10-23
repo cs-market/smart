@@ -60,7 +60,7 @@ function fn_promotion_import_build_conditions(&$object, $primary_object_id, &$pr
             list(, $condition, $operator) = explode('.', $key);
             if ($condition == 'products') {
                 $value = array_filter(explode(',', $value));
-                array_walk($value, function(&$v) {list($t['product_code'], $t['amount']) = explode(':', $v);$v = $t;});
+                array_walk($value, function(&$v) {if (strpos($v, ':') !== false) $v .= ':'; [$t['product_code'], $t['amount']] = explode(':', $v);$v = $t;});
                 $products = fn_promotion_import_get_value('products', array_column($value, 'product_code'), $company_id);
                 // без amount просто имплодим, зону мы можем и не знать
                 foreach ($value as $key => &$data) {
