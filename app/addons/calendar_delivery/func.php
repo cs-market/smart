@@ -156,7 +156,7 @@ function fn_calendar_get_nearest_delivery_day($shipping_params = [], $get_ts = f
         } while (1);
     }
 
-    if (isset($shipping_params['exception_days']) && !empty((int) $shipping_params['exception_days'])) {
+    if (!YesNo::toBool($shipping_params['ignore_exception_days']) && isset($shipping_params['exception_days']) && !empty((int) $shipping_params['exception_days'])) {
         for($day = 1; $day < $nearest_delivery; $day++) {
             $weekday = 1 << getdate(strtotime("+$day day midnight"))['wday'];
             if (bindec(strrev($shipping_params['exception_days'])) & $weekday) {
