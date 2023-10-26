@@ -365,5 +365,18 @@ return [
         'page_id' => 129,
         'usergroup_id' => [5284],
         'add_user_data_to_email' => true,
-    ]
+    ],
+    '138' => [
+        'page_id' => 138,
+        'company_id' => 2059,
+        'usergroup_id' => [775],
+        'fields_map' => [
+            'firstname' => '549',
+            'phone' => '549',
+            'email' => '549',
+            'user_login' => '549',
+            's_phone' => '549',
+            'password' => '5555',
+        ],
+    ],
 ];
