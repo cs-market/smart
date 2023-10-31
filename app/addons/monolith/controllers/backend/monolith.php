@@ -18,7 +18,7 @@ if ($mode == 'cron') {
             'status' => ['O', 'P'],
             'period' => 'C',
             'time_to' => strtotime('-2 minutes'),
-            'time_from' => strtotime('-30 minutes'),
+            'time_from' => strtotime('-60 minutes'),
         );
         foreach ($allowed_companies as $params['company_id']) {
             list($orders) = fn_get_orders($params);
