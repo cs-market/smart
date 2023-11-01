@@ -13,7 +13,7 @@
 
 use Tygh\Enum\CrossSellTypes;
 
-$schema['products']['content']['items']['fillings']['similar'] = $schema['products']['content']['items']['fillings']['recommended'] = [
+$schema['products']['content']['items']['fillings']['similar_products'] = $schema['products']['content']['items']['fillings']['recommended'] = [
     'params' => [
         'cross_sell' => true,
         'related_type' => CrossSellTypes::RECOMMENDED,
@@ -22,7 +22,7 @@ $schema['products']['content']['items']['fillings']['similar'] = $schema['produc
     ]
 ];
 
-$schema['products']['content']['items']['fillings']['similar']['params']['related_type'] = CrossSellTypes::SIMILAR;
+$schema['products']['content']['items']['fillings']['similar_products']['params']['related_type'] = CrossSellTypes::SIMILAR;
 
 $schema['products']['cache']['request_handlers'][] = '%PRODUCT_ID%';
 

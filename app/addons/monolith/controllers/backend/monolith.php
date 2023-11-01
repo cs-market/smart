@@ -31,7 +31,7 @@ if ($mode == 'cron') {
                 }
             }
         }
-        $params['time_to'] = strtotime('-30 minutes');
+        $params['time_to'] = strtotime('-60 minutes');
         $params['time_from'] = strtotime('-7 days');
         $mailer = Tygh::$app['mailer'];
         foreach ($allowed_companies as $params['company_id']) {

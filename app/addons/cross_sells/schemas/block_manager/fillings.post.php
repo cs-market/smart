@@ -11,7 +11,7 @@
 *  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-$schema['similar'] = $schema['recommended'] = array (
+$schema['similar_products'] = $schema['recommended'] = array (
     'only_in_stock' => array (
         'type' => 'checkbox',
         'default_value' => 'Y'
