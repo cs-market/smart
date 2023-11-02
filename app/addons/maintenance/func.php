@@ -350,3 +350,44 @@ function fn_exim_get_last_view_users_count()
 
     return $last_view_results['total_items'];
 }
+
+function fn_maintenance_build_search_condition($fields, $q, $match = 'all') {
+    $condition = '';
+
+    $q = trim($q);
+
+    if ($match == 'any') {
+        $query_pieces = fn_explode(' ', $q);
+        $search_type = ' OR ';
+    } elseif ($match == 'all') {
+        $query_pieces = fn_explode(' ', $q);
+        $search_type = ' AND ';
+    } else {
+        $query_pieces = [$q];
+        $search_type = '';
+    }
+
+    $query_pieces = array_filter($query_pieces, 'fn_string_not_empty');
+
+    if (!is_array($fields)) {
+        $fields = [$fields];
+    }
+
+    $search_conditions = [];
+
+    foreach ($fields as $field) {
+        $tmp = [];
+        foreach ($query_pieces as $piece) {
+            $tmp[] = db_quote("$field LIKE ?l", '%' . $piece . '%');
+        }
+        $search_conditions[] = ' (' . implode($search_type, $tmp) . ') ';
+    }
+
+    $_cond = implode(' OR ', $search_conditions);
+
+    if (!empty($search_conditions)) {
+        $condition = ' AND (' . $_cond . ') ';
+    }
+
+    return $condition;
+}

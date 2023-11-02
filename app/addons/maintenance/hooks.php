@@ -106,6 +106,18 @@ function fn_maintenance_get_users($params, $fields, $sortings, &$condition, $joi
     if ((!isset($params['user_type']) || UserTypes::isAdmin($params['user_type'])) && fn_is_restricted_admin(['user_type' => $auth['user_type']])) {
         $condition['wo_root_admins'] .= db_quote(' AND is_root != ?s ', YesNo::YES);
     }
+
+    if (isset($params['address']) && fn_string_not_empty($params['address'])) {
+        $condition['address'] = fn_maintenance_build_search_condition(['?:user_profiles.b_address', '?:user_profiles.s_address'], $params['address'], 'all');
+    }
+
+    if (isset($params['name']) && fn_string_not_empty($params['name'])) {
+        $name_fields = ['?:users.firstname', '?:users.lastname'];
+        if (!$params['extended_search'] && isset($params['search_query'])) {
+            $name_fields = array_merge($name_fields, ['?:users.email', '?:users.phone', '?:user_profiles.b_phone', '?:user_profiles.s_phone']);
+        }
+        $condition['name'] = fn_maintenance_build_search_condition($name_fields, $params['name'], 'all');
+    }
 }
 
 function fn_maintenance_mailer_create_message_before($_this, &$message, $area, $lang_code, $transport, $builder) {
