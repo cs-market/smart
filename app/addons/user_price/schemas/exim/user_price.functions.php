@@ -49,7 +49,7 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
                     $condition['case_condition'] = ' AND ( ' . implode(' OR ', $conditions) . ' ) ';
                 }
 
-                $users = db_get_hash_multi_array("SELECT " . implode(', ', $search_fields) . " FROM ?:users WHERE 1" . implode('', $condition) , array('level'));
+                $users = db_get_hash_multi_array("SELECT ?:users.user_id, " . implode(', ', $search_fields) . " FROM ?:users WHERE 1" . implode('', $condition) , array('level'));
 
                 if (!empty($users)) {
                     ksort($users);
