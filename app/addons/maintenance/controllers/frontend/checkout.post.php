@@ -17,17 +17,23 @@ $cart = &Tygh::$app['session']['cart'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'update_qty') {
-
         if (!empty($_REQUEST['product_data'])) {
             $cart_products = array_column($cart['products'], 'item_id', 'product_id');
-            $update = [];
+            $save = false;
             foreach ($_REQUEST['product_data'] as $p_id => $data) {
-                $key = $cart_products[$p_id] ?? $p_id;
-                $update[$key] = $data;
+                $update = [];
+                $cart_id = $cart_products[$p_id] ?? $p_id;
+                if (!empty($data['amount'])) {
+                    $update[$cart_id] = $data;
+                    fn_add_product_to_cart($update, $cart, $auth, true);
+                    $save = true;
+                } else {
+                    fn_delete_cart_product($cart, $cart_id);
+                    $save = true;
+                }
             }
 
-            $res = fn_add_product_to_cart($update, $cart, $auth, true);
-            fn_save_cart_content($cart, $auth['user_id']);
+            if ($save) fn_save_cart_content($cart, $auth['user_id']);
         }
 
         unset($cart['product_groups']);

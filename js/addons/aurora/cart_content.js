@@ -29,6 +29,14 @@
       $this = $(this);
     }
 
+    if ($this.hasClass('ty-value-changer__input') && $this.val() == 0) {
+        $controls = $this.closest('.cm-product-controls');
+        if ($controls.length) {
+            $controls.removeClass('in-cart').find('.ty-grid-list__qty').removeClass('ty-cart-content__qty');
+            $this.val($this.data('caVal'));
+        }
+    }
+
     var $cartBtn = $('.ty-btn--recalculate-cart', $this.closest('form'));
 
 //     if (!$cartBtn.length) {
