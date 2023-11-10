@@ -741,27 +741,53 @@ fn_print_r($fantoms);
         }
     }
     fn_print_die(count($corrected_users), $corrected_users);
-} elseif ($mode == 'fix_user_price') {
-    // $users = db_get_fields('SELECT user_id FROM ?:users');
-    // $products = db_get_fields('SELECT product_id FROM ?:products');
-    // $count[] = db_get_field('SELECT count(*) FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
-    // $res = db_query('DELETE FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
-    // $count[] = db_get_field('SELECT count(*) FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
-    // db_query('DELETE FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
-    $condition = ' WHERE 1 ';
-    if (!empty($action)) $condition .= db_quote(' AND company_id = ?i', $action);
-    $user_price_products = db_get_hash_multi_array("SELECT distinct(up.product_id), p.company_id FROM ?:user_price AS up LEFT JOIN ?:products AS p ON p.product_id = up.product_id $condition", ['company_id', 'product_id', 'product_id']);
-    foreach ($user_price_products as $company_id => $products) {
-        list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
-        $company_users = array_column($users, 'user_id');
-        //$company_users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i', $company_id);
-        $wrong[$company_id] = db_get_array('SELECT * FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
+} elseif ($mode == 'prices_maintenance') {
+    if (empty($action)) fn_print_die('empty action');
 
-        db_query('DELETE FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
+    $external_condition = empty($_REQUEST['company_id']) ? '' : db_quote(' AND company_id = ?i', $_REQUEST['company_id']);
+    $companies = db_get_fields('SELECT DISTINCT(company_id) FROM ?:products WHERE 1 ?p', $external_condition);
+    // $companies = [13, 1790];
+
+    if (empty($dispatch_extra) || $dispatch_extra == 'prices') {
+        $extra_usergroups = [42,0];
+        foreach($companies as $company_id) {
+            $wrong = [];
+            if ($usergroups = db_get_field("SELECT usergroups FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $company_id)) {
+                $usergroups = array_merge(explode(',', $usergroups), $extra_usergroups);
+                if ($action == 'check') {
+                    $wrong = db_get_fields('SELECT distinct(usergroup_id) FROM ?:product_prices WHERE usergroup_id NOT IN (?a) AND product_id IN (SELECT product_id FROM ?:products WHERE company_id = ?i)', $usergroups, $company_id);
+                    $wrong = db_get_fields('SELECT usergroup FROM ?:usergroup_descriptions WHERE usergroup_id IN (?a)', $wrong);
+                } elseif ($action == 'fix') {
+                    $wrong = db_query('DELETE FROM ?:product_prices WHERE usergroup_id NOT IN (?a) AND product_id IN (SELECT product_id FROM ?:products WHERE company_id = ?i)', $usergroups, $company_id);
+                }
+
+                if ($wrong) fn_print_r($wrong, $company_id);
+            }
+        }
     }
 
-    fn_print_die($wrong[12]);
-    fn_print_die('stop');
+    if (empty($dispatch_extra) || $dispatch_extra == 'user_prices') {
+        $user_price_products = db_get_hash_multi_array("SELECT distinct(up.product_id), p.company_id FROM ?:user_price AS up LEFT JOIN ?:products AS p ON p.product_id = up.product_id $condition", ['company_id', 'product_id', 'product_id']);
+
+        foreach ($user_price_products as $company_id => $products) {
+            list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
+            $company_users = array_column($users, 'user_id');
+            //$company_users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i', $company_id);
+            if ($action == 'check') {
+                $wrong = db_get_array('SELECT concat(up.product_id, " - ", pd.product) AS product, concat("vendor #", u.company_id, ", ", u.firstname) AS user FROM ?:user_price AS up LEFT JOIN ?:product_descriptions AS pd ON pd.product_id = up.product_id LEFT JOIN ?:users AS u ON u.user_id = up.user_id WHERE up.product_id IN (?a) AND up.user_id NOT IN (?a)', $products, $company_users);
+                $wrong = fn_group_array_by_key($wrong, 'product');
+                foreach ($wrong as &$value) {
+                    $value = array_column($value, 'user');
+                }
+            } elseif ($action == 'fix') {
+                $wrong = db_query('DELETE FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
+            }
+
+            if ($wrong) fn_print_r($wrong, $company_id);
+        }
+    }
+
+    fn_print_die('done');
 } elseif ($mode == 'remove_user_price') {
     $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = "C"', 1824);
 
@@ -1829,7 +1855,7 @@ fn_print_die($orders_wo_points);
         fn_delete_product($product_id);
     }
     fn_print_die('stop');
-} elseif ($mode == 'prices_maintenance') {
+} elseif ($mode == 'prices_maintenance___') {
     $res = db_get_hash_single_array('SELECT MIN(p.price) AS price, p.product_id FROM ?:product_prices AS p LEFT JOIN ?:product_prices AS pp ON pp.product_id = p.product_id AND pp.usergroup_id = 0 WHERE pp.product_id IS NULL GROUP BY product_id', array('product_id', 'price'));
     $template = ['product_id' => 0, 'price' => 0, 'percentage_discount' => 0, 'lower_limit' => 1, 'usergroup_id' => USERGROUP_ALL];
     $insert = [];
