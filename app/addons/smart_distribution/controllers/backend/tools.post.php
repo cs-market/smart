@@ -767,7 +767,7 @@ fn_print_r($fantoms);
     }
 
     if (empty($dispatch_extra) || $dispatch_extra == 'user_prices') {
-        $user_price_products = db_get_hash_multi_array("SELECT distinct(up.product_id), p.company_id FROM ?:user_price AS up LEFT JOIN ?:products AS p ON p.product_id = up.product_id $condition", ['company_id', 'product_id', 'product_id']);
+        $user_price_products = db_get_hash_multi_array("SELECT distinct(up.product_id), p.company_id FROM ?:user_price AS up LEFT JOIN ?:products AS p ON p.product_id = up.product_id $external_condition", ['company_id', 'product_id', 'product_id']);
 
         foreach ($user_price_products as $company_id => $products) {
             list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
