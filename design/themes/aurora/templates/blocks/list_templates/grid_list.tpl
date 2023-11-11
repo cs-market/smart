@@ -15,7 +15,7 @@
     {/if}
 
     {* FIXME: Don't move this file *}
-    {script src="js/tygh/product_image_gallery.js"}
+    {script src="js/addons/aurora/product_image_gallery.js"}
 
     {if $settings.Appearance.enable_quick_view == 'Y'}
         {$quick_nav_ids = $products|fn_fields_from_multi_level:"product_id":"product_id"}
@@ -35,7 +35,7 @@
                 {if $product}
                     {assign var="obj_id" value=$product.product_id}
                     {assign var="obj_id_prefix" value="`$obj_prefix``$product.product_id`"}
-                    {$product.image_pairs = ''}
+                    {* {$product.image_pairs = ''} *}
                     {$wishlist_but_meta = 'ty-btn-icon ty-btn__add-to-wish'}
                     {$active_class = 'ty-btn__full-width'}
                     {include file="common/product_data.tpl" product=$product show_product_amount=true show_amount_label=false}

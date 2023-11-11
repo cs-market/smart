@@ -1,4 +1,5 @@
 {script src="js/addons/aurora/bootstrap-toggle.js"}
+{script src="js/addons/aurora/malma.js"}
 <script type="text/javascript">
     (function(_, $) {
         $.ceEvent('on', 'ce.commoninit', function() {

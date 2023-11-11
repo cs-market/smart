@@ -1,0 +1,23 @@
+@TabletBreakpoint: 767px;
+
+.ty-malma {
+    &__wrap {
+        bottom: 0;
+        display: flex;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 4;
+    }
+    &__item {
+        flex: 1 1 auto;
+        height: 100%;
+    }
+
+    @media (max-width: @TabletBreakpoint) {
+        &__wrap {
+            display: none;
+        }
+    }
+}
