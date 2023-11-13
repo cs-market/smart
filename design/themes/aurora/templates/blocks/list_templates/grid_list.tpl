@@ -35,7 +35,6 @@
                 {if $product}
                     {assign var="obj_id" value=$product.product_id}
                     {assign var="obj_id_prefix" value="`$obj_prefix``$product.product_id`"}
-                    {* {$product.image_pairs = ''} *}
                     {$wishlist_but_meta = 'ty-btn-icon ty-btn__add-to-wish'}
                     {$active_class = 'ty-btn__full-width'}
                     {include file="common/product_data.tpl" product=$product show_product_amount=true show_amount_label=false}

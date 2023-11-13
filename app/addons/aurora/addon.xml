@@ -17,6 +17,8 @@
         <item lang="ru" id="app_gallery">App gallery</item>
         <item lang="ru" id="block_mobile_app_links">Ссылки мобильного приложения</item>
         <item lang="ru" id="mobile_app_links">Ссылки мобильного приложения</item>
+        <item lang="ru" id="about_product">О товаре</item>
+        <item lang="ru" id="cart_text">Корзина</item>
         <item lang="ru" id="sorting">Сортировка</item>
     </language_variables>
     <queries>
