@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'aurora-glyphs';
   src:
-    url('fonts/aurora-glyphs.ttf?5tkm84') format('truetype'),
-    url('fonts/aurora-glyphs.woff?5tkm84') format('woff'),
-    url('fonts/aurora-glyphs.svg?5tkm84#aurora-glyphs') format('svg');
+    url('fonts/aurora-glyphs.ttf') format('truetype'),
+    url('fonts/aurora-glyphs.woff') format('woff'),
+    url('fonts/aurora-glyphs.svg#aurora-glyphs') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ty-icon-aurora-mail:before {
+  content: "\e91c";
+}
 .ty-icon-aurora-discount:before {
   content: "\e91b";
 }
