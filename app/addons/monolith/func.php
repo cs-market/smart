@@ -326,18 +326,20 @@ EOT;
 }
 
 function fn_monolith_parse_soap_response($response) {
-    $result = true;
-    if (empty(trim($response))) {
-        return false;
+    $result = false;
+
+    if (!empty(trim($response))) {
+        $data = json_decode(json_encode(simplexml_load_string(str_ireplace(['SOAP-ENV:', 'SOAP:'], '', $response))), 1);
+
+        if (!empty($data)) {
+            $xml_response = $data['Body']['RequestResponse']['RequestResult'];
+            $result = simplexml_load_string($xml_response);
+
+            return (!empty($result) && !isset($result->error) && !isset($result->scheme->error));
+        }
     }
-    $data = json_decode(json_encode(simplexml_load_string(str_ireplace(['SOAP-ENV:', 'SOAP:'], '', $response))), 1);
-    $xml_response = $data['Body']['RequestResponse']['RequestResult'];
-    $result = simplexml_load_string($xml_response);
-    if (isset($result->error) || isset($result->scheme->error)) {
-        return false;
-    } else {
-        return true;
-    }
+
+    return false;
 }
 /*
 function fn_monolith_place_order_post($cart, $auth, $action, $issuer_id, $parent_order_id, $order_id, $order_status, $short_order_data, $notification_rules) {
