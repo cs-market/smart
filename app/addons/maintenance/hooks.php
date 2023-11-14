@@ -7,6 +7,7 @@ use Tygh\Enum\UsergroupStatuses;
 use Tygh\Enum\ProductFilterProductFieldTypes;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\YesNo;
+use Tygh\Tools\SecurityHelper;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -280,4 +281,14 @@ function fn_maintenance_get_products(&$params, &$fields, $sortings, &$condition,
         if (!is_array($params['exclude_cid'])) $params['exclude_cid'] = explode(',', $params['exclude_cid']);
         $condition .= db_quote(" AND ?:categories.category_id NOT IN (?n)", $params['exclude_cid']);
     }
+}
+
+function fn_maintenance_user_init($auth, $user_info, $first_init) {
+    if (!defined('API') && !fn_get_cookie('device-id')) {
+        fn_set_cookie('device-id', USER_AGENT . '-' . substr(SecurityHelper::generateRandomString(), 0, 8));
+    }
+}
+
+function fn_maintenance_create_order(&$order) {
+    $order['device_id'] = (defined('API')) ? fn_get_headers('Device-Id') : fn_get_cookie('device-id');
 }

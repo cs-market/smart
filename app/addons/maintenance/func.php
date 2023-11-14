@@ -391,3 +391,31 @@ function fn_maintenance_build_search_condition($fields, $q, $match = 'all') {
 
     return $condition;
 }
+
+function fn_get_headers($key = '')
+{
+    $result = array();
+
+    if (function_exists('getallheaders')) {
+        $headers = getallheaders();
+
+        foreach ($headers as $name => $value) {
+            $result[$name] = $value;
+        }
+    } else {
+        foreach ($_SERVER as $name => $value) {
+            if (strncmp($name, 'HTTP_', 5) === 0) {
+                $name = strtolower(str_replace('_', '-', substr($name, 5)));
+                $result[$name] = $value;
+            }
+        }
+    }
+
+    foreach ($result as $name => $value) {
+        $valid_name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
+        unset($result[$name]);
+        $result[$valid_name] = $value;
+    }
+
+    return empty($key) ? $result : (array_key_exists($key, $result) ? $result[$key] : '');
+}

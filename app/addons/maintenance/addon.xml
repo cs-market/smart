@@ -39,6 +39,8 @@
 
         <item>ALTER TABLE `?:orders` ADD `tracking_link` VARCHAR(255) NOT NULL DEFAULT '';</item>
         <item for="uninstall">ALTER TABLE `?:orders` DROP `tracking_link`;</item>
+        <item>ALTER TABLE `?:orders` ADD `device_id` VARCHAR(64) NOT NULL DEFAULT '';</item>
+        <item for="uninstall">ALTER TABLE `?:orders` DROP `device_id`;</item>
     </queries>
     <functions>
         <item for="install">fn_maintenance_install</item>

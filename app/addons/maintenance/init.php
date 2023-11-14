@@ -23,5 +23,7 @@ fn_register_hooks(
     'get_carts',
     'change_usergroup_status_pre',
     'get_product_filter_fields',
-    'get_products'
+    'get_products',
+    'user_init',
+    'create_order'
 );
