@@ -6,8 +6,6 @@
 *                                                                            *
 *****************************************************************************/
 
-use Tygh\Registry;
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 // sidebar is displayed under common form for users

@@ -6,8 +6,6 @@
 *                                                                            *
 *****************************************************************************/
 
-use Tygh\Registry;
-
 $schema['export_fields']['Staff notes'] = array(
     'db_field' => 'staff_notes'
 );
