@@ -420,3 +420,24 @@ function fn_monolith_get_product_data($product_id, &$field_list, &$join, $auth, 
         $condition .= db_quote(" AND IF (?:products.company_id = ?i, ?:product_prices.price IS NOT NULL, 1) ", 45);
     }
 }
+
+function fn_monolith_create_order($order) {
+    if ($order['company_id'] == 45 && $order['storage_id'] == 0) {
+        // 1. debug output
+        $delivery_date_by_storage = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i ORDER BY storage_id', 'storage_id', $order['user_id']);
+        $storage_id = key($delivery_date_by_storage);
+        $storages = fn_get_storages(['get_usergroups' => true]);
+        list($storage) = fn_get_storages(['storage_id' => $storage_id]);
+        fn_write_r('runtime.storages:', Registry::get('runtime.storages'), 'runtime.current_storage:', Registry::get('runtime.current_storage'), 'delivery_date_by_storage:', $delivery_date_by_storage, 'fn_get_storages:', $storages, 'get_storage_data:', $storage);
+
+        // 2. notify us and baltika
+        $mailer = Tygh::$app['mailer'];
+        $mailer->send(array(
+            'to' => array('support@i-sd.ru', 'k.frank@i-sd.ru', 'lysenko_kn@baltika.com'),
+            'from' => 'default_company_orders_department',
+            'data' => array('data' => $data),
+            'subject' => 'i-sd.ru: Empty storage id!',
+            'body' => "Внимание! Размещен заказ без признака склада от user_id " . $order['user_id'] . ' ' . $order['firstname'] . ' ' . $order['email'],
+        ), 'A'); 
+    }
+}

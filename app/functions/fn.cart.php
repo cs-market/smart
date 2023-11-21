@@ -1121,8 +1121,6 @@ function fn_update_order(&$cart, $order_id = 0)
             $order['promotion_ids'] = fn_create_set(array_keys($cart['promotions']));
         }
 
-        // TEMP DEBUG
-        if ($order['company_id'] == 45 && $cart['storage_id'] == 0) fn_write_r($cart, Registry::get('runtime.storages'), Registry::get('runtime.current_storage'));
         fn_set_hook('create_order', $order);
 
         $order_id = db_query("INSERT INTO ?:orders ?e", $order);
