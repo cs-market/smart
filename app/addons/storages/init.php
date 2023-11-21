@@ -9,6 +9,7 @@ fn_register_hooks(
     ['get_products', 27000000],
     ['load_products_extra_data', 27000000],
     'load_products_extra_data_post',
+    'get_filters_products_count_pre',
     'login_user_post',
     'user_logout_before_save_cart',
     'pre_add_to_cart',

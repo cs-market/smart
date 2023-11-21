@@ -331,6 +331,13 @@ function fn_storages_get_products(array &$params, array &$fields, array &$sortin
     }
 }
 
+function fn_storages_get_filters_products_count_pre(&$params, &$cache_params, $cache_tables) {
+    if (Registry::isExist('runtime.storages')) {
+        $params['storage_id'] = Registry::ifGet('runtime.current_storage', 0);
+        $cache_params[] = 'storage_id';
+    }
+}
+
 function fn_init_storages() {
     if (AREA != 'C') {
         return array(INIT_STATUS_OK);
