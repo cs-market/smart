@@ -46,7 +46,8 @@ class SraBmDynamicBlocks extends ASraEntity
         }
 
         if (($object_id = $this->safeGet($params, 'object_id', null)) && ($object_type = $this->safeGet($params, 'object_type', null)) ) {
-            $_REQUEST[$object_type . "_id"] = $object_id;
+            $dynamic_object_scheme = SchemesManager::getDynamicObjectByType($object_type);
+            $_REQUEST[$dynamic_object_scheme['key']] = $object_id;
         }
 
         $params['icon_sizes'] = $this->safeGet($params, 'icon_sizes', [
@@ -73,7 +74,7 @@ class SraBmDynamicBlocks extends ASraEntity
         $containers = $this->getContainersByLocation($location['location_id']);
         $grids = $this->getGridsByContainers($containers);
         // WHY??
-        unset($params['object_type']);
+        //unset($params['object_type']);
         $blocks = $this->getBlocksByGrids($grids, $params);
 
         $data = $this->prepareBlocks($blocks, $grids, $params);
@@ -213,6 +214,12 @@ class SraBmDynamicBlocks extends ASraEntity
                 }
 
                 foreach ($blocks[$grid_id] as $block_id => $block) {
+                    if (!empty($params['object_type'])) {
+                        $dynamic_object_scheme = SchemesManager::getDynamicObjectByType($params['object_type']);
+                        $block['status'] = self::correctStatusForDynamicObject($block, $dynamic_object_scheme);
+                    }
+                    
+
                     if ($block['status'] !== 'A') {
                         continue;
                     }
@@ -242,6 +249,26 @@ class SraBmDynamicBlocks extends ASraEntity
         }
 
         return $result;
+    }
+
+    public static function correctStatusForDynamicObject($block, $dynamic_object_scheme)
+    {
+        $status = $block['status'];
+        // If dynamic object defined correct status
+        if (!empty($dynamic_object_scheme['key'])) {
+            $status = 'A';
+            $object_key = $dynamic_object_scheme['key'];
+
+            if ($block['status'] == 'A' && in_array($_REQUEST[$object_key], $block['items_array'])) {
+                // If block enabled globally and disabled for some dynamic object
+                $status = 'D';
+            } elseif ($block['status'] == 'D' && !in_array($_REQUEST[$object_key], $block['items_array'])) {
+                // If block disabled globally and not enabled for some dynamic object
+                $status = 'D';
+            }
+        }
+
+        return $status;
     }
 
     /**

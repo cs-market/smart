@@ -13,8 +13,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         is_pagination: container.data('caItemsIsPagination') ? true : false,
         pagination_speed: container.data('caItemsPaginationSpeed') || 0
     };
-            console.log('WILog', 'params.pagination_speed', params.pagination_speed);
-
     // [/changed]
 
       if (container.hasClass('jcarousel-skin') || container.parent().hasClass('jcarousel-skin')) {
