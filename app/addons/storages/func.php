@@ -386,7 +386,9 @@ function fn_init_storages() {
 }
 
 function fn_storages_login_user_post($user_id, $cu_id, $udata, $auth, $condition, $result) {
-    fn_delete_session_data('storage');
+    if (Registry::ifGet('runtime.mode', false) != 'token_login') {
+        fn_delete_session_data('storage');
+    }
 }
 
 function fn_storages_user_logout_before_save_cart($auth) {
