@@ -46,3 +46,9 @@ function fn_extended_wishlist_create_order($order) {
         }
     }
 }
+
+function fn_extended_wishlist_user_logout_before_clear_cart($auth, $clear_cart) {
+    if ($clear_cart) {
+        fn_clear_cart(Tygh::$app['session']['wishlist'], false, true);
+    }
+}
