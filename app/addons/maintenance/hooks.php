@@ -113,7 +113,7 @@ function fn_maintenance_get_users($params, $fields, $sortings, &$condition, $joi
     }
 
     if (isset($params['name']) && fn_string_not_empty($params['name'])) {
-        $name_fields = ['?:users.firstname', '?:users.lastname'];
+        $name_fields = ['?:users.user_login', '?:users.firstname', '?:users.lastname'];
         if (!$params['extended_search'] && isset($params['search_query'])) {
             $name_fields = array_merge($name_fields, ['?:users.email', '?:users.phone', '?:user_profiles.b_phone', '?:user_profiles.s_phone']);
         }
