@@ -39,7 +39,16 @@ if ($mode == 'view') {
                         $product['amount'] = 9999;
                     }
 
-                    fn_promotion_apply_bonuses($promotion_data, $tmp, Tygh::$app['session']['auth'], $products);
+                    fn_clear_cart($temp_cart);
+
+                    $temp_cart['products'] = $products;
+                    foreach($temp_cart['products'] as &$p) {
+                        $p['item_id'] = $p['product_id'];
+                        $p['timestamp'] = TIME;
+                    }
+
+                    fn_promotion_apply_bonuses($promotion_data, $temp_cart, Tygh::$app['session']['auth'], $products);
+                    unset($temp_cart);
                     $products = fn_array_merge($products, $backup_amount);
                 }
             }
