@@ -8,17 +8,15 @@ defined('BOOTSTRAP') or die('Access denied');
 
 fn_register_hooks('user_init', 'update_user_pre');
 
-$stack = Registry::get('init_stack');
-
-foreach ($stack as &$stack_data) {
-    if ($stack_data[0] == 'fn_init_api') {
-        $stack_data[0] = 'fn_init_extended_api';
-    }
-    break;
+// fn_init_extended_api делает $this->authenticate(); поэтому надо после вызова $application['session']->init(), но до fn_init_user потому что там корзина и все дела
+if (defined('API')) {
+    $stack = Registry::get('init_stack');
+    $after_fn_init_user = array_search(['fn_init_user'], $stack);
+    array_splice($stack, $after_fn_init_user, 0, [['fn_init_extended_api']]);
+    Registry::set('init_stack', $stack);
 }
-Registry::set('init_stack', $stack);
 
-Tygh::$app['session'] = function ($app) {
+Tygh::$app->extend('session', function (&$session, $app) {
     $session = new \Tygh\Web\Session($app);
 
     // Configure conditions of session start
@@ -31,6 +29,11 @@ Tygh::$app['session'] = function ($app) {
     }
 
     $name_suffix = '_' . substr(md5(Registry::get('config.http_location')), 0, 5);
+
+    // separate cookies for mobile app token for future?
+    // if (defined('API') && !empty($_SERVER['HTTP_AUTHORIZATION'])) {
+    //     $name_suffix = '_' . substr($_SERVER['HTTP_AUTHORIZATION'], 6, 5);
+    // }
 
     if (defined('HTTPS') && Registry::ifGet('config.tweaks.secure_cookies', false)) {
         $name_suffix = '_s' . $name_suffix;
@@ -78,4 +81,4 @@ Tygh::$app['session'] = function ($app) {
     $session->start_on_write = false;
 
     return $session;
-};
+});
