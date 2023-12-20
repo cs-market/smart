@@ -66,6 +66,14 @@ function fn_monolith_generate_xml($order_id) {
 
     fn_set_hook('monolith_generate_xml', $order_info, $monolith_order, $d_record);
 
+    // normalize product_codes
+    $product_ids = array_column($order_info['products'], 'product_id');
+    $product_codes = db_get_hash_single_array('SELECT product_id, product_code FROM ?:products WHERE product_id IN (?a)', ['product_id', 'product_code'], $product_ids);
+    foreach ($order_info['products'] as $k => &$p) {
+        $p['product_code'] = $product_codes[$p['product_id']] ?? $p['product_code'];
+    }
+    unset($p, $product_codes);
+
     $monolith_order['d'][] = array(
         '@attributes' => array ('name' => 'CRMOrder'),
         'r' => array(
