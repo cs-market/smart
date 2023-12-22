@@ -53,9 +53,13 @@
                         {if $show_amount_label}
                             <label class="ty-control-group__label">{__("availability")}:</label>
                         {/if}
-                        <span class="ty-qty-in-stock ty-control-group__item {if $product_amount <= 0}ty-qty-backorder{/if}" id="in_stock_info_{$obj_prefix}{$obj_id}">
-                            {if $product_amount > 0}
-                                {__("in_stock")}
+                        <span class="ty-qty-in-stock ty-control-group__item {if $product_amount <= 0 || $product_amount/$product.qty_step <= 3}ty-qty-backorder{/if}" id="in_stock_info_{$obj_prefix}{$obj_id}">
+                            {if $product_amount > $product.qty_step}
+                                {if $product_amount/$product.qty_step > 3}
+                                    {__("in_stock")}
+                                {else}
+                                    {__("low_stock")}
+                                {/if}
                             {else}
                                 {__("on_backorder")}
                             {/if}

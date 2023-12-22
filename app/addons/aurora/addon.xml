@@ -20,6 +20,7 @@
         <item lang="ru" id="about_product">О товаре</item>
         <item lang="ru" id="cart_text">Корзина</item>
         <item lang="ru" id="sorting">Сортировка</item>
+        <item lang="ru" id="low_stock">Очень мало на остатках</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `app_store` VARCHAR(255) NOT NULL DEFAULT '';</item>
