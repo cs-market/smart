@@ -57,8 +57,10 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
             if (strpos($progress_period['value'], 'month') !== false) {
                 $month = str_replace('month_', '', $progress_period['value']);
                 $year = date("Y");
-                if ($month == 1 && date("m") == '12') {
+                if ($month == 1 && date("m") == 12) {
                     $year +=1;
+                } elseif ($month == 12 && date("m") == 1) {
+                    $year -=1;
                 }
                 $time_from = fn_parse_date('01/'.$month.'/'.$year);
                 $time_to = strtotime("+1 month", $time_from) - 1;
