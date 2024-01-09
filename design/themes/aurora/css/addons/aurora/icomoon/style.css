@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ty-icon-aurora-attachment:before {
+  content: "\e91f";
+}
 .ty-icon-aurora-shipping:before {
   content: "\e91d";
 }
@@ -32,6 +35,9 @@
 }
 .ty-icon-aurora-discount:before {
   content: "\e91b";
+}
+.ty-icon-aurora-telegram:before {
+  content: "\e91e";
 }
 .ty-icon-aurora-external-link:before {
   content: "\e91a";
