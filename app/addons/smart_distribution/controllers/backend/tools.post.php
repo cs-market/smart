@@ -2100,7 +2100,6 @@ fn_print_die($orders_wo_points);
     fn_print_die('stop');
 } elseif ($mode == 'cleanup') {
     if ($action == 'sessions') {
-
         $iteration = empty($dispatch_extra) ? 1 : $dispatch_extra;
         if ($iteration == '1') {
             $_SESSION['user_sessions'] = [];
@@ -2159,9 +2158,9 @@ fn_print_die($orders_wo_points);
             'product_descriptions',
             'product_features_values',
             'product_point_prices',
-            'product_related_products',
-            'product_related_products2' => [
-                'table' => 'product_related_products',
+            'product_relations',
+            'product_relations2' => [
+                'table' => 'product_relations',
                 'related_id' => 'product_id'
             ],
             'product_sales',
@@ -2328,7 +2327,27 @@ fn_print_die($orders_wo_points);
         $iteration += 1;
         fn_redirect('tools.cleanup.orders.' . $iteration);
     }
-    fn_print_die($res1, 'stop');
+    if ($action == 'storages') {
+        list($storages) = fn_get_storages();
+        $wrong_storages = array_filter($storages, function($s) {
+            return !$s['company_id'];
+        });
+        $res[] = fn_delete_storages(array_keys($wrong_storages));
+        list($storages) = fn_get_storages();
+        $res[] = db_query('DELETE FROM ?:user_storages WHERE storage_id NOT IN (?a)', array_keys($storages));
+        $res[] = db_query('DELETE FROM ?:storages_products WHERE storage_id NOT IN (?a)', array_keys($storages));
+        fn_print_die($res, 'stop');
+    }
+    if ($action == 'promotions') {
+        if (!empty($dispatch_extra)) {
+            $prev_month = date_create('last day of previous month 23:59:59');
+            $promotion_ids = db_get_fields('SELECT promotion_id FROM ?:promotions WHERE ((to_date != 0 AND to_date <= ?i) OR status != ?s) AND company_id = ?i', $prev_month->getTimestamp(), 'A', $dispatch_extra);
+            fn_delete_promotions($promotion_ids);
+            fn_print_die('promotions', $promotion_ids);
+        } else {
+            fn_print_die('empty company_id in $dispatch_extra');
+        }
+    }
 } elseif ($mode == 'remove_images_eclipse') {
     $products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 2190);
     foreach ($products as $product_id) {
@@ -2423,26 +2442,10 @@ fn_print_die($orders_wo_points);
     $user_ids = db_get_fields("SELECT user_id FROM ?:user_session_products WHERE type = 'W' GROUP BY user_id HAVING count(product_id) > 60");
     $res = db_query("DELETE FROM ?:user_session_products WHERE type = 'W' AND user_id IN (?a)", $user_ids);
     fn_print_die($res);
-} elseif ($mode == 'cleanup_old_promotions') {
-    $prev_month = date_create('last day of previous month 23:59:59');
-    $promotion_ids = db_get_fields('SELECT promotion_id FROM ?:promotions WHERE ((to_date != 0 AND to_date <= ?i) OR status != ?s) AND company_id = ?i', $prev_month->getTimestamp(), 'A', 45);
-    $promotion_ids = db_get_fields('SELECT promotion_id FROM ?:promotions WHERE ((to_date != 0 AND to_date <= ?i) OR status != ?s) AND company_id IN (?a)', 1685566799, 'A', [45,1810,2058]);
-    fn_delete_promotions($promotion_ids);
-    fn_print_die($promotion_ids);
 } elseif ($mode == 'remove_zero_prices') {
     $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = 2186');
     $res[] = db_query('DELETE FROM ?:product_prices WHERE price = 0 AND usergroup_id != 0 AND product_id IN (?a)', $product_ids);
     $res[] = db_query('DELETE FROM ?:user_price WHERE price = 0 AND product_id IN (?a)', $product_ids);
-    fn_print_die($res);
-} elseif ($mode == 'storages_maintenance') {
-    list($storages) = fn_get_storages();
-    $wrong_storages = array_filter($storages, function($s) {
-        return !$s['company_id'];
-    });
-    $res[] = fn_delete_storages(array_keys($wrong_storages));
-    list($storages) = fn_get_storages();
-    $res[] = db_query('DELETE FROM ?:user_storages WHERE storage_id NOT IN (?a)', array_keys($storages));
-    $res[] = db_query('DELETE FROM ?:storages_products WHERE storage_id NOT IN (?a)', array_keys($storages));
     fn_print_die($res);
 } elseif ($mode == 'baltica_reports') {
     $params = $_REQUEST;
@@ -4004,6 +4007,7 @@ fn_print_die($orders_wo_points);
     if (empty($sessions)) {
         db_query('DELETE FROM ?:sessions WHERE session_id IN (?a)', $_SESSION['delete_session']);
         unset($_SESSION['delete_session']);
+        fn_print_die('done');
     }
 
     foreach ($sessions as &$data) {
