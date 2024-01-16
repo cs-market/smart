@@ -80,34 +80,3 @@ if ($mode == 'daily_task') {
     }
 }
 
-if ($mode == 'view') {
-    $params = $_REQUEST;
-    $function = 'fn_generate_' . $params['type'];
-
-    if (($params['type']) && (is_callable($function))) {
-        $params['export'] = ($action == 'export');
-        $search_schema = fn_get_schema('reports', $params['type']);
-        Tygh::$app['view']->assign('search_schema', $search_schema);
-        list($report, $params) = $function($params);
-        if ($action == 'csv') {
-            $export = fn_exim_put_csv($report, $params, '"');
-            $url = fn_url("exim.get_file?filename=" . $params['filename'], 'A', 'current');
-            return array(CONTROLLER_STATUS_OK, $url);
-        } elseif ($action == 'export'){
-            if (isset($search_schema[$dispatch_extra]['data_params'])) {
-                $suffix = '';
-                foreach ($search_schema[$dispatch_extra]['data_params'] as $param) {
-                    if (!empty($params[$search_schema[$param]['name']]))
-                    $suffix .= '&' . $search_schema[$param]['name'] . '=' . $params[$search_schema[$param]['name']];
-                }
-            }
-            $url = fn_url($search_schema[$dispatch_extra]['data_url'] . implode(',', $report) . $suffix, 'A', 'current');
-            return array(CONTROLLER_STATUS_OK, $url);
-        } else {
-            Tygh::$app['view']->assign('report', $report);
-            Tygh::$app['view']->assign('search', $params);
-        }
-    } else {
-        return array(CONTROLLER_STATUS_NO_PAGE);
-    }
-}

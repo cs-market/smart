@@ -1,0 +1,5 @@
+<?php
+
+$schema = [];
+
+return $schema;

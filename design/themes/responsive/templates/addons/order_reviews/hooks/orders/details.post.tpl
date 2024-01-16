@@ -22,6 +22,8 @@
                         <textarea id="dsc_message_{$obj_prefix}{$obj_id}" name="post_data[message]" class="ty-input-textarea ty-input-text-large" rows="5" cols="72">{$discussion.post_data.message}</textarea>
                     </div>
 
+                    {if $addons.order_reviews.order_pool_link}<a href="{$addons.order_reviews.order_pool_link}" target="_blank" style="color: #005bff;">{__('order_reviews.order_pool')}</a>{/if}
+
                     {include file="common/image_verification.tpl" option="discussion"}
                 <!--new_post_{$obj_prefix}{$obj_id}--></div>
 

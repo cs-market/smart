@@ -2,6 +2,7 @@
 
 use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
 use Tygh\Enum\Addons\Discussion\DiscussionTypes;
+use Tygh\Registry;
 
 defined('BOOTSTRAP') or die('Access denied');
 

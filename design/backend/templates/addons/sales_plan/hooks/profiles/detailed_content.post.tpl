@@ -1,3 +1,4 @@
+{if "MULTIVENDOR"|fn_allowed_for}
 {if $user_data.user_type == 'C'}
     {include file="common/subheader.tpl" title=__("sales_plan")}
     <div class="table-wrapper">
@@ -62,4 +63,5 @@
             </select>
         </div>
     </div>
+{/if}
 {/if}

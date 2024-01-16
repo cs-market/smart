@@ -17,9 +17,24 @@
     <language_variables>
         <item lang="ru" id="order_reviews.allow_order_reviews">Позволить пользователям оставлять отзывы о заказе</item>
         <item lang="ru" id="order_reviews.leave_review">Поставьте оценку заказу</item>
+        <item lang="ru" id="order_reviews_report">Отчет по отзывам заказа</item>
+        <item lang="ru" id="order_reviews_report_menu_description">и выгрузка отчета в файл</item>
+        <item lang="ru" id="order_reviews.order_pool">Пройти опрос</item>
     </language_variables>
     <queries>
         <item for="install" editions="MULTIVENDOR">ALTER TABLE `?:companies` ADD `allow_order_reviews` VARCHAR(1) NOT NULL DEFAULT 'N';</item>
         <item for="uninstall" editions="MULTIVENDOR">ALTER TABLE `?:companies` DROP `allow_order_reviews`;</item>
     </queries>
+    <settings edition_type="ROOT,ULT:VENDOR">
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="order_pool_link">
+                        <type>input</type>
+                        <name>Ссылка на опрос о заказе</name>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
 </addon>
