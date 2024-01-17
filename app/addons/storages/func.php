@@ -659,6 +659,15 @@ function fn_storages_delete_usergroups($usergroup_ids) {
     db_query('DELETE FROM ?:storage_usergroups WHERE usergroup_id IN (?a)', $usergroup_ids);
 }
 
+function fn_storages_exim1c_order_xml_pre(&$order_xml, $order_data, $cml) {
+    if (!empty($order_data['storage_id'])) {
+        $order_xml[$cml['value_fields']][][$cml['value_field']] = array(
+            $cml['name'] => $cml['storage'],
+            $cml['value'] => db_get_field('SELECT `code` FROM ?:storages WHERE storage_id = ?i', $order_data['storage_id'])
+        );
+    }
+}
+
 function fn_storages_api_runtime_handle_index_request($id, $params, $status, &$data) {
     if ($id == 'storage') $data['storage'] = Registry::get('runtime.current_storage');
     if ($id == 'storage_id') $data['storage'] = Registry::get('runtime.current_storage');

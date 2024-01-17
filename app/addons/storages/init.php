@@ -31,6 +31,7 @@ fn_register_hooks(
     'get_user_price',
     'user_price_exim_product_price_pre',
     'delete_usergroups',
+    'exim1c_order_xml_pre',
     'api_runtime_handle_index_request',
     'api_runtime_handle_create_request',
     'api_runtime_handle_delete_request'
