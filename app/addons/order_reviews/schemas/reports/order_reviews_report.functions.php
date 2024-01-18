@@ -46,7 +46,7 @@ function fn_generate_order_reviews_report($params) {
             $output[] = array(
                 __('customer') => $user['firstname'],
                 __('address') => $user['b_address'],
-                __('phone') => $user['phone'],
+                __('code') => !empty($user['fields'][39]) ? $user['fields'][39] : $user['fields'][38],
                 __('date') => fn_date_format($discussion['timestamp'], Registry::get('settings.Appearance.date_format')),
                 __('order_id') => $discussion['object_id'],
                 __('rating') => $discussion['rating_value'],
