@@ -379,4 +379,19 @@ return [
             'password' => '1111',
         ],
     ],
+    '191' => [
+        'page_id' => 191,
+        'company_id' => 2192,
+        'usergroup_id' => [27758],
+        'fields_map' => [
+            'firstname' => '565',
+            'phone' => '562',
+            'email' => '563',
+            'user_login' => '562',
+            's_phone' => '562',
+            'password' => '564',
+            's_address' => '566',
+            'company' => '561',
+        ],
+    ],
 ];
