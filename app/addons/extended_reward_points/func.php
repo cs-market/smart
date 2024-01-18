@@ -100,7 +100,7 @@ function fn_extended_reward_points_calculate_cart_taxes_pre(&$cart, &$cart_produ
     }
 }
 
-function fn_extended_reward_points_pre_place_order($cart, &$allow, $product_groups) {
+function fn_extended_reward_points_pre_place_order(&$cart, &$allow, $product_groups) {
     if ($points = fn_get_cart_points_in_use($cart)) {
         $balance = Tygh::$app['session']['auth']['points'] - $points;
 
@@ -108,6 +108,8 @@ function fn_extended_reward_points_pre_place_order($cart, &$allow, $product_grou
             $allow = false;
             fn_set_notification(NotificationSeverity::WARNING, __('WARNING'), __('extended_reward_points.not_enough_points', [abs($balance)]));
         }
+
+        $cart['points_info']['in_use'] = ['points' => $points, 'cost' => $points];
     }
 }
 
