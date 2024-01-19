@@ -17,17 +17,19 @@ if (!is_callable('fn_array_splice_assoc')) {
     }
 }
 
-$schema = array_merge(['manager' => array(
+$schema['sales_report']['controls'] = array_merge(['manager' => array(
     'label' => 'manager',
     'type' => 'manager_selectbox',
     'name' => 'manager',
-)], $schema);
+)], $schema['sales_report']['controls']);
 
-fn_array_splice_assoc($schema, -4, 0, [    'show_manager' => array(
-    'label' => 'sales_plan.show_manager',
-    'type' => 'checkbox',
-    'name' => 'show_manager',
-    'class' => 'clearfix',
-)]);
+fn_array_splice_assoc($schema['sales_report']['controls'], -4, 0, [
+    'show_manager' => array(
+        'label' => 'sales_plan.show_manager',
+        'type' => 'checkbox',
+        'name' => 'show_manager',
+        'class' => 'clearfix',
+    )],
+);
 
 return $schema;
