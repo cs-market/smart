@@ -1,5 +1,6 @@
 {script src="js/addons/aurora/bootstrap-toggle.js"}
 {script src="js/addons/aurora/malma.js"}
+{if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum}
 <script type="text/javascript">
     (function(_, $) {
         $.ceEvent('on', 'ce.commoninit', function() {
@@ -9,3 +10,4 @@
         });
     }(Tygh, Tygh.$));
 </script>
+{/if}

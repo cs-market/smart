@@ -33,19 +33,19 @@ function fn_import_change_order_status($object) {
             unset($cart['points_info']);
             $cart['subtotal'] = $object['total'];
             fn_promotion_apply('cart', $cart, $customer_auth, $products);
-            $reward = $cart['points_info']['additional'];
             if (isset($cart['points_info']['additional'])) {
+                $reward = $cart['points_info']['additional'];
                 $order_data = array(
                     'order_id' => $order_id,
                     'type' => POINTS,
                     'data' => $reward
                 );
                 db_query("REPLACE INTO ?:order_data ?e", $order_data);
-            }
 
-            // if is gain - correct value
-            if (YesNo::toBool($order_info['points_info']['is_gain'])) {
-                fn_change_user_points($reward-$db_points, $order_info['user_id'], "Корректировка баллов по заказу #$order_id: $db_points —> $reward", CHANGE_DUE_ADDITION);
+                // if is gain - correct value
+                if (YesNo::toBool($order_info['points_info']['is_gain'])) {
+                    fn_change_user_points($reward-$db_points, $order_info['user_id'], "Корректировка баллов по заказу #$order_id: $db_points —> $reward", CHANGE_DUE_ADDITION);
+                }
             }
         }
 

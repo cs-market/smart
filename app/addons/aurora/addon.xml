@@ -32,4 +32,22 @@
         <item>ALTER TABLE `?:companies` ADD `app_gallery` VARCHAR(255) NOT NULL DEFAULT '';</item>
         <item for="uninstall">ALTER TABLE `?:companies` DROP `app_store`;</item>
     </queries>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="dynamic_quantity">
+                        <type>checkbox</type>
+                        <name>Динамическое поле количества</name>
+                        <default_value>Y</default_value>
+                    </item>
+                    <item id="inline_controls">
+                        <type>checkbox</type>
+                        <name>Элементы управления сетки товаров в строку</name>
+                        <default_value>Y</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
 </addon>

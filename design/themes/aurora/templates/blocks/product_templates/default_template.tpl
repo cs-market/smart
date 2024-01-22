@@ -1,4 +1,5 @@
 {script src="js/tygh/exceptions.js"}
+{if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum}{script src="js/addons/aurora/cart_content.js"}{/if}
 
 <div class="ty-product-block ty-product-detail">
     <div class="ty-product-block__wrapper">

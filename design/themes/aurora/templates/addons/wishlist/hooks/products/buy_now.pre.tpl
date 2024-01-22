@@ -6,5 +6,5 @@
         wishlist_but_role="text"
         wishlist_but_meta = 'ty-btn-icon ty-btn__add-to-wish cm-ajax-full-render'
     }
-    </span>
+    <!--wish_list_{$obj_prefix}{$product.product_id}--></span>
 {/if}

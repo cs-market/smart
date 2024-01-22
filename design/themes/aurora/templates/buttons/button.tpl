@@ -16,6 +16,8 @@
     {assign var="suffix" value=""}
 {/if}
 
+{$but_text = $but_text|trim}
+
 {if $but_name && $but_role != "text" && $but_role != "act" && $but_role != "delete"} {* SUBMIT BUTTON *}
     <button {if $but_id}id="{$but_id}"{/if} class="{$but_meta} ty-btn" type="submit" name="{$but_name}" {if $but_onclick}onclick="{$but_onclick nofilter}"{/if}{if $but_title} title="{$but_title}"{/if}>{$but_text}</button>
 

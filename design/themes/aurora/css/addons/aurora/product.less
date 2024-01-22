@@ -12,8 +12,11 @@ Product page
     line-height: initial;
     border-bottom: none;
 }
-.ty-product-feature:nth-child(2n) {
-    background-color: #dfe2e6;
+.ty-product-feature {
+    border-bottom: 1px solid #7c7e80;
+    &:nth-child(2n) {
+        background-color: initial;
+    }
 }
 .ty-icon-shipping {
     margin-right: 8px;
@@ -134,7 +137,7 @@ Product page
     flex-direction: row-reverse;
     align-items: center;
     background-color: #fff;
-    height: 30px;
+    height: var(--quantity-size);
     input&__input {
         float: initial;
         border: none;
@@ -146,9 +149,9 @@ Product page
         float: initial;
         border: none;
         .border-radius(50%);
-        .square(29px);
+        .square(~"var(--quantity-size)");
         display: inline-block;
-        line-height: 30px;
+        line-height: var(--quantity-size);
         background-color: #fff;
         color: @base;
         font-size: 16px;

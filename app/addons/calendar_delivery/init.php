@@ -30,7 +30,4 @@ fn_register_hooks(
     'fill_user_fields',
 );
 
-// backward compatibility
-fn_register_hooks('get_company_data');
-
 define('DOCUMENT_ORIGINALS', 'D');

@@ -2,7 +2,7 @@
 <addon scheme="2.0">
     <id>calendar_delivery</id>
     <name>Calendar delivery</name>
-    <description><![CDATA[Добавляе новый процессор оффлайн доставки с календарем © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <description><![CDATA[Добавляет новый процессор оффлайн доставки с календарем © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
     <priority>26732300</priority>
     <version>1.0.4</version>
     <position>0</position>
@@ -24,6 +24,7 @@
         <item lang="ru" id="after_tomorrow">Послезавтра</item>
         <item lang="ru" id="calendar_delivery.nearest_delivery">Ближайшая доставка</item>
         <item lang="ru" id="calendar_delivery.working_time_till">Доставка на ближайшую дату формируется до</item>
+        <item lang="ru" id="calendar_delivery.max_date">Ограничить возможность доставки следующими днями</item>
         <item lang="ru" id="calendar_delivery.saturday_shipping">Доставка в субботу</item>
         <item lang="ru" id="calendar_delivery.sunday_shipping">Доставка в воскресенье</item>
         <item lang="ru" id="calendar_delivery.monday_rule">Доставка в понедельник при заказе в выходные</item>
@@ -45,7 +46,7 @@
         <item lang="ru" id="calendar_delivery.holidays">Выходные дни</item>
         <item lang="ru" id="calendar_delivery.ignore_exception_days">Игнорировать дни-исключения</item>
         <item lang="ru" id="calendar_delivery.other">Другой</item>
-
+        <item lang="ru" id="calendar_delivery.working_time_till_error_message">Введите корректное время</item>
         <item lang="ru" id="weekday_exim_1">Monday</item>
         <item lang="ru" id="weekday_exim_2">Tuesday</item>
         <item lang="ru" id="weekday_exim_3">Wednesday</item>
@@ -53,17 +54,23 @@
         <item lang="ru" id="weekday_exim_5">Friday</item>
         <item lang="ru" id="weekday_exim_6">Saturday</item>
         <item lang="ru" id="weekday_exim_0">Sunday</item>
+        <item lang="ru" id="block_nearest_delivery">Календарь доставки</item>
+        <item lang="ru" id="block_nearest_delivery_description">Отображает ближайший день когда доступна доставка</item>
     </language_variables>
 
     <queries>
-        <item>ALTER TABLE `?:orders` ADD `delivery_date` int(11) unsigned NOT NULL DEFAULT 0;</item>
-        <item for="uninstall">ALTER TABLE `?:orders` DROP `delivery_date`;</item>
+        <item>ALTER TABLE `?:orders` 
+            ADD `delivery_date` int(11) unsigned NOT NULL DEFAULT 0,
+            ADD `delivery_period` varchar(30) NOT NULL default ''
+        </item>
+        <item for="uninstall">ALTER TABLE `?:orders` 
+            DROP `delivery_date`,
+            DROP `delivery_period`
+        </item>
 
-        <item>ALTER TABLE `?:orders` ADD `delivery_period` varchar(30) NOT NULL default '';</item>
-        <item for="uninstall">ALTER TABLE `?:orders` DROP `delivery_period`;</item>
-
-        <item >ALTER TABLE `?:companies`
+        <item editions="MULTIVENDOR">ALTER TABLE `?:companies`
             ADD `nearest_delivery` TINYINT UNSIGNED NOT NULL DEFAULT '1',
+            ADD `max_date` TINYINT UNSIGNED NOT NULL DEFAULT '0',
             ADD `working_time_till` VARCHAR(8) NOT NULL DEFAULT '17:00',
             ADD `saturday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y',
             ADD `sunday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y',
@@ -72,8 +79,9 @@
             ADD `period_finish` varchar(8) NOT NULL DEFAULT '',
             ADD `period_step` varchar(8) NOT NULL DEFAULT '';
         </item>
-        <item for="uninstall" >ALTER TABLE `?:companies`
+        <item for="uninstall" editions="MULTIVENDOR">ALTER TABLE `?:companies`
             DROP `nearest_delivery`,
+            DROP `max_date`,
             DROP `working_time_till`,
             DROP `saturday_shipping`,
             DROP `sunday_shipping`,
@@ -83,34 +91,28 @@
             DROP `period_step`
         </item>
 
-        <item>ALTER TABLE `?:users` ADD `delivery_date` VARCHAR(7) NOT NULL default '1111111';</item>
-        <item for="uninstall">ALTER TABLE `?:users` DROP `delivery_date`;</item>
-
-        <item>ALTER TABLE `?:users` ADD `nearest_delivery` TINYINT UNSIGNED NOT NULL DEFAULT '0';</item>
-        <item for="uninstall">ALTER TABLE `?:users` DROP `nearest_delivery`;</item>
-
-        <item>ALTER TABLE `?:users` ADD `ignore_exception_days` VARCHAR(1) NOT NULL DEFAULT 'N';</item>
-        <item for="uninstall">ALTER TABLE `?:users` DROP `ignore_exception_days`;</item>
-
-        <item>ALTER TABLE `?:users` ADD `monday_rule` VARCHAR(1) NOT NULL DEFAULT 'Y';</item>
-        <item for="uninstall">ALTER TABLE `?:users` DROP `monday_rule`;</item>
-
-        <item>ALTER TABLE `?:usergroups` ADD `working_time_till` varchar(8)  NOT NULL default '';</item>
-        <item for="uninstall">ALTER TABLE `?:usergroups` DROP `working_time_till`;</item>
-
-        <item>ALTER TABLE `?:usergroups` ADD `delivery_date` VARCHAR(7) NOT NULL default '1111111';</item>
-        <item for="uninstall">ALTER TABLE `?:usergroups` DROP `delivery_date`;</item>
-
-        <item>
-            CREATE TABLE `?:user_storages` (
-                `storage_id` mediumint(8) unsigned NOT NULL,
-                `user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-                `delivery_date` varchar(7) NOT NULL DEFAULT '1111111',
-                PRIMARY KEY (`storage_id`,`user_id`),
-                KEY `user_id` (`user_id`)
-            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+        <item>ALTER TABLE `?:users` 
+            ADD `delivery_date` VARCHAR(7) NOT NULL default '1111111',
+            ADD `nearest_delivery` TINYINT UNSIGNED NOT NULL DEFAULT '0',
+            ADD `ignore_exception_days` VARCHAR(1) NOT NULL DEFAULT 'N',
+            ADD `monday_rule` VARCHAR(1) NOT NULL DEFAULT 'Y'
         </item>
-        <item for="uninstall">DROP TABLE IF EXISTS `?:user_storages`;</item>
+
+        <item for="uninstall">ALTER TABLE `?:users` 
+            DROP `delivery_date`,
+            DROP `nearest_delivery`,
+            DROP `ignore_exception_days`,
+            DROP `monday_rule`'
+        </item>
+
+        <item>ALTER TABLE `?:usergroups` 
+            ADD `working_time_till` varchar(8)  NOT NULL default '',
+            ADD `delivery_date` VARCHAR(7) NOT NULL default '1111111'
+        </item>
+        <item for="uninstall">ALTER TABLE `?:usergroups` 
+            DROP `working_time_till`,
+            DROP `delivery_date`
+        </item>
     </queries>
 
     <functions>

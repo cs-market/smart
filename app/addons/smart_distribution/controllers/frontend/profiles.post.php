@@ -1,20 +1,14 @@
 <?php
 
-use Tygh\Registry;
 use Tygh\Tools\DateTimeHelper;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-	return ;
+    return;
 }
 
-if ($mode == 'update') {
-	if (Registry::get('settings.General.allow_usergroup_signup') != 'Y') {
-		Registry::del('navigation.tabs.usergroups');
-		Tygh::$app['view']->assign('usergroups', array());
-	}
-} elseif ($mode == 'stats') {
+if ($mode == 'stats') {
     if ($auth['user_id']) {
         $stats = [];
         if (isset($_REQUEST['time_from']) && !empty($_REQUEST['time_from']) && isset($_REQUEST['time_to']) && !empty($_REQUEST['time_to'])) {

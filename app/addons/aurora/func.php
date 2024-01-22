@@ -1,6 +1,7 @@
 <?php
 
-use Tygh\Tygh;
+use Tygh\Enum\YesNo;
+use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -22,4 +23,22 @@ function fn_blocks_aurora_get_vendor_info() {
     }
 
     return $company_data;
+}
+
+function fn_aurora_get_product_data_post(&$product_data, $auth, $preview, $lang_code) {
+    $cart_products = array_column(Tygh::$app['session']['cart']['products'], 'amount', 'product_id');
+    if ($product_data['in_cart'] = !empty($cart_products[$product_data['product_id']])) {
+        if (YesNo::toBool(Registry::get('addons.aurora.dynamic_quantity'))) $product_data['selected_amount'] = $cart_products[$product_data['product_id']];
+    }
+}
+
+function fn_aurora_get_products_post(&$products, $params, $lang_code) {
+    $cart_products = array_column(Tygh::$app['session']['cart']['products'], 'amount', 'product_id');
+    foreach ($products as &$product_data) {
+        if ($product_data['in_cart'] = !empty($cart_products[$product_data['product_id']])) {
+            if (YesNo::toBool(Registry::get('addons.aurora.dynamic_quantity'))) {
+                $product_data['selected_amount'] = $cart_products[$product_data['product_id']];
+            }
+        }
+    }
 }

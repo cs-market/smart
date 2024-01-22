@@ -31,7 +31,7 @@
         <input type="text" name="name" id="elm_name" value="{$search.name}" />
     </div>
 </div>
-{if $auth.user_type == "UserTypes::ADMIN"|enum && $search.user_type == "UserTypes::VENDOR"|enum}
+{if $auth.user_type == "UserTypes::ADMIN"|enum && $search.user_type != "UserTypes::ADMIN"|enum}
     <div class="sidebar-field" style="min-width: 180px;">
     {include file="common/select_vendor.tpl"}
     </div>
@@ -80,15 +80,6 @@
             </div>*}
 
             {hook name="profiles:search_form"}{/hook}
-            {* need for regular users search form*}
-            {if !$runtime.company_id}
-                {include file="views/companies/components/company_field.tpl"
-                    name='company_id'
-                    id="elm_company_id"
-                    zero_company_id_name_lang_var="none"
-                    selected=$search.company_id
-                }
-            {/if}
             <div class="control-group">
                 <label class="control-label" for="elm_registration_period">{__("registration_date")}</label>
                 <div class="controls">
@@ -122,8 +113,8 @@
             <div class="controls">
                 <select name="user_orders" id="elm_user_orders" onchange="fn_change_period_avalability(!Tygh.$(this).val(), 'orders_period_');">
                     <option value="">--</option>
-                    <option value="with" {if $search.user_orders == 'with'}selected="_selected"{/if}>{__("with_orders")}</option>
-                    <option value="without" {if $search.user_orders == 'without'}selected="_selected"{/if}>{__("without_orders")}</option>
+                    <option value="with" {if $search.user_orders == 'with'}selected="_selected"{/if}>{__("maintenance.with_orders")}</option>
+                    <option value="without" {if $search.user_orders == 'without'}selected="_selected"{/if}>{__("maintenance.without_orders")}</option>
                 </select>
             </div>
         </div>
@@ -227,10 +218,10 @@
         <label class="control-label">{__("search_products")}</label>
         <div class="controls">
             <label class="radio inline" for="elm_ordered_type_y">
-                <input type="radio" name="ordered_type" class="" id="elm_ordered_type_y" {if $search.ordered_type != 'NIN'}checked="checked"{/if} value="IN">{__("in_order")}
+                <input type="radio" name="ordered_type" class="" id="elm_ordered_type_y" {if $search.ordered_type != 'NIN'}checked="checked"{/if} value="IN">{__("maintenance.in_order")}
             </label>
             <label class="radio inline" for="elm_ordered_type_n">
-                <input type="radio" name="ordered_type" class="" id="elm_ordered_type_n" {if $search.ordered_type == 'NIN'}checked="checked"{/if} value="NIN">{__("nin_order")}
+                <input type="radio" name="ordered_type" class="" id="elm_ordered_type_n" {if $search.ordered_type == 'NIN'}checked="checked"{/if} value="NIN">{__("maintenance.nin_order")}
             </label>
         </div>
     </div>
@@ -241,12 +232,12 @@
         </div>
     </div>
     <div class="sidebar-field well">
-        <label class="control-label">{__("category_products")}</label>
+        <label class="control-label">{__("maintenance.category_products")}</label>
         <div class="controls">
             {include file="pickers/categories/picker.tpl" data_id="location_category" input_name="category_ids" item_ids=$search.category_ids hide_link=true hide_delete_button=true default_name=__("all_categories") extra=""}
         </div>
     </div>
-    
+
     <div class="sidebar-field">
         <div class="controls">
             {include

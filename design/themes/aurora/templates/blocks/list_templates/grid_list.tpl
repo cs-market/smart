@@ -1,6 +1,6 @@
 {if $products}
     {script src="js/tygh/exceptions.js"}
-    {script src="js/addons/aurora/cart_content.js"}
+    {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum}{script src="js/addons/aurora/cart_content.js"}{/if}
 
     {if !$no_pagination}
         {include file="common/pagination.tpl"}
@@ -28,19 +28,27 @@
 
     {$wrapper_class=$wrapper_class|default:"ty-grid-list"}
 
-    {if !$item_class}<div class="{$wrapper_class}" {if $grid_columns}style="--grid-columns: {$grid_columns}"{/if}>{/if}
+    {if !$item_class}<div class="{$wrapper_class} " {if $grid_columns}style="--grid-columns: {$grid_columns}"{/if}>{/if}
         {strip}
-            {$cart_products = $smarty.session.cart.products|array_column:'product_id'}
             {foreach from=$products item="product" name="sproducts"}
                 {if $product}
                     {assign var="obj_id" value=$product.product_id}
                     {assign var="obj_id_prefix" value="`$obj_prefix``$product.product_id`"}
                     {$wishlist_but_meta = 'ty-btn-icon ty-btn__add-to-wish'}
-                    {$active_class = 'ty-btn__full-width'}
-                    {include file="common/product_data.tpl" product=$product show_product_amount=true show_amount_label=false}
+                    {if $addons.aurora.inline_controls == "YesNo::NO"|enum}
+                        {$active_class = 'ty-btn__full-width'}
+                    {else}
+                        {$but_text=" "}
+                    {/if}
+
+                    {include file="common/product_data.tpl" product=$product show_product_amount=true show_amount_label=false }
                     
-                    <div class="ty-grid-list__item {$item_class} 
-                        {if $settings.Appearance.enable_quick_view == 'Y' || $show_features} ty-grid-list__item--overlay{/if}">
+                    <div class="ty-grid-list__item 
+                        {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum} ty-dynamic-quantity {/if}
+                        {if $product.in_cart} ty-grid-list__in-cart {/if}
+                        {if $addons.aurora.inline_controls == "YesNo::YES"|enum} ty-grid-list__inline-controls {/if}
+                        {$item_class}
+                        {if $settings.Appearance.enable_quick_view == "YesNo::YES"|enum || $show_features} ty-grid-list__item--overlay{/if}">
 
                         {assign var="form_open" value="form_open_`$obj_id`"}
                         {$smarty.capture.$form_open nofilter}
@@ -100,7 +108,10 @@
                                 </div>
 
                                 {capture name="product_multicolumns_list_control_data_wrapper"}
-                                    <div class="ty-grid-list__controls cm-product-controls {if $obj_id|in_array:$cart_products}in-cart{/if} {if $product.is_weighted == 'Y'}is-weighted{/if}">
+                                    <div class="ty-grid-list__controls cm-product-controls 
+                                        {if $product.is_weighted == "YesNo::YES"|enum} is-weighted {/if}
+                                        {if $product.in_cart  == "YesNo::YES"|enum} in-cart {/if}
+                                    ">
                                         {hook name="products:product_multicolumns_list_control_data_wrapper"}
                                         {assign var="qty" value="qty_`$obj_id`"}
                                         {if $smarty.capture.$qty|trim}

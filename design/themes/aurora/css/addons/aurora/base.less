@@ -33,6 +33,7 @@ body {
     --button-background: lighten(@grey, 5%);
     --button-background-active: @grey-bg;
     --scroller-gap: 15px;
+    --quantity-size: 29px;
 }
 * {
     outline: 0;
@@ -241,6 +242,7 @@ select {
     background-color: initial;
 }
 .ty-btn {
+    line-height: 1;
     .transition(@transition);
     border: 1px solid transparent;
     box-sizing: border-box;
@@ -307,6 +309,14 @@ select {
             background-color: @red;
         }
     }
+    &-reset {
+        background: none;
+        border: 0;
+        padding: 0;
+    }
+    // > .ty-icon {
+    //     margin-right: 3px;
+    // }
 }
 
 .ty-dropdown-box, .ty-sort-dropdown {
@@ -472,8 +482,10 @@ select {
         z-index: 0;
         .border-top-radius(@border-radius);
         overflow: hidden;
+        border: @border-width solid @decorative;
+        border-bottom: 0;
         &, &:hover {
-            background-color: #dfe2e6;
+            background-color: #fff;
         }
         &:before {
             content: '';
@@ -742,14 +754,82 @@ select {
         box-sizing: border-box;
     }
 }
-.ty-fileuploader {
-    &__a {
-        .ty-btn();
-        .ty-btn__secondary();
-        .ty-icon-aurora-attachment();
-        .aurora-glyphs();
-        &:before {
-            margin-right: 4px;
-        }
-    }
+
+// get from new cs-cart version
+:root {
+    --space-xxxs: 1px;
+    --space-xxs: 2px;
+    --space-xs: 5px;
+    --space-s: 10px;
+    --space-m: 15px;
+    --space-l: 20px;
+    --space-xl: 25px;
+    --space-xxl: 30px;
+    --space-xxxl: 35px;
+    --space-xxxxl: 40px;
+
+    --width-xxxs: 1px;
+    --width-xxs: 2px;
+    --width-xs: 5px;
+    --width-s: 10px;
+    --width-m: 15px;
+    --width-l: 20px;
+    --width-xl: 25px;
+    --width-xxl: 30px;
+    --width-xxxl: 35px;
+    --width-xxxxl: 40px;
+}
+.ty-dl {
+    margin: 0;
+}
+.ty-dt {
+    margin: 0;
+}
+.ty-dd {
+    margin: 0;
+}
+.ty-blockquote {
+    margin: 0;
+}
+.ty-address {
+    font-style: normal;
+}
+.ty-visually-hidden, .ty-visually-hidden-focusable:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// Dialog caret
+.ty-dialog-caret {
+    position: relative;
+    margin-top: var(--space-l);
+    padding: var(--space-l);
+    border: 1px solid #e3e3e3;
+}
+
+.ty-dialog-caret:before,
+.ty-dialog-caret:after {
+    content: '';
+    position: absolute;
+    left: var(--space-s);
+    bottom: 100%;
+    border-top: var(--space-l) solid transparent;
+    border-left: var(--space-l) solid #e3e3e3;
+}
+
+.ty-dialog-caret:after {
+    border-left-color: #fff;
+    transform: scale(0.9);
+    transform-origin: bottom;
+}
+
+.ty-icon-aurora-telegram {
+    color: #0084c6;
 }

@@ -32,6 +32,11 @@
         <item lang="ru" id="log_action_debug">Отладочная информация</item>
         <item lang="ru" id="maintenance.tracking_link">Ссылка для отслеживания</item>
         <item lang="ru" id="maintenance.track_order">Отследить заказ</item>
+        <item lang="ru" id="maintenance.in_order">В заказе</item>
+        <item lang="ru" id="maintenance.nin_order">Не в заказе</item>
+        <item lang="ru" id="maintenance.category_products">Товары из категории</item>
+        <item lang="ru" id="maintenance.with_orders">С заказами</item>
+        <item lang="ru" id="maintenance.without_orders">Без заказов</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:promotions` ADD `external_id` VARCHAR(255) NOT NULL DEFAULT '';</item> 
@@ -41,6 +46,9 @@
         <item for="uninstall">ALTER TABLE `?:orders` DROP `tracking_link`;</item>
         <item>ALTER TABLE `?:orders` ADD `device_id` VARCHAR(64) NOT NULL DEFAULT '';</item>
         <item for="uninstall">ALTER TABLE `?:orders` DROP `device_id`;</item>
+
+        <item>ALTER TABLE `?:products` ADD `barcode` VARCHAR(64) NOT NULL DEFAULT '';</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `barcode`;</item>
     </queries>
     <functions>
         <item for="install">fn_maintenance_install</item>

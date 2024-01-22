@@ -103,7 +103,7 @@ function fn_maintenance_check_rights_delete_user($user_data, $auth, &$result) {
     }
 }
 
-function fn_maintenance_get_users($params, $fields, $sortings, &$condition, $join, $auth) {
+function fn_maintenance_get_users(&$params, &$fields, &$sortings, &$condition, &$join, $auth) {
     if ((!isset($params['user_type']) || UserTypes::isAdmin($params['user_type'])) && fn_is_restricted_admin(['user_type' => $auth['user_type']])) {
         $condition['wo_root_admins'] .= db_quote(' AND is_root != ?s ', YesNo::YES);
     }
@@ -118,6 +118,118 @@ function fn_maintenance_get_users($params, $fields, $sortings, &$condition, $joi
             $name_fields = array_merge($name_fields, ['?:users.email', '?:users.phone', '?:user_profiles.b_phone', '?:user_profiles.s_phone']);
         }
         $condition['name'] = fn_maintenance_build_search_condition($name_fields, $params['name'], 'all');
+    }
+
+    $without_order_prefix = 'orders_period_';
+    if (!empty($params['user_orders'])) {
+        list(
+            $w_time_from,
+            $w_time_to,
+        ) = [
+            $without_order_prefix . 'time_from',
+            $without_order_prefix . 'time_to',
+        ];
+
+        list($params[$w_time_from], $params[$w_time_to]) = fn_create_periods([
+            'period' => $params[$without_order_prefix . 'period'],
+            'time_from' => $params[$w_time_from],
+            'time_to' => $params[$w_time_to]
+        ]);
+
+        $join .= db_quote(" LEFT JOIN ?:orders as user_orders ON ?:users.user_id = user_orders.user_id AND (user_orders.timestamp >= ?i AND user_orders.timestamp <= ?i)", $params[$w_time_from], $params[$w_time_to]);
+        if ($params['user_orders'] == 'without') {
+            $condition['user_orders'] = db_quote(" AND user_orders.user_id IS NULL");
+        }
+        if ($params['user_orders'] == 'with') {
+            $condition['user_orders'] = db_quote(" AND user_orders.user_id IS NOT NULL");
+            if ($params['orders_period_amount']) {
+                $subquery_cond = '';
+                list($params['orders_period_time_from'], $params['orders_period_time_to']) = fn_create_periods([
+                    'period' => $params['orders_period_period'],
+                    'time_from' => $params['orders_period_time_from'],
+                    'time_to' => $params['orders_period_time_to']
+                ]);
+                if ($params['orders_period_time_from']) {
+                    $subquery_cond .= db_quote(' AND ?:orders.timestamp >= ?i ', $params['orders_period_time_from']);
+                }
+                if ($params['orders_period_time_to']) {
+                    $subquery_cond .= db_quote(' AND ?:orders.timestamp <= ?i ', $params['orders_period_time_to']);
+                }
+                
+                $operator = ($params['orders_period_operator'] == 'gt') ? '>' : '<';
+
+                $subquery = db_quote("
+                    SELECT DISTINCT
+                        (?:users.user_id)
+                    FROM
+                        ?:users
+                    LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id AND ?:orders.is_parent_order != 'Y'
+                    
+                    WHERE
+                        1 ?p
+                    GROUP BY
+                        ?:users.user_id
+                    HAVING count(?:orders.order_id) ?p ?i
+                ", $subquery_cond, $operator, $params['orders_period_amount']);
+                $condition['orders_amount'] = db_quote(" AND ?:users.user_id IN ($subquery)");
+            }
+        }
+    }
+    if (isset($params['registration_period']) && YesNo::toBool($params['registration_period'])) {
+        list($registration_period_time_from, $registration_period_time_to) = fn_create_periods([
+            'period' => $params['registration_period_period'],
+            'time_from' => $params['registration_period_time_from'],
+            'time_to' => $params['registration_period_time_to']
+        ]);
+        if ($registration_period_time_from) {
+            $condition['registration_period_time_from'] = db_quote(' AND ?:users.timestamp >= ?i ', $registration_period_time_from);
+        }
+        if ($registration_period_time_to) {
+            $condition['registration_period_time_to'] = db_quote(' AND ?:users.timestamp <= ?i ', $registration_period_time_to);
+        }
+    }
+
+    $products_in_order = [];
+    if (!empty($params['category_ids'])) {
+        $products_in_order = db_get_fields(fn_get_products(['cid' => $params['category_ids'], 'subcats' => 'Y', 'get_query' => true]));
+    }
+
+    if (!empty($params['p_ids']) || !empty($params['category_ids'])) {
+        list($params['ordered_products_time_from'], $params['ordered_products_time_to']) = fn_create_periods([
+            'period' => $params['ordered_products_period'],
+            'time_from' => $params['ordered_products_time_from'],
+            'time_to' => $params['ordered_products_time_to']
+        ]);
+        $condition['order_period'] = db_quote(' AND ?:orders.timestamp > ?i AND ?:orders.timestamp < ?i', $params['ordered_products_time_from'], $params['ordered_products_time_to']);
+    }
+
+    if (!empty($params['ordered_type'])) {
+        if ($params['ordered_type'] == 'IN') {
+
+            if (!empty($products_in_order)) {
+                $condition['ordered_products'] = db_quote(' AND ?:order_details.product_id IN (?n)', $products_in_order);
+                if (strpos($join, 'LEFT JOIN ?:order_details') === false) {
+                    $join .= db_quote(' LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id AND ?:orders.is_parent_order != ?s LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id', YesNo::YES);
+                }
+            }
+        } else {
+            // not ordered products
+            $subquery = db_quote("
+            SELECT DISTINCT
+                (?:users.user_id)
+            FROM
+                ?:users
+            LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id AND ?:orders.is_parent_order != 'Y'
+            LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id
+            WHERE
+                1 AND ?:order_details.product_id IN (?a) ?p
+            GROUP BY
+                ?:users.user_id
+            ", (!empty($products_in_order) ? $products_in_order : $params['p_ids']), $condition['order_period'] ?? '');
+
+            $condition['not_ordered_products'] = db_quote(" AND ?:users.user_id NOT IN ($subquery)");
+            unset($condition['order_product_id'], $condition['order_period']);
+        }
     }
 }
 
@@ -291,4 +403,16 @@ function fn_maintenance_user_init($auth, $user_info, $first_init) {
 
 function fn_maintenance_create_order(&$order) {
     $order['device_id'] = (defined('API')) ? fn_get_headers('Device-Id') : fn_get_cookie('device-id');
+}
+
+function fn_maintenance_get_orders($params, $fields, $sortings, &$condition, &$join, &$group) {
+    if (!empty($params['usergroup_id'])) {
+        $auth = Tygh::$app['session']['auth'];
+        list($users, ) = fn_get_users(array('usergroup_id' => $params['usergroup_id']), $auth);
+        $condition .= db_quote(' AND ?:orders.user_id IN (?a)', array_column($users, 'user_id'));
+    }
+
+    if (isset($params['promotion_id']) && !empty($params['promotion_id'])) {
+        $condition .= db_quote(" AND FIND_IN_SET(?i, promotion_ids)", $params['promotion_id']);
+    }
 }
