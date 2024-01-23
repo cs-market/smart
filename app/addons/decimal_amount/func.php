@@ -63,6 +63,8 @@ function fn_decimal_amount_pre_add_to_cart(&$product_data, $cart, $auth, $update
         if (fn_fmod($data['amount'], 1)) {
             $data['extra']['decimal_amount'] = $data['amount'];
             //$data['original_amount'] = $data['amount'];
+        } else {
+            unset($data['extra']['decimal_amount']);
         }
         if (isset($data['extra']['exclude_from_calculate'])) {
             $data['original_amount'] = $data['amount'];
