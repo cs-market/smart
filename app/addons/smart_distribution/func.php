@@ -1036,3 +1036,13 @@ function fn_smart_distribution_storefront_rest_api_strip_service_data_post(&$car
     if ($cart['user_data']['company_id'] == 1810) $cart['min_order_notice'] = 2500;
     if ($cart['user_data']['company_id'] == 2058) $cart['min_order_notice'] = 1500;
 }
+
+function fn_smart_distribution_create_order($order) {
+    if ($order['company_id'] == 2190 && $order['storage_id'] == 0) {
+        $delivery_date_by_storage = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i ORDER BY storage_id', 'storage_id', $order['user_id']);
+        $storage_id = key($delivery_date_by_storage);
+        $storages = fn_get_storages(['get_usergroups' => true]);
+        list($storage) = fn_get_storages(['storage_id' => $storage_id]);
+        fn_write_r('runtime.storages:', Registry::get('runtime.storages'), 'runtime.current_storage:', Registry::get('runtime.current_storage'), 'delivery_date_by_storage:', $delivery_date_by_storage, 'fn_get_storages:', $storages, 'get_storage_data:', $storage);
+    }
+}
