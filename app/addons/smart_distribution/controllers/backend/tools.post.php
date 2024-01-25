@@ -2245,9 +2245,9 @@ fn_print_die($orders_wo_points);
         }
     }
     if ($action == 'orders') {
-        $res1 = db_query('DELETE FROM ?:order_data WHERE order_id NOT IN (SELECT order_id FROM ?:orders)');
-
         $iteration = empty($dispatch_extra) ? 1 : $dispatch_extra;
+
+        if ($iteration == 1) $res1 = db_query('DELETE FROM ?:order_data WHERE order_id NOT IN (SELECT order_id FROM ?:orders)');
 
         $step = 500;
         $limit = ' LIMIT '. ($iteration-1)* $step . ', ' . $step;
@@ -2348,8 +2348,23 @@ fn_print_die($orders_wo_points);
             fn_print_die('empty company_id in $dispatch_extra');
         }
     }
+    fn_print_die('done');
 } elseif ($mode == 'remove_images_eclipse') {
     $products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 2190);
+    foreach ($products as $product_id) {
+        $products_images = fn_get_image_pairs($product_id, 'product', 'M', true, true, DEFAULT_LANGUAGE);
+        if (!empty($products_images)) {
+            fn_delete_image_pair($products_images['pair_id']);
+        }
+
+        $additional_images = fn_get_image_pairs($product_id, 'product', 'A', true, true, DEFAULT_LANGUAGE);
+        foreach ($additional_images as $pair) {
+            fn_delete_image_pair($pair['pair_id']);
+        }
+    }
+    fn_print_die('done', count($products));
+} elseif ($mode == 'remove_images_znatok') {
+    $products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 2192);
     foreach ($products as $product_id) {
         $products_images = fn_get_image_pairs($product_id, 'product', 'M', true, true, DEFAULT_LANGUAGE);
         if (!empty($products_images)) {
@@ -4266,6 +4281,104 @@ fn_print_die($orders_wo_points);
     }
 
     fn_print_die('done. Out of status:', $out_of_status);
+} elseif ($mode == 'ssessions') {
+    $iteration = empty($action) ? 1 : $action;
+
+    $step = 1000;
+    $limit = ' LIMIT '. ($iteration - 1) * $step . ', ' . $step;
+
+    $sessions = db_get_array("SELECT * FROM ?:user_session_products $limit");
+    if ($sessions) {
+        foreach ($sessions as &$data) {
+            $extra = unserialize($data['extra']);
+            $data['ts'] = $extra['timestamp'] ?? 0;
+            $data['uid'] = $extra['user_id'] ?? 0;
+            db_query('REPLACE INTO ?:user_session_products SET ?u', $data);
+        }
+    } else {
+        fn_print_die('done');
+    }
+
+    fn_print_r($iteration);
+    $iteration += 1;
+    fn_redirect('tools.ssessions.' . $iteration);
+} elseif ($mode == 'debug_sessions') {
+    $user_id = 203165;
+    $usp = db_get_array('SELECT * FROM ?:user_session_products WHERE user_id = ?i AND type = ?s', $user_id, 'W');
+    foreach($usp as $key => &$record) {
+        $record['extra'] = unserialize($record['extra']);
+        if ($record['user_id'] == $extra['user_id']) {
+            unset($usp[$key]);  
+        } else {
+            $record['extra_timestamp'] = $record['extra']['timestamp'];
+        }
+    }
+    $usp = fn_sort_array_by_key($usp, 'extra_timestamp', SORT_DESC);
+    fn_print_die($usp);
+} elseif ($mode == 'baltica_barcodes') {
+    // $file = 'cscart_products.csv';
+    // $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    // $content = fn_array_elements_to_keys($content, 'product_id');
+    // $keywords = db_get_array('SELECT search_words, product_id FROM ?:product_descriptions WHERE product_id IN (?a)', array_keys($content));
+    // $keywords = fn_array_elements_to_keys($keywords, 'product_id');
+    // $result = fn_array_merge($content, $keywords);
+
+    // $params['filename'] = 'cscart_products_.csv';
+    // $params['force_header'] = false;
+    // $export = fn_exim_put_csv(array_values($result), $params, '"');
+
+    $file = 'cscart_products_.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    foreach ($content as $value) {
+        db_query('UPDATE ?:products SET barcode = ?s WHERE product_id = ?i', $value['barcode'], $value['product_id']);
+        db_query('UPDATE ?:product_descriptions SET search_words = ?s WHERE product_id = ?i', $value['search_words'], $value['product_id']);
+    }
+ 
+    fn_print_die('done');
+} elseif ($mode == 'correct_reward_points_january') {
+    $changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE reason LIKE ?l', '% —> ');
+    array_shift($changes); // first order is old
+    foreach ($changes as $change) {
+        $order_id = (int) str_replace('Корректировка баллов по заказу #', '', $change['reason']);
+        fn_revert_reward_points_change($change);
+    }
+    fn_print_die('done', count($changes));
+} elseif ($mode == 'restore_points_in_use') {
+    $iteration = empty($action) ? 1 : $action;
+
+    $step = 500;
+    $limit = ' LIMIT '. ($iteration-1)* $step . ', ' . $step;
+
+    $order_ids = db_get_fields("SELECT order_id FROM ?:orders WHERE group_id != 0 AND order_id > 262068 $limit");
+
+    if (empty($order_ids)) {
+        fn_print_die('done');
+    } else {
+        fn_print_r(reset($order_ids));
+    }
+
+    foreach ($order_ids as $order_id) {
+        $info = fn_get_order_info($order_id);
+        if (!empty($info['points_info']['in_use'])) {
+            fn_reward_points_place_order($order_id, $fake, $fake, $info);
+        }
+    }
+
+    $iteration += 1;
+    fn_redirect('tools.restore_points_in_use.' . $iteration);
+} elseif ($mode == 'check_storages') {
+    $storages = db_get_array('SELECT distinct(sp.storage_id), sp.product_id, p.items_in_package, sp.min_qty, sp.min_qty/p.items_in_package AS sell_from FROM ?:storages_products AS sp LEFT JOIN ?:products AS p ON p.product_id = sp.product_id WHERE p.items_in_package != 1 AND sp.min_qty < p.items_in_package AND sp.min_qty != 0 AND p.company_id = 45 GROUP BY sp.storage_id');
+    $rest_storages = array_filter($storages, function($v) { return $v['sell_from'] != 0.5;});
+    fn_print_die(count($rest_storages), $rest_storages);
+
+    //527827  553385
+    $ordered_products = db_get_array('SELECT o.order_id, o.product_id, o.amount, p.items_in_package, o.amount/p.items_in_package AS coeff, o.amount % p.items_in_package AS rest FROM ?:order_details AS o LEFT JOIN ?:products AS p ON p.product_id = o.product_id LEFT JOIN ?:orders AS ord ON ord.order_id = o.order_id WHERE o.order_id >= 527827 AND o.order_id <= 553385 AND o.amount > 0 AND p.items_in_package > 1 AND ord.company_id = 45 HAVING coeff > 1 AND rest != 0');
+    $orders = fn_group_array_by_key($ordered_products, 'order_id');
+
+    $params['filename'] = 'ordered_products.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($ordered_products, $params, '"');
+    fn_print_die(count($orders), $export);
 }
 
 function fn_revert_reward_points_change($change, $from_order = false) {
