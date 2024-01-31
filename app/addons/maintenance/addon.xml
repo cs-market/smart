@@ -37,6 +37,7 @@
         <item lang="ru" id="maintenance.category_products">Товары из категории</item>
         <item lang="ru" id="maintenance.with_orders">С заказами</item>
         <item lang="ru" id="maintenance.without_orders">Без заказов</item>
+        <item lang="ru" id="maintenance.only_create">Только создание новых</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:promotions` ADD `external_id` VARCHAR(255) NOT NULL DEFAULT '';</item> 
