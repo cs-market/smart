@@ -59,24 +59,22 @@ function fn_sales_plan_delete_company($company_id, $result) {
 
 // TODO CHECK THIS CODE
 function fn_sales_plan_create_order($order) {
-    if (Registry::get('addons.managers.status') == 'A') {
-        $manager = db_get_field("SELECT u.email FROM ?:users AS u LEFT JOIN ?:user_managers AS um ON um.manager_id = u.user_id WHERE um.user_id = ?i AND um.manager_id IN (SELECT user_id FROM ?:users LEFT JOIN ?:companies ON ?:users.company_id = ?:companies.company_id WHERE user_type = ?s AND ?:users.company_id = ?i AND ?:companies.notify_manager_order_insufficient = 'Y')", $order['user_id'], 'V', $order['company_id']);
+    $manager = db_get_field("SELECT u.email FROM ?:users AS u LEFT JOIN ?:user_managers AS um ON um.manager_id = u.user_id WHERE um.user_id = ?i AND um.manager_id IN (SELECT user_id FROM ?:users LEFT JOIN ?:companies ON ?:users.company_id = ?:companies.company_id WHERE user_type = ?s AND ?:users.company_id = ?i AND ?:companies.notify_manager_order_insufficient = 'Y')", $order['user_id'], 'V', $order['company_id']);
 
-        if (!empty($manager)) {
-            $notification_data[$manager]['less_placed'][] = $order['user_id'];
-        }
-        
-        $mailer = Tygh::$app['mailer'];
+    if (!empty($manager)) {
+        $notification_data[$manager]['less_placed'][] = $order['user_id'];
+    }
 
-        if (!empty($notification_data)) {
-            foreach ($notification_data as $manager_email => $data) {
-                $mailer->send(array(
-                    'to' => $manager_email,
-                    'from' => 'default_company_orders_department',
-                    'data' => array('data' => $data),
-                    'tpl' => 'addons/sales_plan/sales_notification.tpl',
-                ), 'A');
-            }
+    $mailer = Tygh::$app['mailer'];
+
+    if (!empty($notification_data)) {
+        foreach ($notification_data as $manager_email => $data) {
+            $mailer->send(array(
+                'to' => $manager_email,
+                'from' => 'default_company_orders_department',
+                'data' => array('data' => $data),
+                'tpl' => 'addons/sales_plan/sales_notification.tpl',
+            ), 'A');
         }
     }
 }
@@ -97,11 +95,9 @@ function fn_sales_plan_place_order($order_id, $action, &$order_status, $cart, $a
 }
 
 function fn_sales_plan_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
-    if (fn_allowed_for('MULTIVENDOR')) {
-        $condition = '';
-        if (Registry::get('runtime.company_id')) {
-            $condition .= db_quote(' AND company_id = ?i', Registry::get('runtime.company_id'));
-        }
-        $user_data['plan'] = db_get_hash_array("SELECT * from ?:sales_plan WHERE user_id = ?i $condition", 'company_id', $user_id);
+    $condition = '';
+    if (Registry::get('runtime.company_id')) {
+        $condition .= db_quote(' AND company_id = ?i', Registry::get('runtime.company_id'));
     }
+    $user_data['plan'] = db_get_hash_array("SELECT * from ?:sales_plan WHERE user_id = ?i $condition", 'company_id', $user_id);
 }
