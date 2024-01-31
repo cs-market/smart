@@ -4476,7 +4476,7 @@ fn_print_die($orders_wo_points);
 
                             if (!$already_granted) {
                                 $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
-                                //db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
+                                db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
                                 $user_info = fn_get_user_info($user_id);
                                 $insert['user_login'] = $user_info['user_login'];
                                 $insert['firstname'] = $user_info['firstname'];
@@ -4588,10 +4588,10 @@ fn_print_die($orders_wo_points);
             }
         }
 
-//         foreach ($add_points as $add) {
-//             $reason = array('order_id' => $add['order_id'], 'to' => $add['status'], 'correction' => 'correct_reward_points_october');
-//             fn_change_user_points($add['points'], $add['user_id'], serialize($reason), CHANGE_DUE_ORDER, $add['timestamp']);
-//         }
+        foreach ($add_points as $add) {
+            $reason = array('order_id' => $add['order_id'], 'to' => $add['status'], 'correction' => 'correct_reward_points_january');
+            fn_change_user_points($add['points'], $add['user_id'], serialize($reason), CHANGE_DUE_ORDER, $add['timestamp']);
+        }
 
         fn_print_r('Текущая корректировка ' . $month, $add_points);
 
