@@ -27,6 +27,30 @@
                         <type>input</type>
                         <name>Reduce reward points sticker id</name>
                     </item>
+                    <item editions="ULTIMATE" id="reward_points_mechanics">
+                        <type>selectbox</type>
+                        <name>Механика бонусных баллов:</name>
+                        <variants>
+                            <item id="A"><name>Полная оплата товара баллами</name></item>
+                            <item id="B"><name>Частичная оплата товара баллами</name></item>
+                        </variants>
+                        <default_value>B</default_value>
+                    </item>
+                    <item editions="ULTIMATE" id="max_rp_discount">
+                        <type>input</type>
+                        <name>Ограничить частичную оплату в объеме от заказа (%)</name>
+                        <default_value>20</default_value>
+                    </item>
+                    <item editions="ULTIMATE" id="max_product_discount">
+                        <type>input</type>
+                        <name>Максимальная скидка на товар с участием бонусных баллов (%)</name>
+                        <default_value>30</default_value>
+                    </item>
+                    <item editions="ULTIMATE" id="reward_points_ttl">
+                        <type>input</type>
+                        <name>Время жизни начисленных бонусных баллов</name>
+                        <default_value>0</default_value>
+                    </item>
                 </items>
             </section>
         </sections>
@@ -53,20 +77,16 @@
         <item lang="ru" id="extended_reward_points.user_points">Баллы пользователя</item>
     </language_variables>
     <queries>
-        <item>ALTER TABLE `?:companies` ADD `reward_points_mechanics` CHAR(1) NOT NULL DEFAULT 'A';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP `reward_points_mechanics`;</item>
-
-        <item>ALTER TABLE `?:companies` ADD `max_rp_discount` TINYINT UNSIGNED NOT NULL DEFAULT '20';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP `max_rp_discount`;</item>
-
-        <item>ALTER TABLE `?:companies` ADD `max_product_discount` TINYINT UNSIGNED NOT NULL DEFAULT '30';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP `max_product_discount`;</item>
-
-        <item>ALTER TABLE `?:companies` ADD `reward_points_ttl` SMALLINT UNSIGNED NOT NULL DEFAULT '0';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP `reward_points_ttl`;</item>
-
-        <item>ALTER TABLE `?:products` ADD `earned_points_eq_price` CHAR(1) NOT NULL DEFAULT 'N'</item>
-        <item for="uninstall">ALTER TABLE `?:products` DROP `earned_points_eq_price`;</item>
+        <item editions="MULTIVENDOR">ALTER TABLE `?:companies`
+            ADD `reward_points_mechanics` CHAR(1) NOT NULL DEFAULT 'A',
+            ADD `max_rp_discount` TINYINT UNSIGNED NOT NULL DEFAULT '20',
+            ADD `max_product_discount` TINYINT UNSIGNED NOT NULL DEFAULT '30',
+            ADD `reward_points_ttl` SMALLINT UNSIGNED NOT NULL DEFAULT '0';</item>
+        <item editions="MULTIVENDOR" for="uninstall">ALTER TABLE `?:companies`
+            DROP `reward_points_mechanics`,
+            DROP `max_rp_discount`,
+            DROP `max_product_discount`,
+            DROP `reward_points_ttl`;</item>
 
         <item>DROP TABLE IF EXISTS `?:reward_point_details`;</item>
         <item>CREATE TABLE `?:reward_point_details` (

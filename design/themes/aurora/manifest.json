@@ -4,7 +4,8 @@
 			"default_product_details_view": "default_template",
 			"thumbnails_gallery": false,
 			"display_track_orders": false,
-			"enable_quick_view": false
+			"enable_quick_view": false,
+			"enable_compare_products": false
 		},
 		"Thumbnails": {
 			"product_details_thumbnail_height": "565",

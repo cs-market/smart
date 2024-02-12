@@ -124,7 +124,11 @@ function fn_extended_reward_points_user_init(&$auth, $user_info) {
         if (!empty($user_info['extended_reward_points'])) {
             $auth['extended_reward_points'] = $user_info['extended_reward_points'];
         } else {
-            $auth['extended_reward_points'] = db_get_row('SELECT reward_points_mechanics, max_rp_discount, max_product_discount FROM ?:companies WHERE company_id = ?i', $auth['company_id']);
+            if (fn_allowed_for('MULTIVENDOR')) {
+                $auth['extended_reward_points'] = db_get_row('SELECT reward_points_mechanics, max_rp_discount, max_product_discount FROM ?:companies WHERE company_id = ?i', $auth['company_id']);
+            } else {
+                $auth['extended_reward_points'] = Registry::get('addons.extended_reward_points');
+            }
         }
     }
 }
@@ -156,7 +160,7 @@ function fn_extended_reward_points_add_product_to_cart_get_price($product_data, 
                 $tmp['price'] = $price;
                 $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($tmp, $auth);
             }
-            
+
             $in_use = fn_get_cart_points_in_use($cart, ($update) ? $product_id : false);
             
             $balance = $auth['points'] - $data['extra']['point_price'] * $amount - $in_use;
@@ -201,7 +205,13 @@ function fn_get_cart_points_in_use($cart, $exclude_products = []) {
 }
 
 function fn_extended_reward_points_change_order_status(&$status_to, &$status_from, &$order_info, &$force_notification, &$order_statuses, &$place_order) {
-    if ($reward_points_ttl = db_get_field('SELECT reward_points_ttl FROM ?:companies WHERE company_id = ?i', $order_info['company_id'])) {
+    if (fn_allowed_for('MULTIVENDOR')) {
+        $reward_points_ttl = db_get_field('SELECT reward_points_ttl FROM ?:companies WHERE company_id = ?i', $order_info['company_id']);
+    } else {
+        $reward_points_ttl = Registry::get('addons.extended_reward_points.reward_points_ttl');
+    }
+
+    if (!empty($reward_points_ttl)) {
 
         $points_info = (isset($order_info['points_info'])) ? $order_info['points_info'] : array();
 

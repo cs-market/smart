@@ -1,3 +1,4 @@
+{include file="common/subheader.tpl" title=__("promotion_progress")}
 <div class="control-group">
     <label class="control-label" for="total_sales">{__("total_sales")}</label>
     <div class="controls">

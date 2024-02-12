@@ -6,7 +6,7 @@ msgstr "Project-Id-Version: tygh"
 
 msgctxt "Addons::name::promotion_step"
 msgid "Promotion step"
-msgstr "Шаг применения акции"
+msgstr "Smart distribution: Шаг применения акции"
 
 msgctxt "Addons::description::promotion_step"
 msgid "promotion_step_description"

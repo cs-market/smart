@@ -1,3 +1,4 @@
+{if "MULTIVENDOR"|fn_allowed_for}
 {include file="common/subheader.tpl" title=__("extended_reward_points") target="#reward_points_company_hook"}
 <div id="reward_points_company_hook" class="in collapse">
     <div class="control-group">
@@ -31,3 +32,4 @@
         </div>
     </div>
 </div>
+{/if}

@@ -7,7 +7,7 @@
     <priority>4294967294</priority>
     <position>0</position>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
-    <default_language>en</default_language>
+    <default_language>ru</default_language>
     <status>active</status>
     <has_icon>Y</has_icon>
     <supplier>CS-Market</supplier>
@@ -17,7 +17,6 @@
         <!-- dependencies by fn_find_promotion_condition -->
     </compatibility>
     <language_variables>
-        <item lang="en" id="promotion_cond_budget">Promotion budget</item>
         <item lang="ru" id="promotion_cond_budget">Бюджет на промо-акцию</item>
     </language_variables>
 </addon>
