@@ -22,6 +22,7 @@ fn_register_hooks(
     'development_show_stub',
     'get_carts',
     'change_usergroup_status_pre',
+    'exim1c_update_product_usergroups_pre',
     'get_product_filter_fields',
     'get_products',
     'user_init',

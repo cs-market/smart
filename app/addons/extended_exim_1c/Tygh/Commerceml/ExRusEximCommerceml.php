@@ -357,12 +357,11 @@ class ExRusEximCommerceml extends RusEximCommerceml
 
         // [csmarket]
         $company_condition = fn_get_company_condition('company_id', true, '', false, true);
-        if ($product_guid) $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp, show_out_of_stock_product FROM ?:products WHERE external_id = ?s $company_condition", $product_guid);
+        if ($product_guid) $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp, show_out_of_stock_product, usergroup_ids FROM ?:products WHERE external_id = ?s $company_condition", $product_guid);
 
         if (empty($product_data)) {
             $_product_data = $this->getProductDataByLinkType($link_type, reset($offers), $cml);
-            if (!empty($_product_data))
-            $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp, show_out_of_stock_product FROM ?:products WHERE product_id = ?s $company_condition", $_product_data['product_id']);
+            if (!empty($_product_data)) $product_data = $_product_data;
         }
 
         $product_id = empty($product_data['product_id']) ? 0 : $product_data['product_id'];
@@ -421,6 +420,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
                 $ugroups = array_keys($ugroups);
             }
             if (!empty($product_data['product_id']) && !empty($ugroups)) {
+                fn_set_hook('exim1c_update_product_usergroups_pre', $product_data, $ugroups);
                 $this->db->query('UPDATE ?:products SET usergroup_ids = ?s WHERE product_id = ?i', implode(',', $ugroups), $product_data['product_id']);
             }
         }
@@ -642,29 +642,30 @@ class ExRusEximCommerceml extends RusEximCommerceml
 
         $article = strval($_product -> {$cml['article']});
         $barcode = strval($_product -> {$cml['bar']});
+        $fields = '?:products.product_id, update_1c, status, tracking, product_code, timestamp, show_out_of_stock_product, usergroup_ids';
 
         $company_condition = fn_get_company_condition('company_id', true, '', false, true);
 
         if ($link_type == 'article') {
             $product_data = $this->db->getRow(
-                "SELECT product_id, update_1c FROM ?:products WHERE product_code = ?s $company_condition",
+                "SELECT $fields FROM ?:products WHERE product_code = ?s $company_condition",
                 $article
             );
 
         } elseif ($link_type == 'barcode') {
             $product_data = $this->db->getRow(
-                "SELECT product_id, update_1c FROM ?:products WHERE product_code = ?s $company_condition",
+                "SELECT $fields FROM ?:products WHERE product_code = ?s $company_condition",
                 $barcode
             );
 
         } else {
             $product_data = $this->db->getRow(
-                "SELECT product_id, update_1c FROM ?:products WHERE external_id = ?s $company_condition",
+                "SELECT $fields FROM ?:products WHERE external_id = ?s $company_condition",
                 $guid_product
             );
             if (empty($product_data) && $this->is_allow_product_variations) {
                 $product_data = $this->db->getRow(
-                    'SELECT product_id, update_1c FROM ?:products WHERE external_id LIKE ?l AND parent_product_id = ?i',
+                    'SELECT $fields FROM ?:products WHERE external_id LIKE ?l AND parent_product_id = ?i',
                     $guid_product . '#%', 0
                 );
             }
@@ -688,7 +689,7 @@ class ExRusEximCommerceml extends RusEximCommerceml
 
                 if (empty($product_data) && !empty($article)) {
                     $product_data = $this->db->getRow(
-                        "SELECT ?:products.product_id, update_1c FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE product_code = ?s $company_condition", DESCR_SL,
+                        "SELECT $fields FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE product_code = ?s $company_condition", DESCR_SL,
                         strval($_product -> {$cml['article']})
                     );
                 }

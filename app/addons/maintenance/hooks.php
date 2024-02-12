@@ -316,6 +316,15 @@ function fn_maintenance_change_usergroup_status_pre($status, &$user_id, $usergro
     }
 }
 
+function fn_maintenance_exim1c_update_product_usergroups_pre($product_data, &$ugroups) {
+    $service_usergroups = Registry::get('addons.maintenance.service_usergroups');
+    if (!empty($service_usergroups) && !empty($product_data['usergroup_ids'])) {
+        if ($product_service_usergroups = array_intersect(explode(',', $product_data['usergroup_ids']), array_keys($service_usergroups))) {
+            $ugroups = array_unique(array_merge($ugroups, $product_service_usergroups));
+        }
+    }
+}
+
 function fn_maintenance_get_product_filter_fields(&$filters) {
     $filters[ProductFilterProductFieldTypes::PRICE]['conditions'] = function($db_field, $join, $condition) {
 
