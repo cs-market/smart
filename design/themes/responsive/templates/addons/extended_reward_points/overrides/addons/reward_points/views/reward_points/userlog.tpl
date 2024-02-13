@@ -52,7 +52,7 @@
 </tr>
 {foreachelse}
 <tr class="ty-table__no-items">
-    <td colspan="3"><p class="ty-no-items">{__("no_items")}</p></td>
+    <td colspan="4"><p class="ty-no-items">{__("no_items")}</p></td>
 </tr>
 {/foreach}
 </table>

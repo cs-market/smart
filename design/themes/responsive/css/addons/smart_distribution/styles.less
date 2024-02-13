@@ -114,7 +114,18 @@
         }
         --scroller-gap: 5px;
     }
-    .ty-cart-content__buttons .ty-btn__primary {
+    .tygh-header {
+        position: sticky;
+        top: 72px;
+    }
+    .top-logo-grid .ty-text-links__a {
+        font-size: 20px;
+    }
+    .ty-filters {
+        max-height: calc(~"100vh - 245px");
+        overflow-y: scroll;
+    }
+    .ty-cart-content__buttons .ty-btn__primary, .ty-grid-list__product_amount {
         display: none;
     }
     .ty-grid-list__item &__points-sticker {
@@ -123,7 +134,20 @@
     .ty-promotion-motivation {
         border: 1px solid #f36;
     }
+    .ty-account-info__reward-points {
+        display: none;
+    }
     .ty-baltika__noviety {
+        .ty-switcher-checkbox, .box-price {
+            display: none;
+        }
+        .ty-grid-list__image {
+            max-width: 120px;
+            margin: 0 auto;
+        }
+        .ty-grid-list__price  {
+            margin-bottom: 5px;
+        }
         .ty-mainbox-simple-title {
             position: absolute;
         }
