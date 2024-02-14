@@ -97,9 +97,6 @@
         <item lang="en" id="telegram.events_subscribed">Events subscribed</item>
         <item lang="ru" id="telegram.events_subscribed">Подписаться на уведомления о событиях</item>
 
-        <item lang="en" id="telegram.change_order_status">Change order status</item>
-        <item lang="ru" id="telegram.change_order_status">Изменить статус заказа</item>
-
         <item lang="en" id="telegram.tg_enabled">Allow to assing telegram to accounts</item>
         <item lang="ru" id="telegram.tg_enabled">Позволить связывать учетную запись с telegram</item>
     </language_variables>

@@ -21,7 +21,7 @@
         <item lang="ru" id="delivery_date">Дата доставки</item>
         <item lang="ru" id="calendar_delivery">Календарь</item>
         <item lang="ru" id="tomorrow">Завтра</item>
-        <item lang="ru" id="after_tomorrow">Послезавтра</item>
+        <item lang="ru" id="day_after_tomorrow">Послезавтра</item>
         <item lang="ru" id="calendar_delivery.nearest_delivery">Ближайшая доставка</item>
         <item lang="ru" id="calendar_delivery.working_time_till">Доставка на ближайшую дату формируется до</item>
         <item lang="ru" id="calendar_delivery.max_date">Ограничить возможность доставки следующими днями</item>

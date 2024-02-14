@@ -11,7 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'update') {
     $user_data = Tygh::$app['view']->getTemplateVars('user_data');
-    if (!Registry::ifget('navigation.tabs.usergroups', false)) {
+
+    if (fn_allowed_for('MULTIVENDOR') && !Registry::ifget('navigation.tabs.usergroups', false)) {
         $user_type = $user_data['user_type'];
 
         if ((!fn_check_user_type_admin_area($user_type) && in_array($auth['user_type'], ['A', 'V']) )
@@ -28,7 +29,6 @@ if ($mode == 'update') {
         }
     }
 
-    $usergroups = Tygh::$app['view']->getTemplateVars('usergroups');
     if (!empty($usergroups)) {
         $active_usergroups = array_keys(array_filter($user_data['usergroups'], function($v) {return $v['status'] == 'A';}));
 

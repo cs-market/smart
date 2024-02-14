@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
     <id>promotion_motivation</id>
-    <name>Smart distribution: Promotion motivation</name>
+    <name>Smart distribution: Мотивации промо</name>
     <description>Добавляет мотивации к использованию промо в витрине</description>
     <version>1.0.1</version>
     <priority>4294967294</priority>

@@ -1,6 +1,9 @@
 <?php
 
+use Tygh\Registry;
 use Tygh\Enum\SiteArea;
+use Tygh\Enum\YesNo;
+use Tygh\Enum\ObjectStatuses;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -32,30 +35,68 @@ function fn_product_availability_update_product_pre(&$product_data, $product_id,
     }
 }
 
-function fn_product_availability_get_products($params, $fields, $sortings, &$condition, $join, $sorting, $group_by, $lang_code, $having) {
+function fn_product_availability_get_products($params, $fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
     if (SiteArea::isStorefront(AREA)) {
         $condition .= db_quote(' AND IF(products.avail_till, products.avail_till >= ?i, 1)', TIME);
 
         // Cut off out of stock products
-        $condition .= db_quote(
-            ' AND (CASE products.show_out_of_stock_product' .
-            "   WHEN ?s THEN (products.amount > 0 OR products.tracking = 'D')" .
-            '   ELSE 1' .
-            ' END)',
-            'N'
-        );
+        if (Registry::get('addons.warehouses.status') == ObjectStatuses::ACTIVE) {
+            $location_manager = Tygh::$app['location'];
+            if ($destination_id = $location_manager->getDestinationId()) {
+                $join .= db_quote(' RIGHT JOIN ?:warehouses_destination_products_amount AS wdpa ON wdpa.product_id = products.product_id AND wdpa.destination_id = ?i ', $destination_id);
+                $condition .= db_quote(
+                    ' AND (CASE products.show_out_of_stock_product' .
+                    '   WHEN ?s THEN (
+                        CASE products.is_stock_split_by_warehouses WHEN ?s'
+                        . " THEN (wdpa.amount > 0 OR products.tracking = 'D')"
+                        . ' ELSE 1 END
+                    )' .
+                    '   ELSE 1' .
+                    ' END)',
+                    YesNo::NO, YesNo::YES
+                );
+            }
+        } else {
+            $condition .= db_quote(
+                ' AND (CASE products.show_out_of_stock_product' .
+                "   WHEN ?s THEN (products.amount > 0 OR products.tracking = 'D')" .
+                '   ELSE 1' .
+                ' END)',
+                'N'
+            );
+        }
     }
 }
 
-function fn_product_availability_get_product_data($product_id, $field_list, $join, $auth, $lang_code, &$condition, $price_usergroup) {
-    // Cut off out of stock products
+function fn_product_availability_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, &$condition, $price_usergroup) {
     if (SiteArea::isStorefront(AREA)) {
-        $condition .= db_quote(
-            ' AND (CASE ?:products.show_out_of_stock_product' .
-            "   WHEN ?s THEN (?:products.amount > 0 OR ?:products.tracking = 'D')" .
-            '   ELSE 1' .
-            ' END)',
-            'N'
-        );
+        $condition .= db_quote(' AND IF(?:products.avail_till, ?:products.avail_till >= ?i, 1)', TIME);
+
+        // Cut off out of stock products
+        if (Registry::get('addons.warehouses.status') == ObjectStatuses::ACTIVE) {
+            $location_manager = Tygh::$app['location'];
+            if ($destination_id = $location_manager->getDestinationId()) {
+                $join .= db_quote(' RIGHT JOIN ?:warehouses_destination_products_amount AS wdpa ON wdpa.product_id = ?:products.product_id AND wdpa.destination_id = ?i ', $destination_id);
+                $condition .= db_quote(
+                    ' AND (CASE ?:products.show_out_of_stock_product' .
+                    '   WHEN ?s THEN (
+                        CASE ?:products.is_stock_split_by_warehouses WHEN ?s'
+                        . " THEN (wdpa.amount > 0 OR ?:products.tracking = 'D')"
+                        . ' ELSE 1 END
+                    )' .
+                    '   ELSE 1' .
+                    ' END)',
+                    YesNo::NO, YesNo::YES
+                );
+            }
+        } else {
+            $condition .= db_quote(
+                ' AND (CASE ?:products.show_out_of_stock_product' .
+                "   WHEN ?s THEN (?:products.amount > 0 OR ?:products.tracking = 'D')" .
+                '   ELSE 1' .
+                ' END)',
+                'N'
+            );
+        }
     }
 }
