@@ -9,6 +9,23 @@
             });
             $('.cm-autoclick').click();
         });
+
+        $.ceEvent('on', 'dispatch_event_pre', function (e, jelm, processed) {
+            if (e.type !== 'click') {
+                return;
+            }
+
+            if (jelm.hasClass('cm-save-value')) {
+                id = jelm.prop('id');
+                if (jelm.is('[type=checkbox]')) {
+                    val = jelm.prop("checked");
+                } else {
+                    val = jelm.val();
+                }
+                $.cookie.set(id, val);
+                return false;
+            }
+        });
     }(Tygh, Tygh.$));
 </script>
 {/if}

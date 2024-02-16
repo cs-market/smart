@@ -26,7 +26,10 @@
             <div class="ty-control-group ty-checkout__terms">
                 <div class="cm-field-container">
                     <input type="hidden" name="documents_originals[{$group_key}]" value="N">
-                    <label for="documents_originals_{$group_key}" class="cm-check-agreement"><input type="checkbox" id="documents_originals_{$group_key}" name="documents_originals[{$group_key}]" value="Y" class="checkbox" {if $shipping.service_params.offer_documents_checked == "YesNo::YES"|enum}checked="_checked"{/if}>{__('calendar_delivery.documents_originals')}</label>
+                    <label for="documents_originals_{$group_key}" class="cm-check-agreement">
+                        {$id = "documents_originals_`$group_key`"}
+                        <input type="checkbox" id="documents_originals_{$group_key}" name="documents_originals[{$group_key}]" value="Y" class="checkbox cm-save-value" {if ($smarty.cookies.$id == 'true') || ($smarty.cookies.$id == '' && $shipping.service_params.offer_documents_checked == "YesNo::YES"|enum)}checked="_checked"{/if}>{__('calendar_delivery.documents_originals')}
+                    </label>
                 </div>
             </div>
         </div>

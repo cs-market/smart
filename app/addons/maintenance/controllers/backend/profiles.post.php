@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'update') {
     $user_data = Tygh::$app['view']->getTemplateVars('user_data');
+    $usergroups = Tygh::$app['view']->getTemplateVars('usergroups');
 
     if (fn_allowed_for('MULTIVENDOR') && !Registry::ifget('navigation.tabs.usergroups', false)) {
         $user_type = $user_data['user_type'];

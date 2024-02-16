@@ -125,7 +125,7 @@
         max-height: calc(~"100vh - 245px");
         overflow-y: scroll;
     }
-    .ty-cart-content__buttons .ty-btn__primary, .ty-grid-list__product_amount {
+    .ty-cart-content__buttons .ty-btn__primary,  .ty-scroller-list .ty-grid-list__product_amount {
         display: none;
     }
     .ty-grid-list__item &__points-sticker {
@@ -334,6 +334,7 @@
         }
     }
     .ty-mobile-menu {
+        z-index: 2;
         position: fixed;
         bottom: 0;
         background: #fff;
