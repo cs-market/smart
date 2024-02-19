@@ -47,6 +47,14 @@
                             <item lang="ru" for="tooltip">Список чатов которые будут считаться как админские</item>
                         </translations>
                     </item>
+                    <item id="tg_ordered_products_table">
+                        <name>Add ordered products table to order notification</name>
+                        <type>checkbox</type>
+                        <translations>
+                            <item lang="ru">Добавить таблицу с заказанными товарами в уведомление о заказе</item>
+                        </translations>
+                        <default_value>Y</default_value>
+                    </item>
                     <item id="disable_anonymous_checkout">
                         <name>Authorized shopping only</name>
                         <type>checkbox</type>
@@ -99,10 +107,22 @@
 
         <item lang="en" id="telegram.tg_enabled">Allow to assing telegram to accounts</item>
         <item lang="ru" id="telegram.tg_enabled">Позволить связывать учетную запись с telegram</item>
+
+        <item lang="en" id="telegram.notify_customer">Notify customer via telegram</item>
+        <item lang="ru" id="telegram.notify_customer">Уведомить покупателя по telegram</item>
+
+        <item lang="en" id="telegram.unsubscribe">Unsubscribe from telegram notifications</item>
+        <item lang="ru" id="telegram.unsubscribe">Отписаться от уведомлений telegram</item>
+
+        <item lang="en" id="telegram.last_order_info">Last order info</item>
+        <item lang="ru" id="telegram.last_order_info">Информация о последнем заказе</item>
+
+        <item lang="en" id="telegram.answer">Answer</item>
+        <item lang="ru" id="telegram.answer">Ответить</item>
     </language_variables>
     <queries>
-<!--        <item>ALTER TABLE `?:users` ADD `chat_id` varchar(32) NOT NULL default ''</item>
-        <item for="uninstall">ALTER TABLE `?:users` DROP `chat_id`;</item>-->
+        <item>ALTER TABLE `?:users` ADD `chat_id` varchar(32) NOT NULL default ''</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP `chat_id`;</item>
 
         <item>ALTER TABLE `?:users` ADD `tg_events_subscribed` varchar(1) NOT NULL default 'Y'</item>
         <item for="uninstall">ALTER TABLE `?:users` DROP `tg_events_subscribed`</item>

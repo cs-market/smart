@@ -35,6 +35,7 @@ class RenderManager {
             }
         } else {
             $resource_name = fn_get_storage_data('telegram_last_command_'.$this->chat_id);
+            fn_set_storage_data('telegram_last_command_'.$this->chat_id);
         }
 
         $parsed_resource = parse_url($resource_name);
@@ -55,12 +56,6 @@ class RenderManager {
             if (!empty($resource_name[0])) {
                 $result['child_entity'] = implode("/", $resource_name);
             }
-        }
-
-        // redirect to auth
-        if ($result['name'] == 'start' && !empty(reset($result['params'])) && strlen(reset($result['params'])) == 32) {
-            $result['id'] = reset($result['params']);
-            $result['name'] = 'auth';
         }
 
         return $result;
@@ -104,6 +99,9 @@ class RenderManager {
             $entity_properties = $this->getEntityFromPath($resource);
 
             $response = $this->getResponseFromEntity($entity_properties, $context);
+            if (!empty($response['redirect'])) {
+                $response = $this->renderLocation($response['redirect'], $context);
+            }
         }
 
         return $response;

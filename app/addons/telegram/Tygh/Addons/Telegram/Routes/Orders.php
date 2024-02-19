@@ -4,11 +4,13 @@ namespace Tygh\Addons\Telegram\Routes;
 
 use Tygh\Registry;
 use Tygh\Enum\SiteArea;
+use Tygh\Enum\YesNo;
 
 class Orders extends ARoute {
     public function render($id, $params, $context) {
         if (!empty($id)) {
-            if ($order = fn_get_order_info($id)) {
+            $order = isset($context['order_info']) ? $context['order_info'] : fn_get_order_info($id);
+            if (!empty($order)) {
                 $return = [];
                 $return['message'] = $this->getTelegramOrderInfo($order);
 
@@ -17,7 +19,7 @@ class Orders extends ARoute {
                         [[
                             'text' => __('link'),
                             'url' => fn_url('orders.details&order_id='.$order['order_id'], $this->area),
-                        ]],                 
+                        ]],
                         [[
                             'text' => __('telegram.change_order_status'),
                             'callback_data' => '/order_status/'.$id,
@@ -62,6 +64,8 @@ class Orders extends ARoute {
         $info['order_date'] = __('order_date') . ': ' . fn_date_format($order['timestamp'], Registry::get('settings.Appearance.date_format'));
         $info['order_status'] = __('order_status') . ': ' . fn_get_status_data($order['status'], STATUSES_ORDER)['description'];
 
+        fn_set_hook('get_telegram_order_info', $order, $info, $this);
+
         $currencies = Registry::get('currencies');
         $currency_symbol = $currencies[CART_PRIMARY_CURRENCY]['symbol'];
         if (!empty((float) $order['shipping_cost']))
@@ -91,7 +95,7 @@ class Orders extends ARoute {
         // $city = $this->getOrderParam($order, 'city');
         // if (!empty($city))
         //     $info['city'] = __('city') . ': ' . $city;
-        // $address = $this->getOrderParam($order, 'address');
+        $address = $this->getOrderParam($order, 'address');
         if (!empty($address))
             $info['address'] = __('address') . ': ' . $address;
         $phone = $this->getOrderParam($order, 'phone');
@@ -100,13 +104,17 @@ class Orders extends ARoute {
         $info['end_customer'] = '';
 
         // products table
-        // $info['ordered_products'] = '<b>' . __('ordered_products') . '</b>';
-        // foreach($order['products'] as $id => $product) {
-        //     $info["ordered_products_name.$id"] = $product['product'];
-        //     $info["ordered_products_code.$id"] = __('product_code') . ': ' . $product['product_code'];
-        //     $info["ordered_products_data.$id"] = __('amount') . ': ' . $product['amount'] . ' * ' . $formatter->asPrice($product['price']);
-        //     $info["ordered_products_nl.$id"] = '';
-        // }
+        if (YesNo::toBool(Registry::get('addons.telegram.tg_ordered_products_table'))) {
+            $info['ordered_products'] = '<b>' . __('ordered_products') . '</b>';
+            foreach($order['products'] as $id => $product) {
+                $info["ordered_products_name.$id"] = $product['product'];
+                $info["ordered_products_code.$id"] = __('product_code') . ': ' . $product['product_code'];
+                $info["ordered_products_data.$id"] = __('amount') . ': ' . $product['amount'] . ' * ' . $formatter->asPrice($product['price']);
+                $info["ordered_products_nl.$id"] = '';
+            }
+        }
+
+        fn_set_hook('get_telegram_order_info_post', $order, $info, $this);
 
         return str_replace('&nbsp;', ' ', implode($nl, $info));
     }

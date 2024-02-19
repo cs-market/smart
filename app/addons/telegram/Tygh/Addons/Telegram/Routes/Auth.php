@@ -19,7 +19,7 @@ class Auth extends ARoute {
                 }
 
                 return [
-                    'message' => __('hello') . ', ' . $user_data['firstname'],
+                    'message' => __('hello') . ', ' . $user_data['firstname'] . '. ' . __('successful_login'),
                     'inline_keyboard' => [[
                     [
                         'text' => 'В меню',
@@ -37,7 +37,7 @@ class Auth extends ARoute {
             if ($user_data && fn_user_password_verify((int) $user_data['user_id'], $password, (string) $user_data['password'], $salt)) {
                 db_query('UPDATE ?:users SET chat_id = ?s WHERE user_id = ?i', $this->chat_id, $user_data['user_id']);
                 return [
-                    'message' => __('hello') . ', ' . $user_data['firstname'],
+                    'message' => __('hello') . ', ' . $user_data['firstname'] . '. ' . __('successful_login'),
                     'inline_keyboard' => [[
                     [
                         'text' => 'В меню',

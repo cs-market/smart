@@ -6,7 +6,6 @@ class Products extends ARoute {
     private $separate_products = false;
 
     public function render($params, $context) {
-
         if ($params['id']) {
             $product = fn_get_product_data($params['id'], $_SESSION['auth']);
             return [

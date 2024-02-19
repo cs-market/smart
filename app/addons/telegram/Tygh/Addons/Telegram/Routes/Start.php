@@ -21,33 +21,29 @@ class Start extends ARoute {
                 ],
             ]];
         } else {
-            $commands = [];
-
-            if (empty($this->auth['user_id'])) {
-                $commands[] = [[
-                    'text' => __('authorization'),
-                    'callback_data' => '/auth'
-                ]];
+            if (empty($this->auth['user_id']) && YesNo::toBool(Registry::get('addons.telegram.disable_anonymous_checkout'))) {
+                $ekey = (!empty(reset($params))) ? '/' . reset($params) : '';
+                return ['redirect' => '/auth' . $ekey];
             }
 
-//             $commands[] = [
-//                 [
-//                     'text' => __('search_products'),
-//                     'callback_data' => '/search'
-//                 ],
-//                 [
-//                     'text' => __('catalog'),
-//                     'callback_data' => '/catalog'
-//                 ],
-//                 [
-//                     'text' => __('products'),
-//                     'callback_data' => '/products'
-//                 ],
-//             ];
+            // $commands[] = [
+            //     [
+            //         'text' => __('search_products'),
+            //         'callback_data' => '/search'
+            //     ],
+            //     [
+            //         'text' => __('catalog'),
+            //         'callback_data' => '/catalog'
+            //     ],
+            //     [
+            //         'text' => __('products'),
+            //         'callback_data' => '/products'
+            //     ],
+            // ];
             if ($this->auth['user_id'] && $order_id = db_get_field('SELECT max(order_id) FROM ?:orders WHERE user_id = ?i', $this->auth['user_id'])) {
                 $commands[] = [
                     [
-                        'text' => __('last_order_info'),
+                        'text' => __('telegram.last_order_info'),
                         'callback_data' => '/orders/'.$order_id
                     ]
                 ];
@@ -67,9 +63,6 @@ class Start extends ARoute {
             'backend' => true,
             'anonymous' => true,
         ];
-        if (YesNo::toBool(Registry::get('addons.telegram.disable_anonymous_checkout'))) {
-            $privileges['anonymous'] = false;
-        }
 
         return $privileges;
     }

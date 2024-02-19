@@ -102,3 +102,55 @@ function fn_telegram_get_users($params, &$fields, $sortings, &$condition, $join,
         $condition['tg_events_subscribed'] = db_quote(' AND ?:users.tg_events_subscribed = ?s AND ?:users.chat_id != ?s', $params['tg_events_subscribed'], '');
     }
 }
+
+function fn_telegram_get_status_params_definition(&$status_params, $type) {
+    if ($type == 'O') {
+        $status_params['tg_notify_customer'] = [
+            'type' => 'checkbox',
+            'label' => 'telegram.notify_customer',
+            'default_value' => 'Y'
+        ];
+    }
+}
+
+function fn_telegram_change_order_status(&$status_to, &$status_from, &$order_info, &$force_notification, &$order_statuses, &$place_order) {
+    if (
+        isset($order_statuses[$status_to]['params']['tg_notify_customer']) && 
+        YesNo::toBool($order_statuses[$status_to]['params']['tg_notify_customer']) && 
+        $chat_id = db_get_field('SELECT chat_id FROM ?:users WHERE user_id = ?i', $order_info['user_id'])
+    ) {
+        $render_manager = Tygh::$app['addons.telegram.render_manager'];
+        $render_manager->initRender(Tygh::$app['session']['auth'], 'C', $chat_id);
+        $context['order_info'] = $order_info;
+        $context['order_info']['status'] = $status_to;
+        $data = $render_manager->renderLocation('/orders/'.$order_info['order_id'], $context);
+        if (!empty($data)) {
+            $messenger = \Tygh::$app['addons.telegram.messenger'];
+            $result = $messenger->sendMessage($chat_id, $data);
+        }
+
+        $force_notification['C'] = false;
+
+        fn_set_hook('telegram_change_order_status', $status_to, $status_from, $order_info, $force_notification, $order_statuses, $place_order);
+    }
+}
+
+function fn_telegram_helpdesk_send_message_pre(&$message, $mailbox) {
+    foreach ($message['users'] as $user_id => $user) {
+        if ($chat_id = db_get_field('SELECT chat_id FROM ?:users WHERE user_id = ?i', $user_id)) {
+            $messenger = \Tygh::$app['addons.telegram.messenger'];
+
+            $result = $messenger->sendMessage($chat_id, [
+                'message' => strip_tags($message['message']),
+                'inline_keyboard' => [[[
+                    'text' => __('telegram.answer'),
+                    'url' => fn_url('tickets.view', 'C'),
+                ]]]
+            ]);
+
+            if ($result->isSuccess()) {
+                unset($message['users'][$user_id]);
+            }
+        }
+    }
+}
