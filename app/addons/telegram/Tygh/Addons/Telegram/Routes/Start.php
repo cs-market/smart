@@ -43,6 +43,12 @@ class Start extends ARoute {
             if ($this->auth['user_id'] && $order_id = db_get_field('SELECT max(order_id) FROM ?:orders WHERE user_id = ?i', $this->auth['user_id'])) {
                 $commands[] = [
                     [
+                        'text' => __('view_orders'),
+                        'callback_data' => '/orders/?items_per_page=10'
+                    ]
+                ];
+                $commands[] = [
+                    [
                         'text' => __('telegram.last_order_info'),
                         'callback_data' => '/orders/'.$order_id
                     ]
@@ -50,10 +56,13 @@ class Start extends ARoute {
             }
         }
 
-        return [
-            'message'=> 'Здравствуйте, что будем делать?',
-            'inline_keyboard' => $commands
-        ];
+        $return = ['message' => 'Здравствуйте, что будем делать?'];
+
+        if (!empty($commands)) {
+            $return['inline_keyboard'] = $commands;
+        }
+
+        return $return;
     }
 
     public function privileges($id, $params, $context)

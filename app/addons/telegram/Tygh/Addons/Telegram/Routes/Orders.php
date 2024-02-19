@@ -95,7 +95,7 @@ class Orders extends ARoute {
         // $city = $this->getOrderParam($order, 'city');
         // if (!empty($city))
         //     $info['city'] = __('city') . ': ' . $city;
-        $address = $this->getOrderParam($order, 'address');
+        // $address = $this->getOrderParam($order, 'address');
         if (!empty($address))
             $info['address'] = __('address') . ': ' . $address;
         $phone = $this->getOrderParam($order, 'phone');
