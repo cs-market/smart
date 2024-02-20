@@ -26,5 +26,6 @@ fn_register_hooks(
     'get_product_filter_fields',
     'get_products',
     'user_init',
-    'create_order'
+    'create_order',
+    'update_product_amount_before_tracking_checking',
 );

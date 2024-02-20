@@ -22,6 +22,11 @@
                         <name>Сервисные юзергруппы</name>
                         <variants/>
                     </item>
+                    <item id="track_amount_in_backend">
+                        <type>checkbox</type>
+                        <name>Отслеживать остатки при смене статуса в админ-панели</name>
+                        <default_value>Y</default_value>
+                    </item>
                 </items>
             </section>
         </sections>
