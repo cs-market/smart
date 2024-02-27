@@ -37,7 +37,7 @@ function fn_calendar_delivery_install()
           ADD `exception_days` varchar(7) NOT NULL,
           ADD `exception_time_till` varchar(5) NOT NULL DEFAULT '11:00',
           ADD `delivery_date` varchar(7) NOT NULL DEFAULT '1111111',
-          ADD `monday_rule` varchar(8) NOT NULL DEFAULT 'Y',
+          ADD `monday_rule` varchar(1) NOT NULL DEFAULT 'Y',
           ADD `holidays` varchar(255) NOT NULL DEFAULT ''
         ");
         db_query("CREATE TABLE `?:user_storages` (

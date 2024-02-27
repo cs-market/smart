@@ -102,7 +102,7 @@
             DROP `delivery_date`,
             DROP `nearest_delivery`,
             DROP `ignore_exception_days`,
-            DROP `monday_rule`'
+            DROP `monday_rule`
         </item>
 
         <item>ALTER TABLE `?:usergroups` 

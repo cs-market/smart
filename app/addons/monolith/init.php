@@ -12,5 +12,7 @@ fn_register_hooks(
     'update_product_post',
     'get_products',
     ['get_product_data', 4300000000],
-    'create_order'
+    'create_order',
+    'products_sorting',
+    'get_products_pre'
 );

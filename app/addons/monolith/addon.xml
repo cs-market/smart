@@ -38,4 +38,12 @@
             </section>
         </sections>
     </settings>
+    <language_variables>
+        <item lang="ru" id="sort_by_subbrand_asc">Сортировать по суббренду по возрастанию</item>
+        <item lang="ru" id="sort_by_subbrand_desc">Сортировать по суббренду по убыванию</item>
+    </language_variables>
+    <queries>
+        <item>ALTER TABLE `?:products` ADD `subbrand` VARCHAR(255) NOT NULL DEFAULT '';</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `subbrand`;</item>
+    </queries>
 </addon>

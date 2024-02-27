@@ -413,10 +413,11 @@ function fn_monolith_update_product_post(&$product_data, $product_id, $lang_code
     }
 }
 
-function fn_monolith_get_products($params, $fields, $sortings, &$condition, $join, $sorting, $group_by, $lang_code, $having) {
+function fn_monolith_get_products($params, $fields, &$sortings, &$condition, $join, $sorting, $group_by, $lang_code, $having) {
     if (SiteArea::isStorefront(AREA) && in_array('prices', $params['extend'])) {
         $condition .= db_quote(' AND IF (products.company_id = 45, prices.price IS NOT NULL, 1)');
     }
+    $sortings['subbrand'] = 'products.subbrand';
 }
 
 function fn_monolith_get_product_data($product_id, &$field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup){
@@ -447,5 +448,17 @@ function fn_monolith_create_order($order) {
             'subject' => 'i-sd.ru: Empty storage id!',
             'body' => "Внимание! Размещен заказ без признака склада от user_id " . $order['user_id'] . ' ' . $order['firstname'] . ' ' . $order['email'],
         ), 'A'); 
+    }
+}
+
+function fn_monolith_products_sorting(&$sorting) {
+    if (SiteArea::isAdmin(AREA) || Tygh::$app['session']['auth']['company_id'] = 45) {
+        $sorting['subbrand'] = array('description' => __('subbrand'), 'default_order' => 'desc');
+    }
+}
+
+function fn_monolith_get_products_pre(&$params, $items_per_page, $lang_code) {
+    if (Tygh::$app['session']['auth']['company_id'] = 45 && empty($params['sort_by'])) {
+        $params['sort_by'] = 'subbrand';
     }
 }
