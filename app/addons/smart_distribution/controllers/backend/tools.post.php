@@ -4534,7 +4534,7 @@ fn_print_die($orders_wo_points);
         $orders = db_get_fields("SELECT order_id FROM ?:orders WHERE company_id IN (?a) AND $time_condition AND is_parent_order = ?s AND group_id NOT IN (?a)", [1810, 2058], 'N', [17,18]);
 
         foreach ($orders as $order_id) {
-//             if ($order_id == 455927) continue;
+            // if ($order_id == 455927) continue;
             $order_info = fn_get_order_info($order_id);
 
             if ($order_info['status'] == 'H') {
@@ -4624,6 +4624,220 @@ fn_print_die($orders_wo_points);
 
 //     $iteration += 1;
 //     fn_redirect('tools.restore_points_in_use.' . $iteration);
+} elseif ($mode == 'correct_reward_points_february1') {
+    $add_field = db_quote(", DATE_FORMAT(FROM_UNIXTIME(timestamp), '%m') as `interval`, timestamp");
+    $group_condition = ' GROUP BY `interval`';
+    $time_condition = db_quote(" timestamp BETWEEN ?i AND ?i", fn_parse_date('01/02/2024'), fn_parse_date('31/03/2024')-1);
+    $exclude_condition = db_quote(" AND ?:orders.status != 'T' AND ?:orders.status != 'I' AND ?:orders.is_parent_order != 'Y'");
+    $periods = db_get_hash_multi_array("SELECT count(order_id) as count, user_id $add_field FROM ?:orders WHERE company_id IN (?a) AND $time_condition $exclude_condition GROUP BY user_id, `interval` ORDER BY timestamp", ['interval', 'user_id', 'count'], [1810, 2058]);
+
+    foreach ($periods as $month => $users) {
+        foreach ($users as $user_id) {
+            $promotions = [];
+            // need to add usergroup here;
+            $ugroups = [/*розница*/14776, 13858, /*опт*/ 13360, 13361];
+            $ug_id = db_get_field('SELECT usergroup_id FROM ?:usergroup_links WHERE user_id = ?i AND usergroup_id IN (?a) AND status = ?s', $user_id, $ugroups, 'A');
+            
+            if (empty($ug_id)) continue; // что ты такое??
+            $company_id = db_get_field('SELECT company_id FROM ?:users WHERE user_id = ?i', $user_id);
+            if (!in_array($company_id, [1810, 2058])) continue;
+
+            if ($month == '02') {
+                // Промо февраля, Начисление ЮГ Самара март:
+
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67121 круп 80к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67122 круп 150к-1.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67123 круп 250к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67114 розн 0к-0.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67115 розн 20к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67113 розн 50к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67116 розн 80к-2.5%
+
+                // Промо февраля, Начисление ЮГ Тольятти март:
+
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67124 круп 80к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67125 круп 150к-1.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67126 круп 250к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67117 розн 0к-0.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67118 розн 20к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67119 розн 50к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67120 розн 80к-2.5%
+             
+                // Вега_Самара_Розничные
+                $promotions[1810][13858] = [67116, 67113, 67115, 67114];
+                // Вега_Самара_Крупнооптовые_клиенты
+                $promotions[1810][13360] = [67123, 67122, 67121];
+
+                // Вега_Тольятти_Розничные клиенты
+                $promotions[2058][14776] = [67120, 67119, 67118, 67117];
+                // Вега_Тольятти_Крупный ОПТ
+                $promotions[2058][13361] = [67126, 67125, 67124];
+            }
+
+            if ($month == '03') {
+                // Промо март, Начисление ЮГ Самара апрель:
+
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69673 круп 80к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69674 круп 150к-1.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69675 круп 250к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69419 розн 0к-0.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69420 розн 20к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69421 розн 50к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69422 розн 80к-2.5%
+
+                // Промо март, Начисление ЮГ Тольятти апрель:
+
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69676 круп 80к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69677 круп 150к-1.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69678 круп 250к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67117 розн 0к-0.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67118 розн 20к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67119 розн 50к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=67120 розн 80к-2.5%
+             
+                // Вега_Самара_Розничные
+                $promotions[1810][13858] = [69422, 69421, 69420, 69419];
+                // Вега_Самара_Крупнооптовые_клиенты
+                $promotions[1810][13360] = [69675, 69674, 69673];
+
+                // Вега_Тольятти_Розничные клиенты
+                $promotions[2058][14776] = [67120, 67119, 67118, 67117];
+                // Вега_Тольятти_Крупный ОПТ
+                $promotions[2058][13361] = [69678, 69677, 69676];
+            }
+
+            if (!isset($promotions[$company_id][$ug_id])) continue;
+
+            foreach ($promotions[$company_id][$ug_id] as $promotion_id) {
+                $promotion = fn_get_promotion_data($promotion_id);
+                $progress_condition = fn_find_promotion_condition($promotion['conditions'], 'progress_total_paid');
+                $val = fn_promotion_validate_promotion_progress($promotion['promotion_id'], $progress_condition, ['user_id' => $user_id], $promotion);
+
+                if ($val > $progress_condition['value']) {
+                    foreach($promotion['bonuses'] as $bonus) {
+                        if ($bonus['bonus'] == 'give_usergroup') {
+                            $already_granted = db_get_field('SELECT link_id FROM ?:usergroup_links WHERE user_id = ?i AND usergroup_id = ?i AND status = ?s', $user_id, $bonus['value'], 'A');
+
+                            if (!$already_granted) {
+                                $insert = ['user_id' => $user_id, 'usergroup_id' => $bonus['value'], 'status' => 'A'];
+                                db_query('REPLACE INTO ?:usergroup_links SET ?u', $insert);
+                                $user_info = fn_get_user_info($user_id);
+                                $insert['user_login'] = $user_info['user_login'];
+                                $insert['firstname'] = $user_info['firstname'];
+                                $insert['add_usergroup'] = fn_get_usergroup_name($bonus['value']);
+                                $insert['period_total_sales'] = $val;
+                                $insert['promo'] = $promotion['name'];
+                                $insert['vendor'] = ($company_id == 1810) ? 'вега' : 'вегаТ';
+                                $insert['user_type'] = fn_get_usergroup_name($ug_id);
+
+                                $result[] = $insert;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    $params['filename'] = 'grade_usergroups_feb-march.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($result, $params, '"');
+    fn_print_die($result);
+} elseif ($mode == 'correct_reward_points_february2') {
+    $promotions[1810]['02'] = [67132, 67133, 67134, 67135, 67136];
+    $promotions[1810]['03'] = [69679, 69680, 69681, 69682, 69683];
+
+    $promotions[2058]['02'] = [67127, 67128, 67129, 67130, 67131];
+    $promotions[2058]['03'] = [69684, 69685, 69686, 69687, 69688];
+
+    foreach ($promotions as $company_id => &$company_promotions) {
+        foreach ($company_promotions as &$ps) {
+            foreach ($ps as &$p) {
+                $p = fn_get_promotion_data($p);
+            }
+        }
+    }
+
+    $months = ['02','03'];
+
+    foreach ($months as $month) {
+        $year = 2024;
+        $add_points = [];
+        $start_ts = fn_parse_date('01/' . $month . '/'. $year);
+        $end_ts = strtotime("+1 month", $start_ts) - 1;
+        $time_condition = db_quote(" timestamp BETWEEN ?i AND ?i", $start_ts, $end_ts);
+        $orders = db_get_fields("SELECT order_id FROM ?:orders WHERE company_id IN (?a) AND $time_condition AND is_parent_order = ?s AND group_id NOT IN (?a)", [1810, 2058], 'N', [17,18]);
+
+        foreach ($orders as $order_id) {
+            // if ($order_id == 455927) continue;
+            $order_info = fn_get_order_info($order_id);
+
+            if ($order_info['status'] == 'H') {
+                if ($order_info['points_info']['reward']) continue;
+                if ($order_info['points_info']['in_use']['points']) continue;
+
+                $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s', $order_info['user_id'], CHANGE_DUE_ORDER);
+
+                $is_corrected = false;
+                $is_once_granted = false;
+                $is_group_order = false;
+                foreach ($reward_point_changes as $change) {
+                    $details = unserialize($change['reason']);
+                    if (!empty($details['order_id']) && $details['order_id'] == $order_info['order_id']) {
+                        $is_once_granted = true;
+                    }
+                    if (!empty($details['order_id']) && $details['order_id'] == $order_info['order_id'] && strpos($details['correction'], 'correct_reward_points_') !== false) {
+                        $is_corrected = true;
+                        break;
+                    }
+                }
+                if ($is_corrected) continue;
+
+                $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $order_info['user_id']);
+                $customer_auth = fn_fill_auth($_data, array(), false, 'C');
+                foreach ($promotions[$order_info['company_id']][$month] as $promotion) {
+                    $res = fn_check_promotion_conditions($promotion, $order_info, $customer_auth, $order_info['products']);
+                    //$points = round($order_info['total']*$percent/100);
+                    if ($res) {
+                        $percent = reset($promotion['bonuses'])['value'];
+                        $points = round($order_info['total']*$percent/100);
+
+                        if (empty($points)) break;
+                        $add_points[] = [
+                            'user_id' => $order_info['user_id'],
+                            'company_id' => $order_info['company_id'],
+                            'order_id' => $order_info['order_id'],
+                            'status' => $order_info['status'],
+                            'order_total' => $order_info['total'],
+                            'percent' => $percent,
+                            'points' => $points,
+                            'timestamp' => $order_info['timestamp'],
+                            // 'is_once_granted' => $is_once_granted,
+                            // 'is_group_order' => $is_group_order,
+                        ];
+                        break;
+                    }
+                }
+            } else {
+                $out_of_status[] = $order_info['order_id'];
+            }
+        }
+
+        foreach ($add_points as $add) {
+            $reason = array('order_id' => $add['order_id'], 'to' => $add['status'], 'correction' => 'correct_reward_points_january');
+            fn_change_user_points($add['points'], $add['user_id'], serialize($reason), CHANGE_DUE_ORDER, $add['timestamp']);
+        }
+
+        fn_print_r('Текущая корректировка ' . $month, $add_points);
+
+        $params['filename'] = "points_to_correct_$month.csv";
+        $params['force_header'] = true;
+        $export = fn_exim_put_csv($add_points, $params, '"');
+    }
+
+    fn_print_die('done. Out of status:', $out_of_status);
+
 } elseif ($mode == 'check_storages') {
     $storages = db_get_array('SELECT distinct(sp.storage_id), sp.product_id, p.items_in_package, sp.min_qty, sp.min_qty/p.items_in_package AS sell_from FROM ?:storages_products AS sp LEFT JOIN ?:products AS p ON p.product_id = sp.product_id WHERE p.items_in_package != 1 AND sp.min_qty < p.items_in_package AND sp.min_qty != 0 AND p.company_id = 45 GROUP BY sp.storage_id');
     $rest_storages = array_filter($storages, function($v) { return $v['sell_from'] != 0.5;});
