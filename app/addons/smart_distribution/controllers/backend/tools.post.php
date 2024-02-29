@@ -4631,6 +4631,11 @@ fn_print_die($orders_wo_points);
     $exclude_condition = db_quote(" AND ?:orders.status != 'T' AND ?:orders.status != 'I' AND ?:orders.is_parent_order != 'Y'");
     $periods = db_get_hash_multi_array("SELECT count(order_id) as count, user_id $add_field FROM ?:orders WHERE company_id IN (?a) AND $time_condition $exclude_condition GROUP BY user_id, `interval` ORDER BY timestamp", ['interval', 'user_id', 'count'], [1810, 2058]);
 
+    foreach ($periods as &$orders) {
+        $orders = array_keys($orders);
+    }
+    unset($orders);
+
     foreach ($periods as $month => $users) {
         foreach ($users as $user_id) {
             $promotions = [];
