@@ -24,7 +24,12 @@
                     </item>
                     <item id="track_amount_in_backend">
                         <type>checkbox</type>
-                        <name>Отслеживать остатки при смене статуса в админ-панели</name>
+                        <name>Изменять остатки при смене статуса заказа в админ-панели</name>
+                        <default_value>Y</default_value>
+                    </item>
+                    <item id="ignore_price_for_usergroup_all">
+                        <type>checkbox</type>
+                        <name>Игнорировать цену для юзергруппы "Все"</name>
                         <default_value>Y</default_value>
                     </item>
                 </items>

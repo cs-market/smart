@@ -9,11 +9,19 @@ defined('BOOTSTRAP') or die('Access denied');
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'cancel' || $mode == 'edit') {
         $params = $_REQUEST;
+
         if (isset($params['order_id'])) {
             $order = fn_get_order_info($params['order_id']);
             if (!empty($order)) {
                 $status_data = fn_get_status_params($order['status'], STATUSES_ORDER);
+                $allow_cancel = YesNo::NO;
                 if (!empty($status_data) && YesNo::toBool($status_data['allow_cancel'])) {
+                    $allow_cancel = YesNo::YES;
+                }
+
+                fn_set_hook('order_cancellation_extra_check', $allow_cancel, $order);
+
+                if (YesNo::toBool($allow_cancel)) {
                     fn_change_order_status($order['order_id'], Registry::get('addons.order_cancellation.cancellation_status'));
                     if ($mode == 'cancel') {
                         fn_redirect(fn_url('orders.details&order_id='.$order['order_id']));
@@ -21,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         fn_order_cancellation_reorder($order['order_id'], Tygh::$app['session']['cart'], $auth);
                         fn_redirect(fn_url('checkout.cart'));
                     }
+                } else {
+                    fn_set_notification('W', __('warning'), __('order_cancellation.order_changes_declined'));
                 }
             }
         }

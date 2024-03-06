@@ -452,13 +452,13 @@ function fn_monolith_create_order($order) {
 }
 
 function fn_monolith_products_sorting(&$sorting) {
-    if (SiteArea::isAdmin(AREA) || Tygh::$app['session']['auth']['company_id'] = 45) {
+    if (SiteArea::isAdmin(AREA) || Tygh::$app['session']['auth']['company_id'] == 45) {
         $sorting['subbrand'] = array('description' => __('subbrand'), 'default_order' => 'desc');
     }
 }
 
 function fn_monolith_get_products_pre(&$params, $items_per_page, $lang_code) {
-    if (Tygh::$app['session']['auth']['company_id'] = 45 && empty($params['sort_by'])) {
-        $params['sort_by'] = 'subbrand';
+    if (Tygh::$app['session']['auth']['company_id'] == 45 && empty($params['sort_by'])) {
+        $params['sort_by'] = 'product';
     }
 }

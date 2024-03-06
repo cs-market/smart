@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
     <id>order_cancellation</id>
-    <name>Smart distribution: Order cancellation</name>
-    <description>Позволяет отменять заказ на определенных статусах</description>
+    <name>Smart distribution: Отмена заказа</name>
+    <description>Позволяет отменять и редактировать заказ в витрине на определенных статусах</description>
     <version>1.0</version>
     <priority>32342353000</priority>
     <position>0</position>
@@ -25,12 +25,10 @@
         </sections>
     </settings>
     <language_variables>
-        <item lang="en" id="cancel_order">Cancel the order</item>
         <item lang="ru" id="cancel_order">Отменить заказ</item>
         <item lang="ru" id="order_cancellation">Отмена заказа</item>
-        
-        <item lang="en" id="allow_order_cancellation">Allow to cancel the order</item>
         <item lang="ru" id="allow_order_cancellation">Разрешить отмену заказа</item>
+        <item lang="ru" id="order_cancellation.order_changes_declined">К сожалению, этот заказ недоступен к изменению</item>
     </language_variables>
     <queries>
         <item for="install" editions="MULTIVENDOR">ALTER TABLE ?:companies ADD `allow_order_cancellation` VARCHAR(1) default 'Y'</item>

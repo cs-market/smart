@@ -373,28 +373,30 @@ function fn_maintenance_get_products(&$params, &$fields, $sortings, &$condition,
         //for sorting by price
         $auth = Tygh::$app['session']['auth'];
 
-        $remove_join = " LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1";
-        $add_join = db_quote(" LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1 AND usergroup_id IN (?a)",  array_filter($auth['usergroup_ids']));
-        $join = str_replace($remove_join, $add_join, $join);
-
-        $regular_price_field = isset($fields['price']) ? str_replace(' as price', '', $fields['price']) : false;
-
-        if (!empty($regular_price_field)) {
-            $join .= ' LEFT JOIN ?:product_prices as reg_prices ON reg_prices.product_id = products.product_id AND reg_prices.lower_limit = 1 AND reg_prices.usergroup_id = 0 ';
-            $fields['price'] = db_quote(
-                'IF('.$regular_price_field.' IS NOT NULL, '.$regular_price_field .', reg_prices.price) as price'
-            );
-        }
-
-        $remove_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
-        //need to move to join
-        //$add_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
-        $condition = str_replace($remove_condition, ''/*$add_condition*/, $condition);
-
-        if (in_array('prices2', $params['extend'])) {
-            $remove_join = db_quote(' AND prices_2.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
-            $add_join = db_quote(' AND prices_2.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
+        if (YesNo::toBool(Registry::get('addons.maintenance.ignore_price_for_usergroup_all'))) {
+            $remove_join = " LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1";
+            $add_join = db_quote(" LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1 AND usergroup_id IN (?a)",  array_filter($auth['usergroup_ids']));
             $join = str_replace($remove_join, $add_join, $join);
+
+            $regular_price_field = isset($fields['price']) ? str_replace(' as price', '', $fields['price']) : false;
+
+            if (!empty($regular_price_field)) {
+                $join .= ' LEFT JOIN ?:product_prices as reg_prices ON reg_prices.product_id = products.product_id AND reg_prices.lower_limit = 1 AND reg_prices.usergroup_id = 0 ';
+                $fields['price'] = db_quote(
+                    'IF('.$regular_price_field.' IS NOT NULL, '.$regular_price_field .', reg_prices.price) as price'
+                );
+            }
+
+            $remove_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
+            //need to move to join
+            //$add_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
+            $condition = str_replace($remove_condition, ''/*$add_condition*/, $condition);
+
+            if (in_array('prices2', $params['extend'])) {
+                $remove_join = db_quote(' AND prices_2.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
+                $add_join = db_quote(' AND prices_2.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
+                $join = str_replace($remove_join, $add_join, $join);
+            }
         }
     }
 
