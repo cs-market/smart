@@ -320,6 +320,7 @@ function fn_calendar_delivery_get_user_info($user_id, $get_profile, $profile_id,
 function fn_calendar_delivery_get_user_short_info_pre($user_id, &$fields, $condition, $join, $group_by) {
     $fields[] = 'delivery_date';
     $fields[] = 'nearest_delivery';
+    $fields[] = 'ignore_other_nearest_delivery';
     $fields[] = 'monday_rule';
     if (Registry::get('addons.storages.status') == 'A') $fields[] = 'ignore_exception_days';
 }
@@ -407,8 +408,7 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
 
                     // TODO грохнуть это к 2023 году так как повсеместно передодим на nearest_delivery_day weekdays_availability
                     $shipping['service_params'] = fn_array_merge($shipping['service_params'], $shipping_company_settings, $storage_settings, $usergroup_working_time_till, ['ignore_exception_days' => $user_info['ignore_exception_days'] ?? 'N']);
-
-                    $shipping['service_params']['nearest_delivery'] = max($shipping['service_params']['nearest_delivery'], $user_info['nearest_delivery']);
+                    $shipping['service_params']['nearest_delivery'] = (YesNo::toBool($user_info['ignore_other_nearest_delivery'])) ? $user_info['nearest_delivery'] : max($shipping['service_params']['nearest_delivery'], $user_info['nearest_delivery']);
                     fn_set_hook('calendar_delivery_service_params', $group, $shipping, $shipping_company_settings, $usergroup_working_time_till);
 
                     $shipping['service_params']['weekdays_availability'] = strrev($weekdays_availability);

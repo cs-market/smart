@@ -42,6 +42,10 @@ $schema['export_fields']['Nearest delivery'] = [
     'db_field' => 'nearest_delivery',
 ];
 
+$schema['export_fields']['Ignore other nearest delivery'] = [
+    'db_field' => 'ignore_other_nearest_delivery',
+];
+
 $schema['export_fields']['Monday rule'] = [
     'db_field' => 'monday_rule',
 ];
