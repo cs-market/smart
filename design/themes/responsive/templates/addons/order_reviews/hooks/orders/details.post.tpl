@@ -18,7 +18,7 @@
                     </div>
 
                     <div class="ty-control-group">
-                        <label for="dsc_message_{$obj_prefix}{$obj_id}" class="ty-control-group__title cm-required">{__("your_message")}</label>
+                        <label for="dsc_message_{$obj_prefix}{$obj_id}" class="ty-control-group__title">{__("your_message")}</label>
                         <textarea id="dsc_message_{$obj_prefix}{$obj_id}" name="post_data[message]" class="ty-input-textarea ty-input-text-large" rows="5" cols="72">{$discussion.post_data.message}</textarea>
                     </div>
 
