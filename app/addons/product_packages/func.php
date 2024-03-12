@@ -45,7 +45,7 @@ function fn_product_packages_pre_add_to_cart(&$product_data) {
 function fn_product_packages_exim_1c_import_value_fields(&$product, $value_field, $_name_field, $_v_field, $cml) {    
     if (in_array($_name_field, $cml['items_in_package'])) {
         $func = (Registry::get('addons.maintenance.status') == 'A') ? 'fn_maintenance_exim_import_price' : 'floatval';
-        $product['items_in_package'] = $func(strval($_feature -> {$cml['value']}));
+        $product['items_in_package'] = $func($_v_field);
     }
 }
 
