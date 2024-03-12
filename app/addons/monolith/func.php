@@ -271,13 +271,13 @@ function fn_monolith_generate_xml($order_id) {
                 ($order_info['documents_originals']) ? 1 : 0
             )
         ], 
-        [
-            'f' => array(
-                $addon['order_prefix'] . $order_id, 
-                'PaymType', 
-                $payment_type_map[$order_info['payment_method']['payment_id']]
-            )
-        ]
+//         [
+//             'f' => array(
+//                 $addon['order_prefix'] . $order_id,
+//                 'PaymType',
+//                 $payment_type_map[$order_info['payment_method']['payment_id']]
+//             )
+//         ]
     ];
 
     // if we have comment
