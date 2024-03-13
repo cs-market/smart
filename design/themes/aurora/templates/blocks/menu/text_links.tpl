@@ -15,7 +15,7 @@
         </span>
     {/if}
 
-        <ul {if !$submenu}id="text_links_{$text_links_id}"{/if} class="ty-text-links{if $inline && !$submenu} cm-popup-box ty-text-links__show_inline{/if}">
+        <ul {if !$submenu}id="text_links_{$text_links_id}"{/if} class="ty-text-links{if $inline && !$submenu} ty-text-links__show_inline{/if}">
             {foreach from=$items item="menu"}
                 <li class="ty-text-links__item ty-level-{$menu.level|default:0}{if $menu.active} ty-text-links__active{/if}{if $menu.class} {$menu.class}{/if}{if $inline && !$submenu && $menu.subitems} ty-text-links__subitems{/if}">
                     <a class="ty-text-links__a" {if $menu.href}href="{$menu.href|fn_url}"{/if}>{$menu.item}</a> 
