@@ -119,6 +119,9 @@
 
         <item lang="en" id="telegram.answer">Answer</item>
         <item lang="ru" id="telegram.answer">Ответить</item>
+
+        <item lang="ru" id="log_action_telegram_command">Telegram команда</item>
+        <item lang="en" id="log_action_telegram_command">Telegram command</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:users` ADD `chat_id` varchar(32) NOT NULL default ''</item>
@@ -130,4 +133,8 @@
         <item editions="MULTIVENDOR">ALTER TABLE `?:companies` ADD `tg_enabled` varchar(1) NOT NULL default 'N'</item>
         <item editions="MULTIVENDOR" for="uninstall">ALTER TABLE `?:companies` DROP `tg_enabled`</item>
     </queries>
+    <functions>
+        <item for="install">fn_telegram_install</item>
+        <item for="uninstall">fn_telegram_uninstall</item>
+    </functions>
 </addon>

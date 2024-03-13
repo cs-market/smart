@@ -34,6 +34,8 @@ class Telegram extends AEntity
         $command = fn_dot_syntax_get('callback_query.data', $params, fn_dot_syntax_get('message.text', $params, false));
         $chat_id = fn_dot_syntax_get('callback_query.message.chat.id', $params, fn_dot_syntax_get('message.chat.id', $params, false));
 
+        fn_log_event('requests', 'telegram_command', ['data' => serialize(['chat_id' => $chat_id, 'command' => $command, 'user_id' => $this->auth['user_id'], 'request' => $params])]);
+        
         $this->render_manager->initRender($this->auth, $this->area, $chat_id);
 
         $data = $this->render_manager->renderLocation($command, $params);

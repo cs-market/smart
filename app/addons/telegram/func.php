@@ -2,6 +2,8 @@
 
 use Tygh\Registry;
 use Tygh\Enum\YesNo;
+use Tygh\Settings;
+use Tygh\Languages\Languages;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -152,5 +154,35 @@ function fn_telegram_helpdesk_send_message_pre(&$message, $mailbox) {
                 unset($message['users'][$user_id]);
             }
         }
+    }
+}
+
+function fn_telegram_install() {
+    $variant = Settings::instance()->getVariant('Logging', 'log_type_requests', 'telegram_command');
+    if (empty($variant)) {
+        $setting = Settings::instance()->getSettingDataByName('log_type_requests');
+        $telegram_command = Settings::instance()->updateVariant(array(
+            'object_id'  => $setting['object_id'],
+            'name'       => 'telegram_command',
+            'position'   => 5,
+        ));
+
+        foreach (Languages::getAll() as $lang_code => $_lang) {
+            $description = array(
+                'object_id' => $telegram_command,
+                'object_type' => Settings::VARIANT_DESCRIPTION,
+                'lang_code' => $lang_code,
+                'value' => 'Telegram command'
+            );
+            Settings::instance()->updateDescription($description);
+        }
+    }
+}
+
+
+function fn_telegram_uninstall() {
+    $variant = Settings::instance()->getVariant('Logging', 'log_type_requests', 'telegram_command');
+    if (!empty($variant)) {
+        Settings::instance()->removeVariant($variant['variant_id']);
     }
 }
