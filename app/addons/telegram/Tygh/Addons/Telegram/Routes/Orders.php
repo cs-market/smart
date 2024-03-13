@@ -33,6 +33,7 @@ class Orders extends ARoute {
                 ];
             }
         } else {
+            if ($this->area == 'C') $params['user_id'] = $this->auth['user_id'];
             list($orders, $search) = fn_get_orders($params, 6);
 
             if (!empty($orders)) {
