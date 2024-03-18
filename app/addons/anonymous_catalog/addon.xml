@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>anonymous_catalog</id>
+    <version>1.0.1</version>
+    <default_language>ru</default_language>
+    <priority>100</priority>
+    <status>active</status>
+    <name>Каталог товаров для гостей</name>
+    <description>Позволяет вывести страницу со списком всех товаров без цены и зависимостей от юзергрупп</description>
+</addon>

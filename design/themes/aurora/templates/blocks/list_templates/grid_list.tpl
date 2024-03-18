@@ -91,6 +91,7 @@
                                     </div>
                                 {/if}
 
+                                {if $show_price}
                                 <div class="ty-grid-list__price {if $product.price == 0}ty-grid-list__no-price{/if}">
                                     {hook name="products:grid_prices_block"}
                                         {assign var="old_price" value="old_price_`$obj_id`"}
@@ -106,6 +107,7 @@
                                         {$smarty.capture.$list_discount nofilter}
                                     {/hook}
                                 </div>
+                                {/if}
 
                                 {capture name="product_multicolumns_list_control_data_wrapper"}
                                     <div class="ty-grid-list__controls cm-product-controls 

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>baltika_auth_page</id>
+    <version>1.0.1</version>
+    <default_language>ru</default_language>
+    <priority>100</priority>
+    <status>active</status>
+    <name>Страница авторизации Балтика</name>
+    <description></description>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <settings edition_type="ROOT,ULT:VENDOR">
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="auth_mode">
+                        <type>input</type>
+                        <name>Mode страницы авторизации</name>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+</addon>

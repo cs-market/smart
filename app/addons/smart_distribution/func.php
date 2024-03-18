@@ -564,14 +564,14 @@ function fn_smart_distribution_get_products_pre(&$params, $items_per_page, $lang
     if (isset($params['pshort']) && YesNo::toBool($params['pshort'])) unset($params['pshort']);
     if (isset($params['pfull']) && YesNo::toBool($params['pfull'])) unset($params['pfull']);
 
-    if (SiteArea::isStorefront(AREA)) {
+    if (SiteArea::isStorefront(AREA) && Registry::get('runtime.mode') != 'product_catalog') {
         // hide lost products
         $params['exclude_cid'] = 1056;
     }
 
     if (!empty($params['exclude_cid'])) {
         $params['extend'][] = 'categories';
-        if (!empty($params['custom_extend'])) $params['custom_extend'][] = 'categories';
+        if (!empty($params['custom_extend']) && Registry::get('runtime.mode') != 'product_catalog') $params['custom_extend'][] = 'categories';
     }
 }
 

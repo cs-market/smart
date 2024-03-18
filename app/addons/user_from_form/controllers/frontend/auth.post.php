@@ -1,12 +1,14 @@
 <?php
 
+use Tygh\Registry;
+
 defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return;
 }
 
-if ($mode == 'login_form' || $mode == 'baltika_login_form') {
+if ($mode == 'login_form' || $mode == Registry::get('addons.baltika_auth_page.auth_mode')) {
     if (isset($_SESSION['custom_registration'])) {
         $schema = fn_get_schema('user_from_form', 'schema');
         $company_id = $_SESSION['custom_registration'] ;

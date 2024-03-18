@@ -246,7 +246,7 @@ function fn_product_stickers_get_products_pre(&$params, $items_per_page, $lang_c
 }
 
 function fn_product_stickers_get_products(&$params, &$fields, &$sortings, &$condition, &$join, &$sorting, &$group_by, &$lang_code, &$having) {
-    if (AREA == 'C' && Registry::get('addons.bestsellers.status') == 'A' && !strpos($join, 'product_sales')) {
+    if (AREA == 'C' && Registry::get('addons.bestsellers.status') == 'A' && !strpos($join, 'product_sales') && Registry::get('runtime.mode') != 'product_catalog') {
         $fields[] = 'SUM(?:product_sales.amount) as sales_amount';
         $join .= ' LEFT JOIN ?:product_sales ON ?:product_sales.product_id = products.product_id AND ?:product_sales.category_id = products_categories.category_id ';
     }
