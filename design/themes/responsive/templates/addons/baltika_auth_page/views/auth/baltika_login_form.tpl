@@ -44,7 +44,7 @@
         {hook name="index:login_buttons"}
             <div>
                 <input type="hidden" name="remember_me" id="remember_me_{$id}" value="Y" />
-                {include file="buttons/button.tpl" but_text=__("send") but_onclick=$but_onclick but_name="dispatch[auth.login]" but_meta="ty-btn__login-button ty-btn__full-width"}
+                {include file="buttons/button.tpl" but_text=__("sign_in") but_onclick=$but_onclick but_name="dispatch[auth.login]" but_meta="ty-btn__login-button ty-btn__full-width"}
                 {include file="buttons/button.tpl" but_text=__("register") but_onclick=$but_onclick but_href="pages.view&page_id=169" but_meta="ty-btn__login-button ty-btn__full-width"}
             </div>
         {/hook}
