@@ -46,6 +46,9 @@ $schema['mobile_app_links'] = [
     'wrappers' => 'blocks/wrappers'
 ];
 
+$schema['products']['settings']['hide_add_to_cart_button']['default_value'] = 'N';
+
+
 $schema['vendor_logo']['content']['vendor_info']['function'] = ['fn_blocks_aurora_get_vendor_info'];
 
 $schema['banners']['templates']['addons/banners/blocks/carousel.tpl']['settings']['scroll_per_page'] = [

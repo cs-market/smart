@@ -41,7 +41,7 @@
                         {$but_text=" "}
                     {/if}
 
-                    {include file="common/product_data.tpl" product=$product show_product_amount=true show_amount_label=false }
+                    {include file="common/product_data.tpl" product=$product show_amount_label=false }
                     
                     <div class="ty-grid-list__item 
                         {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum} ty-dynamic-quantity {/if}
