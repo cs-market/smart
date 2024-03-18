@@ -19,7 +19,7 @@
             <img src="{$images_dir}/addons/baltika_auth_page/arrow.svg" />
             {strip}
         </div>
-        <a href="#" class="ty-btn">Смотреть каталог</a>
+        <a href="{"categories.product_catalog&company_id=45"|fn_url}" class="ty-btn">Смотреть каталог</a>
     </div>
     <div class="well advantage">
         <span class="advantage-infograph">50+</span>
@@ -33,23 +33,4 @@
         <span class="advantage-infograph">50K+</span>
         <span class="advantage-text">Пользователей</span>
     </div>
-{*     <div class="well advantage">
-        <span class="advantage-text">123</span>
-    </div>
-    <div class="well advantage">
-        <span class="advantage-text">123</span>
-    </div>
-    <div class="well advantage">
-        <span class="advantage-text">123</span>
-    </div>
-
-    <div class="well advantage">
-        <span class="advantage-text">123</span>
-    </div>
-    <div class="well advantage">
-        <span class="advantage-text">123</span>
-    </div>
-    <div class="well advantage">
-        <span class="advantage-text">123</span>
-    </div> *}
 </div>
