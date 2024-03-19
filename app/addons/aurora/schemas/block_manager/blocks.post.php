@@ -20,6 +20,10 @@ $schema['banners']['templates']['addons/aurora/blocks/grid.tpl'] = [
         'limit' =>  array (
             'type' => 'input',
             'default_value' => 0
+        ),
+        'section_name' =>  array (
+            'type' => 'checkbox',
+            'default_value' => 'N'
         )
     )
 ];

@@ -185,7 +185,7 @@ function fn_product_groups_split_cart($cart, $only_mandatory_order_split = false
                         }
                     }
                     fn_product_groups_get_package_info($proto);
-                    $p_groups[] = $proto;
+                    if (!empty($proto['products'])) $p_groups[] = $proto;
                 }
             }
 

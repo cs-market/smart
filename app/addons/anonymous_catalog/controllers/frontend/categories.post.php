@@ -5,7 +5,7 @@ use Tygh\Registry;
 defined('AREA') or die('Access denied');
 
 if ($mode == 'product_catalog') {
-    if (!empty($auth['user_id'])) return array(CONTROLLER_STATUS_FORBIDDEN);
+    if (!empty($auth['user_id'])) return array(CONTROLLER_STATUS_NO_PAGE);
 
     $params = $_REQUEST;
     if (fn_allowed_for('MULTIVENDOR') && !isset($_REQUEST['company_id'])) {
