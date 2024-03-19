@@ -59,20 +59,6 @@ if ($mode == 'base_price' && $action) {
     $unexist_products = array_diff($sku, $products);
     fn_print_die($sku, $products, $unexist_products, count($unexist_products), count($products));
     //fn_print_die('here');
-} elseif ($mode == 'delete_znatok') {
-    $pids = db_get_fields("SELECT product_id FROM ?:products WHERE 1 AND company_id in (?a) LIMIT 1000", array('2192'));
-    $counter = 0;
-    if ($pids) {
-        foreach ($pids as $pid) {
-            if (fn_delete_product($pid)) {
-                $counter += 1;
-            }
-        }
-        fn_print_r($pids);
-        fn_redirect('tools.delete_znatok');
-    }
-
-    fn_print_die('done');
 } elseif ($mode == 'correct_molvest') {
     $params = array('company_id' => 13);
     list($products, ) = fn_get_products($params);
