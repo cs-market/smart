@@ -788,14 +788,6 @@ fn_print_r($fantoms);
     }
 
     fn_print_die('done');
-} elseif ($mode == 'remove_user_price') {
-    $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = "C"', 1824);
-
-    // db_query('DELETE FROM ?:user_price WHERE product_id IN (?a)', $products);
-    $prices = db_get_fields('SELECT distinct(user_id) FROM ?:user_price WHERE user_id IN (?a)', $users);
-    $diff = array_diff($users, $prices);
-    fn_print_die($diff, count($users), count($prices));
-    fn_print_die('stop');
 } elseif ($mode == 'import_user_price_alidi') {
     $dir = 'alidi/';
     $files = fn_get_dir_contents($dir, false, true, 'csv');
@@ -1004,23 +996,6 @@ fn_print_r($fantoms);
     // [/remove not use variants]
 
     die('Finis');
-} elseif ($mode == 'remove_vega_images') {
-    fn_delete_image_pairs($pid, 'product');
-    $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 1810);
-    foreach ($product_ids as $pid) { fn_delete_image_pairs($pid, 'product'); }
-    fn_print_die('Fin');
-} elseif ($mode == 'remove_univita_products') {
-    $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE updated_timestamp = 0 AND company_id = 1787');
-    foreach ($product_ids as $product_id) {
-        fn_delete_product($product_id);
-    }
-    fn_print_die(count($product_ids));
-} elseif ($mode == 'remove_univita_images') {
-    $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = 1787');
-    foreach ($product_ids as $product_id) {
-        fn_delete_image_pairs($product_id, 'product');
-    }
-    fn_print_die(count($product_ids));
 } elseif ($mode == 'features_maintenance') {
     //delete fantom products
     // $pids = db_get_fields('SELECT product_id FROM ?:products');
@@ -1199,10 +1174,6 @@ fn_print_r($fantoms);
         db_query('UPDATE ?:products SET ?u WHERE product_id = ?i', $data, $data['product_id']);
     }
     fn_print_die(count($content));
-} elseif ($mode == 'remove_mikale_images') {
-    $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 1815);
-    foreach ($product_ids as $pid) { fn_delete_image_pairs($pid, 'product'); }
-    fn_print_die('Fin');
 } elseif ($mode == 'restore_vega_products') {
     $file = 'cscart_products.csv';
     $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
@@ -1395,19 +1366,6 @@ fn_print_r($fantoms);
     $deleted = array_diff($old_ids, $current_ids);
     fn_print_die($deleted);
     
-} elseif ($mode == 'remove_vegat_products') {
-    $company_id = 2058;
-    $product_ids = db_get_fields("SELECT product_id FROM ?:products WHERE company_id = ?i AND timestamp > ?i", $company_id, 1630580300);
-    $file1 = 'products.csv';
-    $content = fn_exim_get_csv(array(), $file1, array('validate_schema'=> false, 'delimiter' => ';') );
-    $sku = array_column($content, 'Product code');
-    $product_ids = db_get_fields("SELECT product_id FROM ?:products WHERE company_id = ?i AND product_code IN (?a)", $company_id, $sku);
-    fn_print_die($sku);
-
-    // foreach ($product_ids as $product_id) {
-    //     fn_delete_product($product_id);
-    // }
-    // fn_print_die(count($product_ids));
 } elseif ($mode == 'find_fantom_products') {
     $products = db_get_fields('SELECT distinct(product_id) FROM ?:products_categories');
     $fantoms = db_get_array('SELECT product_id, product_code, company_id FROM ?:products WHERE product_id NOT IN (?a)', $products);
@@ -1560,10 +1518,6 @@ fn_print_r($fantoms);
         }
     }
     fn_print_die($images);
-} elseif ($mode == 'remove_prices_mikale') {
-    list($products) = fn_get_products(['company_id' => 1815]);
-    $pids = array_keys($products);
-    db_query('DELETE FROM ?:product_prices WHERE usergroup_id != ?i AND product_id IN (?a)', 0, $pids);
 } elseif ($mode == 'calculate_return_total') {
     $returns = db_get_fields('SELECT return_id FROM ?:returns ORDER BY return_id DESC');
 
@@ -2349,34 +2303,37 @@ fn_print_die($orders_wo_points);
         }
     }
     fn_print_die('done');
-} elseif ($mode == 'remove_images_eclipse') {
-    $products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 2190);
-    foreach ($products as $product_id) {
-        $products_images = fn_get_image_pairs($product_id, 'product', 'M', true, true, DEFAULT_LANGUAGE);
-        if (!empty($products_images)) {
-            fn_delete_image_pair($products_images['pair_id']);
-        }
+} elseif ($mode == 'remove') {
+    if (empty($action)) fn_print_die('dispatch=tools.cleanup.[smthng]&company_id=xxx');
+    if (!($company_id = $_REQUEST['company_id'])) fn_print_die('add &company_id=xxx');
 
-        $additional_images = fn_get_image_pairs($product_id, 'product', 'A', true, true, DEFAULT_LANGUAGE);
-        foreach ($additional_images as $pair) {
-            fn_delete_image_pair($pair['pair_id']);
-        }
+    if ($action == 'user_prices') {
+        $res = db_query('DELETE FROM ?:user_price WHERE product_id IN (SELECT product_id FROM ?:products WHERE company_id = ?i)', $company_id);
     }
-    fn_print_die('done', count($products));
-} elseif ($mode == 'remove_images_znatok') {
-    $products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 2192);
-    foreach ($products as $product_id) {
-        $products_images = fn_get_image_pairs($product_id, 'product', 'M', true, true, DEFAULT_LANGUAGE);
-        if (!empty($products_images)) {
-            fn_delete_image_pair($products_images['pair_id']);
+    if ($action == 'prices') {
+        $res = db_query('DELETE FROM ?:product_prices WHERE product_id IN (SELECT product_id FROM ?:products WHERE company_id = ?i) AND usergroup_id != ?i', $company_id, 0);
+    }
+    if ($action == 'product_images') {
+        $res = 0;
+        $products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', $company_id);
+        foreach ($products as $product_id) {
+            fn_delete_image_pairs($product_id, 'product');
         }
+        $res = count($products);
+    }
+    if ($action == 'products') {
+        $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', $company_id);
+        foreach ($product_ids as $product_id) {
+            fn_delete_product($product_id);
+        }
+        $res = count($product_ids);
+    }
 
-        $additional_images = fn_get_image_pairs($product_id, 'product', 'A', true, true, DEFAULT_LANGUAGE);
-        foreach ($additional_images as $pair) {
-            fn_delete_image_pair($pair['pair_id']);
-        }
-    }
-    fn_print_die('done', count($products));
+    fn_print_die('Done. Count:', $res);
+} elseif ($mode == 'remove_empty_storages') {
+    $empty_storages = db_get_fields('SELECT storage_id FROM ?:storages WHERE company_id = 0');
+    fn_delete_storages($empty_storages);
+    fn_print_die(count($empty_storages));
 } elseif ($mode == 'managers_addon_migration') {
     $managers = db_get_array('SELECT * FROM ?:vendors_customers');
     $managers = array_map(function($v) {
@@ -3103,9 +3060,6 @@ fn_print_die($orders_wo_points);
         fn_print_die(fn_ip_to_db($ip));
     }
     fn_print_die();
-} elseif ($mode == 'remove_storages') {
-    $empty_storages = db_get_fields('SELECT storage_id FROM ?:storages WHERE company_id = 0');
-    fn_delete_storages($empty_storages);
 } elseif ($mode == 'correct_reward_points_april') {
     $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, CART_LANGUAGE);
     $grant_reward_points_statuses = array_filter($order_statuses, function($v) {
