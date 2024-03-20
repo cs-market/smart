@@ -2,7 +2,7 @@
     .border-radius(10px);
     background-color: rgba(0, 33, 71, 0.3);
     padding: 5px;
-    @media @mobile {
+    @media @tablet {
         padding: 5px 15px;
     }
 }
@@ -46,7 +46,7 @@
         align-items: center;
         align-content: center;
         box-sizing: border-box;
-        @media @mobile {
+        @media @tablet {
             flex-direction: initial;
             padding: 10px 30px;
         }
@@ -61,14 +61,18 @@
         .advantage-wrapper {
             flex: 0 1 auto;
             width: initial;
-            max-width: 100%;
-            @media @mobile {
+            max-width: calc(~"100% - 450px");
+            @media @tablet {
                 flex-grow: 1;
+                max-width: initial;
             }
         }
     }
     &__content-form {
         padding: 2px 40px 57px;
+        @media @tablet {
+            flex-basis: 100%;
+        }
         input[type="text"], input[type="password"] {
             color: black;
             border: 1px solid #002147;
@@ -97,29 +101,33 @@
     .tygh-content .ty-btn + .ty-btn {
         margin: 28px 0 0;
     }
-    .advantage-content {
-        .ty-grid();
-        --grid-gap: 30px;
-        --grid-width-max: 200px;
-        --grid-width-min: 200px;
-        grid-auto-rows: 1fr;
-        @media @mobile {
-            margin-top: 10px;
-            grid-auto-rows: initial;
-        }
-    }
     .advantage {
         text-align: center;
-        @media @mobile {
+        &-content {
+            //.ty-grid();
+            display: grid;
+            grid-gap: var(--grid-gap);
+            grid-template-columns: repeat(3,minmax(100px,200px));
+            --grid-gap: 30px;
+            grid-auto-rows: 1fr;
+
+            @media @tablet {
+                grid-template-columns: auto;
+                margin-top: 10px;
+                grid-auto-rows: initial;
+            }
+        }
+        @media @tablet {
             display: flex;
             align-items: center;
+            justify-content: space-around;
         }
         &-infograph {
             display: block;
             color: #fff;
             font-size: 42px;
             margin-top: 18px;
-            @media @mobile {
+            @media @tablet {
                 display: inline-block;
                 margin-top: initial;
             }
@@ -133,12 +141,12 @@
             grid-column-start: 1;
             grid-column-end: 4;
             text-align: center;
-            @media @mobile {
+            @media @tablet {
                 grid-column-start: initial;
                 grid-column-end: initial;
-                & ~ .advantage {
-                    justify-content: space-around;
-                }
+                // & ~ .advantage {
+                //     justify-content: space-around;
+                // }
             }
             a {
                 .ty-btn__login-button();
@@ -172,10 +180,10 @@
             width: 60px;
             display: block;
             margin: 7px auto;
-            @media @mobile {
+            @media @tablet {
                 display: initial;
                 // float: left;
-                margin-right: 10px;
+                margin: 0 10px 0 0;
             }
         }
     }
@@ -187,7 +195,7 @@
             justify-content: space-between;
             word-wrap: wrap;
             align-items: center;
-            @media @mobile {
+            @media @tablet {
                 flex-wrap: wrap;
                 > span {
                     flex-basis: 45%;
