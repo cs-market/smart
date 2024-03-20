@@ -12,7 +12,8 @@ if ($mode == 'product_catalog') {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
 
-    $params['custom_extend'] = ['product_name'];
+    $params['custom_extend'] = ['product_name', 'categories'];
+    $params['exclude_cid'] = 9064;
     list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
     fn_gather_additional_products_data($products, array(
         'get_icon' => true,
