@@ -7,4 +7,16 @@
     <status>active</status>
     <name>Каталог товаров для гостей</name>
     <description>Позволяет вывести страницу со списком всех товаров без цены и зависимостей от юзергрупп</description>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="anonymous_usergroups">
+                        <type>input</type>
+                        <name>Юзергруппы для анонимного каталога</name>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
 </addon>
