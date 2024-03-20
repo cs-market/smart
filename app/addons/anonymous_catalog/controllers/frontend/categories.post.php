@@ -19,8 +19,6 @@ if ($mode == 'product_catalog') {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
 
-    $selected_layout = fn_get_products_layout($_REQUEST);
     Tygh::$app['view']->assign('products', $products);
     Tygh::$app['view']->assign('search', $search);
-    Tygh::$app['view']->assign('selected_layout', $selected_layout);
 }
