@@ -19,7 +19,7 @@
 {$is_selected_filters = $smarty.request.features_hash}
 
 {if $layouts.products_multicolumns.template}
-    {include file="`$layouts.$selected_layout.template`" columns=5 show_price=false show_list_buttons=false show_add_to_cart=false show_old_price=false show_product_amount=false}
+    {include file="`$layouts.products_multicolumns.template`" columns=5 show_price=false show_list_buttons=false show_add_to_cart=false show_old_price=false show_product_amount=false}
 {/if}
 
 {elseif !$show_not_found_notification && $is_selected_filters}
