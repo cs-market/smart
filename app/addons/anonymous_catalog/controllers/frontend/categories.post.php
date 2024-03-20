@@ -14,7 +14,14 @@ if ($mode == 'product_catalog') {
 
     $params['custom_extend'] = ['product_name'];
     list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
-
+    fn_gather_additional_products_data($products, array(
+        'get_icon' => true,
+        'get_detailed' => true,
+        'get_additional' => true,
+        'get_options' => false,
+        'get_discounts' => false,
+        'get_features' => false
+    ));
     if (isset($search['page']) && ($search['page'] > 1) && empty($products)) {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
