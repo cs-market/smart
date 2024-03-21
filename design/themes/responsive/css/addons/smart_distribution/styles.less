@@ -114,9 +114,20 @@
         }
         --scroller-gap: 5px;
     }
+    // &.guest .tygh-header {
+    //     display: none;
+    // }
+    .baltika-storages .ty-icon-aurora-truck {
+        font-size: 20px;
+    }
     &:not(.checkout) .tygh-header {
         position: sticky;
         top: 72px;
+    }
+    &__mobile-banners {
+        img {
+            max-width: 75px;
+        }
     }
     .top-logo-grid .ty-text-links__a, .top-logo-grid .ty-dropdown-box__title a {
         font-size: 18px;
@@ -183,6 +194,7 @@
             }
         }
     }
+
     .ty-grid-list {
         @scroller-gap: 5px;
         &__item-name, .product-list-field {
@@ -231,9 +243,9 @@
         .ty-cart-content__qty .quantity {
             float: left;
         }
-        &__top-buttons {
-            display: none;
-        }
+        // &__top-buttons {
+        //     display: none;
+        // }
         &__image-block {
             padding: 13px 0;
         }

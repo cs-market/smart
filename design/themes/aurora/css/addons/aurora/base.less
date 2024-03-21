@@ -167,6 +167,9 @@ select {
             padding-right: 0;
             max-width: calc(~"100% - 50px");
             display: inline-block;
+            @media @tablet {
+                white-space: initial;
+            }
         }
     }
     &-non-closable &-titlebar-close {

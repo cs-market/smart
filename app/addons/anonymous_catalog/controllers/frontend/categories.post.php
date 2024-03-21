@@ -11,7 +11,7 @@ if ($mode == 'product_catalog') {
     if (fn_allowed_for('MULTIVENDOR') && !isset($_REQUEST['company_id'])) {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
-
+    fn_add_breadcrumb(__('catalog'));
     $params['custom_extend'] = ['product_name', 'categories'];
     $params['exclude_cid'] = 9064;
     list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
