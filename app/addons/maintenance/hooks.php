@@ -429,7 +429,7 @@ function fn_maintenance_get_orders($params, $fields, $sortings, &$condition, &$j
 }
 
 function fn_maintenance_update_product_amount_before_tracking_checking($product_id, &$amount_delta, $product_options, $sign, $notify, $order_info) {
-    if ((SiteArea::isAdmin(AREA) || Registry::get('runtime.controller') == 'exim') && !YesNo::toBool(Registry::get('addons.maintenance.track_amount_in_backend'))) {
+    if ((SiteArea::isAdmin(AREA) || in_array(Registry::get('runtime.controller'), ['ex_exim_1c', 'exim'])) && !YesNo::toBool(Registry::get('addons.maintenance.track_amount_in_backend'))) {
         $amount_delta = 0;
     }
 }

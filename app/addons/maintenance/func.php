@@ -172,7 +172,7 @@ function fn_delete_notification_by_message($message) {
 
     if (!empty($notifications)) {
         foreach ($notifications as $key => $data) {
-            if ($data['message'] == $message) {
+            if ($data['message'] == $message || $data['title'] == $message) {
                 unset($notifications[$key]);
             }
         }

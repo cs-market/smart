@@ -8,7 +8,7 @@
                 $(this).closest('.cm-product-controls').addClass('in-cart').find('.ty-grid-list__qty').addClass('ty-cart-content__qty');
             });
             $('.ty-btn__add-to-wish').click(function() {
-                $(this).find('.ty-icon-aurora-star-empty').addClass('ty-icon-aurora-star-full');
+                $('.ty-icon-aurora-star-empty', $(this)).addClass('ty-icon-aurora-star-full').removeClass('ty-icon-aurora-star-empty');
             });
             $('.cm-autoclick').click();
         });
