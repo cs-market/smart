@@ -4797,8 +4797,7 @@ fn_print_die($orders_wo_points);
         }
     }
 
-    //$months = ['02','03'];
-    $months = ['02'];
+    $months = ['03'];
 
     foreach ($months as $month) {
         $year = 2024;
@@ -4873,7 +4872,6 @@ fn_print_die($orders_wo_points);
             fn_save_user_additional_data(POINTS, $current_value + $add['diff'], $add['user_id']);
             db_query('UPDATE ?:reward_point_changes SET amount = ?i WHERE change_id = ?i', $add['points'], $add['change']['change_id']);
         }
-        fn_print_die(array_column($add_points, 'diff'), $add_points, array_sum(array_column($add_points, 'diff')));
 
         fn_print_r('Текущая корректировка ' . $month, $add_points);
 
