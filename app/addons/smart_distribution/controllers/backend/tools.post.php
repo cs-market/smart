@@ -4690,11 +4690,11 @@ fn_print_die($orders_wo_points);
     $export = fn_exim_put_csv($result, $params, '"');
     fn_print_die($result);
 } elseif ($mode == 'correct_reward_points_february2') {
-    $promotions[1810]['02'] = [67132, 67133, 67134, 67135, 67136];
-    $promotions[1810]['03'] = [69679, 69680, 69681, 69682, 69683];
+    $promotions[1810]['02'] = [67136, 67135, 67134, 67133, 67132];
+    $promotions[1810]['03'] = [69683, 69682, 69681, 69680, 69679];
 
-    $promotions[2058]['02'] = [67127, 67128, 67129, 67130, 67131];
-    $promotions[2058]['03'] = [69684, 69685, 69686, 69687, 69688];
+    $promotions[2058]['02'] = [67131, 67130, 67129, 67128, 67127];
+    $promotions[2058]['03'] = [69688, 69687, 69686, 69685, 69684];
 
     foreach ($promotions as $company_id => &$company_promotions) {
         foreach ($company_promotions as &$ps) {
@@ -4782,7 +4782,107 @@ fn_print_die($orders_wo_points);
     }
 
     fn_print_die('done. Out of status:', $out_of_status);
+} elseif ($mode == 'correct_reward_points_february3') {
+    $promotions[1810]['02'] = [67136, 67135, 67134, 67133, 67132];
+    $promotions[1810]['03'] = [69683, 69682, 69681, 69680, 69679];
 
+    $promotions[2058]['02'] = [67131, 67130, 67129, 67128, 67127];
+    $promotions[2058]['03'] = [69688, 69687, 69686, 69685, 69684];
+
+    foreach ($promotions as $company_id => &$company_promotions) {
+        foreach ($company_promotions as &$ps) {
+            foreach ($ps as &$p) {
+                $p = fn_get_promotion_data($p);
+            }
+        }
+    }
+
+    //$months = ['02','03'];
+    $months = ['02'];
+
+    foreach ($months as $month) {
+        $year = 2024;
+        $add_points = [];
+        $start_ts = fn_parse_date('01/' . $month . '/'. $year);
+        $end_ts = strtotime("+1 month", $start_ts) - 1;
+        $time_condition = db_quote(" timestamp BETWEEN ?i AND ?i", $start_ts, $end_ts);
+        $orders = db_get_fields("SELECT order_id FROM ?:orders WHERE company_id IN (?a) AND $time_condition AND is_parent_order = ?s AND group_id NOT IN (?a)", [1810, 2058], 'N', [17,18]);
+
+        foreach ($orders as $order_id) {
+            // if ($order_id == 455927) continue;
+            $order_info = fn_get_order_info($order_id);
+
+            if ($order_info['status'] == 'H') {
+                if ($order_info['points_info']['reward']) continue;
+                if ($order_info['points_info']['in_use']['points']) continue;
+
+                $reward_point_changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s', $order_info['user_id'], CHANGE_DUE_ORDER);
+
+                $is_corrected = false;
+                $is_once_granted = false;
+                $is_group_order = false;
+                foreach ($reward_point_changes as $change) {
+                    $details = unserialize($change['reason']);
+                    if (!empty($details['order_id']) && $details['order_id'] == $order_info['order_id']) {
+                        $is_once_granted = true;
+                    }
+                    if (!empty($details['order_id']) && $details['order_id'] == $order_info['order_id'] && strpos($details['correction'], 'correct_reward_points_') !== false) {
+                        $is_corrected = true;
+                        break;
+                    }
+                }
+
+                if (!$is_corrected) continue;
+
+                $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $order_info['user_id']);
+                
+                $customer_auth = fn_fill_auth($_data, array(), false, 'C');
+                foreach ($promotions[$order_info['company_id']][$month] as $promotion) {
+                    $res = fn_check_promotion_conditions($promotion, $order_info, $customer_auth, $order_info['products']);
+                    if ($res) {
+                        $percent = reset($promotion['bonuses'])['value'];
+                        $points = round($order_info['total']*$percent/100);
+                        if (empty($points)) break; 
+                        if ($change['amount'] == $points) break; // corrected right
+
+                        $add_points[] = [
+                            'user_id' => $order_info['user_id'],
+                            'company_id' => $order_info['company_id'],
+                            'order_id' => $order_info['order_id'],
+                            'status' => $order_info['status'],
+                            'order_total' => $order_info['total'],
+                            'percent' => $percent,
+                            'points' => $points,
+                            'timestamp' => $order_info['timestamp'],
+                            'change' => $change,
+                            'diff' => $points - $change['amount'],
+                            // 'is_once_granted' => $is_once_granted,
+                            // 'is_group_order' => $is_group_order,
+                        ];
+                        break;
+
+                    }
+                }
+            } else {
+                $out_of_status[] = $order_info['order_id'];
+            }
+        }
+
+        foreach ($add_points as $add) {
+            $current_value = (int) fn_get_user_additional_data(POINTS, $add['user_id']);
+            fn_save_user_additional_data(POINTS, $current_value + $add['diff'], $add['user_id']);
+            db_query('UPDATE ?:reward_point_changes SET amount = ?i WHERE change_id = ?i', $add['points'], $add['change']['change_id']);
+        }
+        fn_print_die(array_column($add_points, 'diff'), $add_points, array_sum(array_column($add_points, 'diff')));
+
+        fn_print_r('Текущая корректировка ' . $month, $add_points);
+
+        $params['filename'] = "points_to_correct_$month.csv";
+        $params['force_header'] = true;
+        $export = fn_exim_put_csv($add_points, $params, '"');
+    }
+
+    fn_print_die('done. Out of status:', $out_of_status);
 } elseif ($mode == 'check_storages') {
     $storages = db_get_array('SELECT distinct(sp.storage_id), sp.product_id, p.items_in_package, sp.min_qty, sp.min_qty/p.items_in_package AS sell_from FROM ?:storages_products AS sp LEFT JOIN ?:products AS p ON p.product_id = sp.product_id WHERE p.items_in_package != 1 AND sp.min_qty < p.items_in_package AND sp.min_qty != 0 AND p.company_id = 45 GROUP BY sp.storage_id');
     $rest_storages = array_filter($storages, function($v) { return $v['sell_from'] != 0.5;});
