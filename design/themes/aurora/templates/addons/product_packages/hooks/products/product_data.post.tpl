@@ -1,5 +1,5 @@
 {capture name="package_switcher_`$obj_id`"}
-{if $product.items_in_package && $product.items_in_package != 1 && $product.package_switcher == "YesNo::YES"|enum}
+{if $product.items_in_package && $product.items_in_package != 1 && ("ULTIMATE"|fn_allowed_for || $product.package_switcher == "YesNo::YES"|enum)}
     <div class="ty-switcher-checkbox">
         {if isset($product.selected_amount)}
             {assign var="default_amount" value=$product.selected_amount}

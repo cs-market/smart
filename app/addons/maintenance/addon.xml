@@ -60,6 +60,8 @@
 
         <item>ALTER TABLE `?:products` ADD `barcode` VARCHAR(64) NOT NULL DEFAULT '';</item>
         <item for="uninstall">ALTER TABLE `?:products` DROP `barcode`;</item>
+
+        <item>ALTER TABLE `?:product_feature_variant_descriptions` CHANGE `variant` `variant` VARCHAR(1024) NOT NULL DEFAULT '';</item>
     </queries>
     <functions>
         <item for="install">fn_maintenance_install</item>

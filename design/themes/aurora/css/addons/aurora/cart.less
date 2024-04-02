@@ -59,12 +59,30 @@ Cart page
         background-color: transparent;
         border: 1px solid @base;
     }
+    &__shipping-method, &__shipping-method__wrapper {
+        height: auto;
+        min-height: 40px;
+    }
+    .pickup__offices--list .ty-one-store {
+        border-bottom: 0;
+    }
+    .pickup--list .pickup__offices-wrapper {
+        overflow: hidden;
+    }
+    &__submit-order {
+        position: sticky;
+        bottom: 0;
+    }
 }
 
 .ty-orders {
     &__actions-icon {
         vertical-align: middle;
         margin-right: 3px;
+    }
+    &-summary__wrapper {
+        background-color: @footer_bg;
+        border-color: darken(@footer_bg, 5%);
     }
 }
 #point_payment {

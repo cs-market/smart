@@ -333,12 +333,14 @@ function fn_maintenance_get_product_filter_fields(&$filters) {
             array_filter(Tygh::$app['session']['auth']['usergroup_ids'])
         );
 
-        $condition .= db_quote("
-            AND ?:product_prices.lower_limit = 1 AND ?:product_prices.usergroup_id IN (?n) AND prices_2.price IS NULL",
-            array_filter(Tygh::$app['session']['auth']['usergroup_ids'])
-        );
+        if (YesNo::toBool(Registry::get('addons.maintenance.ignore_price_for_usergroup_all'))) {
+            $condition .= db_quote("
+                AND ?:product_prices.lower_limit = 1 AND ?:product_prices.usergroup_id IN (?n) AND prices_2.price IS NULL",
+                array_filter(Tygh::$app['session']['auth']['usergroup_ids'])
+            );
+        }
 
-        if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
+        if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id') && YesNo::toBool(Registry::get('addons.maintenance.ignore_price_for_usergroup_all'))) {
             $db_field = "IF(shared_prices.product_id IS NOT NULL, shared_prices.price, ?:product_prices.price)";
             $join .= db_quote(" LEFT JOIN ?:ult_product_prices AS shared_prices ON shared_prices.product_id = products.product_id"
                 . " AND shared_prices.lower_limit = 1"
@@ -403,6 +405,58 @@ function fn_maintenance_get_products(&$params, &$fields, $sortings, &$condition,
     if (!empty($params['exclude_cid'])) {
         if (!is_array($params['exclude_cid'])) $params['exclude_cid'] = explode(',', $params['exclude_cid']);
         $condition .= db_quote(" AND ?:categories.category_id NOT IN (?n)", $params['exclude_cid']);
+    }
+}
+
+function fn_maintenance_load_products_extra_data(&$extra_fields, $products, $product_ids, &$params, $lang_code) {
+    if (YesNo::toBool(Registry::get('addons.maintenance.ignore_price_for_usergroup_all'))) {
+        // нет единого запроса, чтобы брались прайсовые цены и только если их нет брались базовые поэтому тут берем базовые а в fn_maintenance_load_products_extra_data_post берем поверх прайсовые если они есть
+        if (
+        in_array('prices', $params['extend'])
+        && $params['sort_by'] != 'price'
+        && !in_array('prices2', $params['extend'])
+        ) {
+            $extra_fields['?:product_prices']['condition'] = db_quote(
+                ' AND ?:product_prices.lower_limit = 1 AND ?:product_prices.usergroup_id = ?i', USERGROUP_ALL);
+        }
+
+        $params['auth_usergroup_ids'] = array_filter(Tygh::$app['session']['auth']['usergroup_ids']);
+    }
+}
+
+function fn_maintenance_load_products_extra_data_post(&$products, $product_ids, $params, $lang_code) {
+    if (YesNo::toBool(Registry::get('addons.maintenance.ignore_price_for_usergroup_all'))) {
+        if (!empty($params['auth_usergroup_ids'])) {
+            $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, min(prices.price), prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a) GROUP BY product_id", 'product_id', $product_ids, 1, $params['auth_usergroup_ids']);
+            $products = fn_array_merge($products, $prices);
+        }
+    }
+}
+
+function fn_maintenance_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
+    if (YesNo::toBool(Registry::get('addons.maintenance.ignore_price_for_usergroup_all')) && SiteArea::isStorefront(AREA)) {
+        $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
+        $price_usergroup = db_quote(' 
+            AND CASE WHEN 
+            (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
+            THEN ?:product_prices.usergroup_id IN (?a) 
+            ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_filter($usergroup_ids), array_filter($usergroup_ids), USERGROUP_ALL);
+    }
+}
+
+function fn_maintenance_get_product_price($product_id, $amount, $auth, &$price, &$skip) {
+    if (YesNo::toBool(Registry::get('addons.maintenance.ignore_price_for_usergroup_all'))) {
+        $skip = true;
+        $usergroup_ids = empty($usergroup_ids) ? $auth['usergroup_ids'] : $usergroup_ids;
+        $usergroup_ids = array_filter($usergroup_ids);
+
+        $price = db_get_field("
+            SELECT min(IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100)) as price 
+            FROM ?:product_prices as prices 
+            WHERE prices.product_id = ?i AND CASE WHEN 
+                (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?n) )
+                THEN prices.usergroup_id IN (?n) 
+                ELSE prices.usergroup_id = ?i END ORDER BY lower_limit", $product_id, $product_id, $usergroup_ids, $usergroup_ids, USERGROUP_ALL);
     }
 }
 

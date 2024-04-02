@@ -89,6 +89,28 @@ Header
                 left: 0;
             }
         }
+        .ty-text-links__item {
+            .border-radius(@border-radius);
+            border: 0;
+            background-color: @base;
+            .box-shadow(fade(@base, 80%) 0px 5px 15px 0px);
+            padding: 8px 10px;
+            a {
+                display: flex;
+                align-items: center;
+                font-size: 18px;
+                color: #fff;
+                .aurora-glyphs();
+                .ty-icon-aurora-menu();
+                &:hover {
+                    color: #fff;
+                }
+                &:before {
+                    font-size: 18px;
+                    margin-right: 6px;
+                }
+            }
+        }
     }
     [class^="ty-icon-aurora-"], [class*=" ty-icon-aurora-"] {
         font-size: 20px;

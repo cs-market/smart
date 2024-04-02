@@ -117,7 +117,7 @@
                                         {hook name="products:product_multicolumns_list_control_data_wrapper"}
                                         {assign var="qty" value="qty_`$obj_id`"}
                                         {if $smarty.capture.$qty|trim}
-                                            <div class="ty-grid-list__qty {if $obj_id|in_array:$cart_products}ty-cart-content__qty{/if}">
+                                            <div class="ty-grid-list__qty {if $product.in_cart == "YesNo::YES"|enum}ty-cart-content__qty{/if}">
                                                 {$smarty.capture.$qty nofilter}
                                             </div>
                                             {include file="buttons/update_cart.tpl"

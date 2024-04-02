@@ -4,7 +4,7 @@ use Tygh\Enum\SiteArea;
 use Tygh\Registry;
 use Tygh\Http;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_monolith_generate_xml($order_id) {
     $schema = fn_get_schema('monolith', 'schema');

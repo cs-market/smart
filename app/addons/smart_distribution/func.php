@@ -625,17 +625,6 @@ function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fie
     }
 }
 
-function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
-    if (SiteArea::isStorefront(AREA)) {
-        $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
-        $price_usergroup = db_quote(' 
-            AND CASE WHEN 
-            (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
-            THEN ?:product_prices.usergroup_id IN (?a) 
-            ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_filter($usergroup_ids), array_filter($usergroup_ids), USERGROUP_ALL);
-    }
-}
-
 // function fn_smart_distribution_get_usergroups_price($product_id, $usergroup_ids = array()) {
 //     $usergroup_ids = empty($usergroup_ids) ? Tygh::$app['session']['auth']['usergroup_ids'] : $usergroup_ids;
 //     $usergroup_ids = array_filter($usergroup_ids);
@@ -651,41 +640,6 @@ function fn_smart_distribution_get_product_data_post(&$product_data, $auth, $pre
         $p['full_info'] = true;
         $p['date'] = true;
         $product_data['buy_together'] = fn_buy_together_get_chains($p, $auth);
-    }
-}
-
-function fn_smart_distribution_get_product_price($product_id, $amount, $auth, &$price, &$skip) {
-    $skip = true;
-    $usergroup_ids = empty($usergroup_ids) ? $auth['usergroup_ids'] : $usergroup_ids;
-    $usergroup_ids = array_filter($usergroup_ids);
-
-    $price = db_get_field("
-        SELECT min(IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100)) as price 
-        FROM ?:product_prices as prices 
-        WHERE prices.product_id = ?i AND CASE WHEN 
-            (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?n) )
-            THEN prices.usergroup_id IN (?n) 
-            ELSE prices.usergroup_id = ?i END ORDER BY lower_limit", $product_id, $product_id, $usergroup_ids, $usergroup_ids, USERGROUP_ALL);
-}
-
-function fn_smart_distribution_load_products_extra_data(&$extra_fields, $products, $product_ids, &$params, $lang_code) {
-    // нет единого запроса, чтобы брались прайсовые цены и только если их нет брались базовые поэтому тут берем базовые а в fn_smart_distribution_load_products_extra_data_post берем поверх прайсовые если они есть
-    if (
-    in_array('prices', $params['extend'])
-    && $params['sort_by'] != 'price'
-    && !in_array('prices2', $params['extend'])
-    ) {
-        $extra_fields['?:product_prices']['condition'] = db_quote(
-            ' AND ?:product_prices.lower_limit = 1 AND ?:product_prices.usergroup_id = ?i', USERGROUP_ALL);
-    }
-
-    $params['auth_usergroup_ids'] = array_filter(Tygh::$app['session']['auth']['usergroup_ids']);
-}
-
-function fn_smart_distribution_load_products_extra_data_post(&$products, $product_ids, $params, $lang_code) {
-    if (!empty($params['auth_usergroup_ids'])) {
-        $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, min(prices.price), prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a) GROUP BY product_id", 'product_id', $product_ids, 1, $params['auth_usergroup_ids']);
-        $products = fn_array_merge($products, $prices);
     }
 }
 
@@ -790,6 +744,7 @@ function fn_smart_distribution_promotion_apply_pre(&$promotions, $zone, $data, $
 }
 
 function fn_smart_distribution_add_product_to_cart_get_price($product_data, $cart, $auth, $update, $_id, &$data, $product_id, $amount, $price, $zero_price_action, $allow_add) {
+    // для передачи уровня цены в 1с
     $usergroup_condition = db_quote("AND ?:product_prices.usergroup_id IN (?n)", ((SiteArea::isStorefront(AREA) || defined('ORDER_MANAGEMENT')) ? array_merge(array(USERGROUP_ALL), $auth['usergroup_ids']) : USERGROUP_ALL));
     $data['extra']['usergroup_id'] = db_get_field(
         "SELECT ?:product_prices.usergroup_id "
