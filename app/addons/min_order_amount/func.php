@@ -26,7 +26,7 @@ function fn_min_order_amount_pre_place_order(&$cart, $allow, $product_groups) {
 function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $cart_products, $product_groups) {
     $cart['min_order_failed'] = false;
     unset($cart['min_order_notification']);
-    if (isset($cart['skip_min_check']) && $cart['skip_min_check']) {
+    if ((isset($cart['skip_min_check']) && $cart['skip_min_check']) || defined('ORDER_MANAGEMENT')) {
         return;
     }
 
