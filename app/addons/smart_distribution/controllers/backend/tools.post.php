@@ -4893,8 +4893,8 @@ fn_print_die($orders_wo_points);
             $current_value = (int) fn_get_user_additional_data(POINTS, $add['user_id']);
             $add['user_points_before'] = $current_value;
             $add['user_points_after'] = $current_value + $add['diff'];
-            // fn_save_user_additional_data(POINTS, $current_value + $add['diff'], $add['user_id']);
-            // db_query('UPDATE ?:reward_point_changes SET amount = ?i WHERE change_id = ?i', $add['points'], $add['change']['change_id']);
+            fn_save_user_additional_data(POINTS, $current_value + $add['diff'], $add['user_id']);
+            db_query('UPDATE ?:reward_point_changes SET amount = ?i WHERE change_id = ?i', $add['points'], $add['change']['change_id']);
         }
         unset($add);
 
