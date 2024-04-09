@@ -4932,9 +4932,9 @@ fn_print_die($orders_wo_points);
             if ($month == '04') {
                 // Промо март, Начисление ЮГ Самара апрель:
 
-                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69673 круп 80к-1%
-                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69674 круп 150к-1.5%
-                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69675 круп 250к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73986 круп 80к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73987 круп 150к-1.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73988 круп 250к-2%
                 // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73978 розн 0к-0.5%
                 // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73979 розн 20к-1%
                 // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73980 розн 50к-2%
@@ -4942,9 +4942,9 @@ fn_print_die($orders_wo_points);
 
                 // Промо март, Начисление ЮГ Тольятти апрель:
 
-                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69676 круп 80к-1%
-                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69677 круп 150к-1.5%
-                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=69678 круп 250к-2%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73989 круп 80к-1%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73990 круп 150к-1.5%
+                // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73991 круп 250к-2%
                 // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73985 розн 0к-0.5%
                 // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73984 розн 20к-1%
                 // http://i-sd.ru/fadCcCyH9P.php?dispatch=promotions.update&promotion_id=73983 розн 50к-2%
@@ -4952,13 +4952,13 @@ fn_print_die($orders_wo_points);
              
                 // Вега_Самара_Розничные
                 $promotions[1810][13858] = [73981, 73980, 73979, 73978];
-                // Вега_Самара_Крупнооптовые_клиенты !!!!!!!пока нет
-                //$promotions[1810][13360] = [69675, 69674, 69673];
+                // Вега_Самара_Крупнооптовые_клиенты
+                //$promotions[1810][13360] = [73988, 73987, 73986];
 
                 // Вега_Тольятти_Розничные клиенты
                 $promotions[2058][14776] = [73982, 73983, 73984, 73985];
-                // Вега_Тольятти_Крупный ОПТ !!!!!!!пока нет
-                //$promotions[2058][13361] = [69678, 69677, 69676];
+                // Вега_Тольятти_Крупный ОПТ
+                $promotions[2058][13361] = [73991, 73990, 73989];
             }
 
             if (!isset($promotions[$company_id][$ug_id])) continue;
