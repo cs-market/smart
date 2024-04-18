@@ -52,9 +52,7 @@ fn_register_hooks(
     'checkout_get_user_profiles',
     'get_mailboxes_pre',
     'usergroup_types_get_map_user_type',
-    //temporary
     'pre_get_orders',
-    'get_orders_post',
     'extract_cart',
     'get_promotions',
     'promotion_apply_before_get_promotions',
