@@ -5,7 +5,17 @@
     (function(_, $) {
         $.ceEvent('on', 'ce.commoninit', function() {
             $('.ty-btn__add-to-cart').click(function() {
-                $(this).closest('.cm-product-controls').addClass('in-cart').find('.ty-grid-list__qty').addClass('ty-cart-content__qty');
+                dynamic_product = $(this).closest('.ty-dynamic-quantity')
+                if (dynamic_product.length) {
+                    dynamic_product.addClass('ty-product-in-cart')
+                    qty_control = $('.ty-grid-list__qty', dynamic_product);
+                    if (!qty_control.length) {
+                        qty_control = $('.ty-product-block__qty', dynamic_product);
+                    }
+                    if (qty_control.length) {
+                        qty_control.addClass('ty-cart-content__qty');
+                    }
+                }
             });
             $('.ty-btn__add-to-wish').click(function() {
                 $('.ty-icon-aurora-star-empty', $(this)).addClass('ty-icon-aurora-star-full').removeClass('ty-icon-aurora-star-empty');

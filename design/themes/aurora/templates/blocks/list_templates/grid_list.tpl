@@ -20,7 +20,7 @@
     {if $settings.Appearance.enable_quick_view == 'Y'}
         {$quick_nav_ids = $products|fn_fields_from_multi_level:"product_id":"product_id"}
     {/if}
-    {if $products|count < $settings.Appearance.columns_in_products_list}
+    {if !$show_empty && $products|count < $settings.Appearance.columns_in_products_list}
         {$grid_columns = $products|count}
     {elseif $columns}
         {$grid_columns = $columns}
@@ -45,7 +45,8 @@
                     
                     <div class="ty-grid-list__item 
                         {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum} ty-dynamic-quantity {/if}
-                        {if $product.in_cart} ty-grid-list__in-cart {/if}
+                        {if $product.in_cart} ty-product-in-cart {/if}
+                        {if $product.is_weighted == "YesNo::YES"|enum} ty-weighted-product {/if}
                         {if $addons.aurora.inline_controls == "YesNo::YES"|enum} ty-grid-list__inline-controls {/if}
                         {$item_class}
                         {if $settings.Appearance.enable_quick_view == "YesNo::YES"|enum || $show_features} ty-grid-list__item--overlay{/if}">
@@ -54,7 +55,9 @@
                         {$smarty.capture.$form_open nofilter}
                             {hook name="products:product_multicolumns_list"}
                                 <div class="ty-grid-list__image">
-                                    {include file="views/products/components/product_icon.tpl" product=$product show_gallery=true}
+                                    <a href="{"$product_detail_view_url"|fn_url}">
+                                        {include file="views/products/components/product_icon.tpl" product=$product show_gallery=true}
+                                    </a>
 
                                     {assign var="product_labels" value="product_labels_`$obj_prefix``$obj_id`"}
                                     {$smarty.capture.$product_labels nofilter}
@@ -110,10 +113,7 @@
                                 {/if}
 
                                 {capture name="product_multicolumns_list_control_data_wrapper"}
-                                    <div class="ty-grid-list__controls cm-product-controls 
-                                        {if $product.is_weighted == "YesNo::YES"|enum} is-weighted {/if}
-                                        {if $product.in_cart  == "YesNo::YES"|enum} in-cart {/if}
-                                    ">
+                                    <div class="ty-grid-list__controls cm-product-controls">
                                         {hook name="products:product_multicolumns_list_control_data_wrapper"}
                                         {assign var="qty" value="qty_`$obj_id`"}
                                         {if $smarty.capture.$qty|trim}
@@ -154,7 +154,7 @@
                     </div>
                 {/if}
             {/foreach}
-            {*if $show_empty && $smarty.foreach.sprod.last}
+            {if $show_empty}
                 {assign var="iteration" value=$smarty.foreach.sproducts.iteration}
                 {capture name="iteration"}{$iteration}{/capture}
                 {hook name="products:products_multicolumns_extra"}
@@ -163,14 +163,14 @@
                 {if $iteration % $columns != 0}
                     {math assign="empty_count" equation="c - it%c" it=$iteration c=$columns}
                     {section loop=$empty_count name="empty_rows"}
-                        <div class="ty-column{$columns}">
+                        <div class="ty-grid-list__item">
                             <div class="ty-product-empty">
                                 <span class="ty-product-empty__text">{__("empty")}</span>
                             </div>
                         </div>
                     {/section}
                 {/if}
-            {/if*}
+            {/if}
         {/strip}
     {if !$item_class}</div>{/if}
 

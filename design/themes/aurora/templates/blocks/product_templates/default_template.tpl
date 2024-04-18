@@ -2,7 +2,11 @@
 {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum}{script src="js/addons/aurora/cart_content.js"}{/if}
 
 <div class="ty-product-block ty-product-detail">
-    <div class="ty-product-block__wrapper">
+    <div class="ty-product-block__wrapper 
+    {if $product.in_cart} ty-product-in-cart {/if}
+    {if $product.is_weighted == "YesNo::YES"|enum} ty-weighted-product {/if}
+    {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum} ty-dynamic-quantity {/if}
+    ">
     {hook name="products:view_main_info"}
         {if $product}
             {assign var="obj_id" value=$product.product_id}
@@ -137,9 +141,15 @@
                         {include file="buttons/button.tpl" but_href="products.view?product_id=`$product.product_id`" but_text=__("view_details") but_role="submit"}
                     {/if}
 
-                    <div class="ty-product-block__qty">
+                    <div class="ty-product-block__qty  {if $product.in_cart == "YesNo::YES"|enum}ty-cart-content__qty{/if}">
                         {assign var="qty" value="qty_`$obj_id`"}
                         {$smarty.capture.$qty nofilter}
+
+                        {include file="buttons/update_cart.tpl"
+                             but_id="button_cart_`$obj_id`"
+                             but_meta="ty-btn--recalculate-cart hidden hidden-phone hidden-tablet"
+                             but_name="dispatch[checkout.update_qty]"
+                        }
                     </div>
 
                     {assign var="add_to_cart" value="buttons_product"}

@@ -97,7 +97,7 @@
                     {if $settings.Appearance.quantity_changer == "Y"}
                         <a class="cm-increase ty-value-changer__increase">&#43;</a>
                     {/if}
-                    <input type="text" size="5" class="ty-value-changer__input cm-amount" id="qty_count_{$obj_prefix}{$obj_id}" name="product_data[{$obj_id}][amount]" value="{$default_amount}"{if $product.qty_step > 1} data-ca-step="{$product.qty_step}"{/if} data-ca-min-qty="{if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum}0{elseif $product.min_qty > 1}{$product.min_qty}{else}1{/if}" />
+                    <input type="text" size="5" class="ty-value-changer__input cm-amount" id="qty_count_{$obj_prefix}{$obj_id}" name="product_data[{$obj_id}][amount]" value="{$default_amount}" data-ca-val="{$default_amount}" {if $product.qty_step > 1} data-ca-step="{$product.qty_step}"{/if} data-ca-min-qty="{if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum}0{elseif $product.min_qty > 1}{$product.min_qty}{else}1{/if}" />
                     {if $settings.Appearance.quantity_changer == "Y"}
                         <a class="cm-decrease ty-value-changer__decrease">&minus;</a>
                     {/if}

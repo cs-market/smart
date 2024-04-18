@@ -172,6 +172,7 @@ select {
             }
         }
     }
+
     &-non-closable &-titlebar-close {
         display: none;
     }
@@ -280,7 +281,7 @@ select {
         }
     }
     &__add-to-wish {
-        padding: 4px 6px;
+        padding: 6px;
         margin: 0;
         font-size: 22px;
         background-color: #fff;
@@ -298,6 +299,7 @@ select {
             position: absolute;
             top: 10px;
             right: 10px;
+            z-index: 10;
         }
     }
     &-go {
@@ -320,17 +322,31 @@ select {
         border: 0;
         padding: 0;
     }
-    // > .ty-icon {
-    //     margin-right: 3px;
-    // }
+    i, .ty-icon {
+        position: initial;
+    }
 }
 
 .ty-dropdown-box, .ty-sort-dropdown {
     &__title {
         .ty-tile-button();
-        // @media @mobile {
-        //     padding: 6px 10px;
-        // }
+        --text-color: darken(@base, 40%);
+        --icon-color: @base;
+        --arrow-color: var(--text-color);
+        &, &.open {
+            i {
+                color: var(--icon-color);
+            }
+            a {
+                color: var(--text-color);
+            }
+            .ty-icon-down-micro, .ty-icon-up-micro {
+                color: var(--arrow-color);
+            }
+        }
+        @media @mobile {
+            padding: 6px 10px;
+        }
         .ty-account-info__title {
             padding: initial;
         }
@@ -339,20 +355,13 @@ select {
             font-size: 20px;
             .aurora-glyphs();
             margin-right: 5px;
-            color: @base;
         }
         .ty-icon-down-micro {
             position: static;
         }
         &.open {
-            & i {
-                color: @decorative;
-            }
-            &, & a {
-                color: #081307;
-            }
-            a > span, a > .ty-icon-down-micro, a > .ty-minicart-title {
-                color: #081307;
+            .ty-minicart-title {
+                color: inherit;
             }
             &:after {
                 content: "";
@@ -399,6 +408,14 @@ select {
     }
 }
 
+.cm-gallery-item {
+    width: 100%;
+}
+.ty-no-image:before{
+    content: "";
+    display: block;
+    padding-top: calc(~"100% * var(--aspect-ratio)");
+}
 .ty-icon-down-micro {
     position: static;
     margin-left: 5px;
@@ -521,6 +538,12 @@ select {
     }
     &__show_inline > &__item {
         margin: initial;
+    }
+    &__active {
+        border-color: var(--border-color-active);
+    }
+    &-wrapper {
+        border-bottom: 0;
     }
 }
 .ty-breadcrumbs {

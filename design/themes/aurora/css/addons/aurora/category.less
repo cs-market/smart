@@ -5,7 +5,7 @@ Category page
 .ty-grid-list {
     .ty-grid();
     //grid-template-columns: repeat(auto-fit,minmax(230px,auto));
-    justify-content: space-between;
+    //justify-content: space-between;
     @media @tablet {
         //grid-template-columns: repeat(calc(~"var(--columns) - 1"), minmax(200px, 300px));
     }
@@ -19,6 +19,8 @@ Category page
         padding: 15px;
         .border-radius(10px);
         .box-shadow(~"rgba(0, 0, 0, 0.08) 0px 1px 20px 0px, rgba(0, 0, 0, 0.04) 0px 2px 8px 0px");
+        max-width: 100%;
+        box-sizing: border-box;
         &:hover {
             .box-shadow(rgba(90, 112, 114, 0.3) 0px 4px 18px);
             background-color: #fff;
@@ -28,6 +30,10 @@ Category page
             display: flex;
             flex-direction: column;
             min-height: 100%;
+        }
+        .ty-no-image {
+            width: auto !important;
+            height: auto !important;
         }
     }
     &__item-name {
@@ -45,13 +51,14 @@ Category page
     &__image {
         border: 0;
         padding: 0;
+        > a {
+            display: block;
+            margin-bottom: 20px;
+        }
     }
 
     &__qty {    
         width: 100%;
-        .ty-dynamic-quantity .ty-grid-list__controls:not(.is-weighted) & {
-            display: none;
-        }
     }
     &__sku {
         * {
@@ -75,15 +82,6 @@ Category page
         padding-top: 20px;
         gap: 8px 3px;
         flex-wrap: wrap;
-        &.in-cart:not(.is-weighted) {
-            gap: 0;
-            .ty-grid-list__qty {
-                display: block;
-            }
-            .ty-btn__add-to-cart  {
-                display: none;
-            }
-        }
     }
     .button-container {
         flex-basis: 100%;
@@ -135,6 +133,7 @@ Category page
         --grid-width-min: 280px;
         --grid-width-max: auto;
     }
+
     .owl-theme .owl-controls {
         margin-top: 3px;
         .owl-page span {

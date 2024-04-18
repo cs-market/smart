@@ -32,7 +32,7 @@
         {if $iteration == 0 || $iteration % $columns != 0}
             {math assign="empty_count" equation="c - it%c" it=$iteration c=$columns}
             {section loop=$empty_count name="empty_rows"}
-                <div class="ty-column{$columns}">
+                <div class="ty-grid-list__item">
                     <div class="ty-product-empty">
                         <span class="ty-product-empty__text">{__("empty")}</span>
                     </div>
@@ -50,7 +50,7 @@
         </div>
         {if $products|count < 40}
         <div class="ty-float-right">
-            {include file="buttons/button.tpl" but_text=__("add_all_to_cart") but_meta="ty-btn__secondary cm-post cm-ajax cm-ajax-full-render" but_href="checkout.add.wishlist" but_role="action" but_target_id="cart_status*"}
+            {include file="buttons/button.tpl" but_text=__("add_all_to_cart") but_meta="ty-btn__primary cm-post cm-ajax cm-ajax-full-render ty-btn__wl-add-all" but_href="checkout.add.wishlist" but_role="action" but_target_id="cart_status*"}
         </div>
         {/if}
     </div>

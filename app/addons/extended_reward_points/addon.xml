@@ -75,6 +75,7 @@
         <item lang="ru" id="reward_points_report">Отчет о бонусных баллах</item>
         <item lang="ru" id="extended_reward_points.expired_reward_points_ttl">Истек срок действия бонусных баллов</item>
         <item lang="ru" id="extended_reward_points.user_points">Баллы пользователя</item>
+        <item lang="ru" id="userlog_expiration_date">Дата сгорания</item>
     </language_variables>
     <queries>
         <item editions="MULTIVENDOR">ALTER TABLE `?:companies`

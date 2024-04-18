@@ -18,7 +18,10 @@ $cart = &Tygh::$app['session']['cart'];
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'update_qty') {
         if (!empty($_REQUEST['product_data'])) {
-            $cart_products = array_column($cart['products'], 'item_id', 'product_id');
+            foreach ($cart['products'] as $item_id => $product ) {
+                    $cart_products[$product['product_id']] = $item_id;
+            }
+
             $save = false;
             foreach ($_REQUEST['product_data'] as $p_id => $data) {
                 $update = [];
@@ -33,6 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
 
+            $cart['change_cart_products'] = true;
+            fn_calculate_cart_content($cart, $auth, 'E', true, 'F', true);
             if ($save) fn_save_cart_content($cart, $auth['user_id']);
         }
 

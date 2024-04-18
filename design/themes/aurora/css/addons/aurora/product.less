@@ -173,3 +173,20 @@ Product page
         color: @decorative;
     }
 }
+.ty-product-empty {
+    margin: 0;
+    height: 100%;
+}
+
+.ty-dynamic-quantity:not(.ty-weighted-product) {
+    &:not(.ty-product-in-cart) {
+        .ty-grid-list__qty, .ty-product-block__qty  {
+            display: none;
+        }
+    }
+    &.ty-product-in-cart {
+        .ty-btn__add-to-cart  {
+            display: none;
+        }
+    }
+}

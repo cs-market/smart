@@ -16,9 +16,9 @@
             {/strip}
         {/capture}
         {if !$location_detected}{$extra_meta = 'cm-autoclick'}{/if}
-
+        {$c_url = $config.current_url|escape:'url'}
         {include file="common/popupbox.tpl"
-                 href="geo_maps.customer_geolocation"
+                 href="geo_maps.customer_geolocation?return_url=`$c_url`"
                  link_text=$smarty.capture.geo_maps_location_popup_opener
                  link_text_meta="ty-geo-maps__geolocation__opener-text"
                  link_icon="ty-icon-location-arrow"

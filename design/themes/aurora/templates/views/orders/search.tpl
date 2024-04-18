@@ -63,10 +63,10 @@
     {foreach from=$orders item="o"}
         <tr>
             <td class="ty-orders-search__item"><a href="{"orders.details?order_id=`$o.order_id`"|fn_url}"><strong>#{$o.order_id}</strong></a></td>
-            <td class="ty-orders-search__item">{include file="common/status.tpl" status=$o.status display="view"}</td>
+            <td class="ty-orders-search__item"><a href="{"orders.details?order_id=`$o.order_id`"|fn_url}">{include file="common/status.tpl" status=$o.status display="view"}</a></td>
             <td class="ty-orders-search__item">
                 <ul class="ty-orders-search__user-info">
-                    <li class="ty-orders-search__user-name">{$o.firstname} {$o.lastname}</li>
+                    <li class="ty-orders-search__user-name"><a href="{"orders.details?order_id=`$o.order_id`"|fn_url}">{$o.firstname} {$o.lastname}</a></li>
                     <li  class="ty-orders-search__user-mail"><a href="mailto:{$o.email|escape:url}">{$o.email}</a></li>
                 </ul>
             </td>
@@ -74,14 +74,14 @@
 
             {hook name="orders:manage_data"}{/hook}
 
-            <td class="ty-orders-search__item">{include file="common/price.tpl" value=$o.total}</td>
+            <td class="ty-orders-search__item"><a href="{"orders.details?order_id=`$o.order_id`"|fn_url}">{include file="common/price.tpl" value=$o.total}</a></td>
             <td class="ty-orders-search__item ty-orders-search__item--actions">
-                {include file="buttons/button.tpl" 
+                {*include file="buttons/button.tpl" 
                         but_meta="cm-new-window ty-btn-icon" 
                         but_role="text" 
                         but_title=__("print_invoice") 
                         but_href="orders.print_invoice?order_id=`$o.order_id`" 
-                        but_icon="ty-orders__actions-icon ty-icon-print"}
+                        but_icon="ty-orders__actions-icon ty-icon-print"*}
 
                 {include file="buttons/button.tpl" 
                         but_meta="ty-btn-icon"
@@ -90,12 +90,12 @@
                         but_href="orders.reorder?order_id=`$o.order_id`" 
                         but_icon="ty-orders__actions-icon ty-icon-cw"}
 
-                {include file="buttons/button.tpl" 
+                {*include file="buttons/button.tpl" 
                         but_meta="ty-btn-icon" 
                         but_role="text" 
                         but_title=__("search_products")
                         but_href="products.search?search_performed=Y&order_ids=`$o.order_id`"
-                        but_icon="ty-orders__actions-icon ty-icon-search"}
+                        but_icon="ty-orders__actions-icon ty-icon-search"*}
             </td>
         </tr>
     {foreachelse}

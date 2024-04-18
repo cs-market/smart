@@ -62,7 +62,7 @@
                         </div>
                         <div class="cm-cart-buttons ty-cart-content__buttons buttons-container{if $smarty.session.cart.amount} full-cart{else} hidden{/if}">
                             <div class="ty-float-left">
-                                <a href="{"checkout.cart"|fn_url}" rel="nofollow" class="ty-btn ty-btn__secondary">{__("cart_text")}</a>
+                                <a href="{"checkout.cart"|fn_url}" rel="nofollow" class="ty-btn ty-btn__primary">{__("cart_text")}</a>
                             </div>
                             <div class="ty-float-right">
                                 {include file="buttons/proceed_to_checkout.tpl" but_text=__("checkout")}
