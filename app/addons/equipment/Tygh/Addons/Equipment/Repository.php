@@ -46,7 +46,6 @@ class Repository
      */
     public function find(array $params = [], $items_per_page = 0)
     {
-
         $params = $this->populateDefaultFindParameters($params);
 
         $fields = [
@@ -57,7 +56,7 @@ class Repository
         $order_by = $this->buildOrderBy($params);
         $group_by = $this->buildGroupBy($params);
         $having = [];
-        $limit = $this->buildLimit($params, $items_per_page);
+        $limit = $this->buildLimit($params, $params['items_per_page']);
 
         $equipment = $this->db->getHash(
             'SELECT ?p FROM ?:equipment AS equipment ?p WHERE ?p ?p ?p ?p ?p',
@@ -160,7 +159,8 @@ class Repository
             'name'             => null,
             'status'           => null,
             'page'             => 1,
-            'sort_by'         => 'equipment_id',
+            'items_per_page'   => 10,
+            'sort_by'          => 'equipment_id',
             'group_by'         => 'equipment_id',
         ], $params);
 
@@ -270,7 +270,7 @@ class Repository
     protected function buildLimit(array $params, $items_per_page = 0)
     {
         $limit = '';
-        if ($items_per_page !== 0) {
+        if ($items_per_page != 0) {
             $limit = db_paginate($params['page'], $items_per_page);
         }
 

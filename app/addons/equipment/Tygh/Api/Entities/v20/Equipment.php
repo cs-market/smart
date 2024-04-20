@@ -20,8 +20,7 @@ class Equipment extends AEntity
         if ($id) {
             $data = $this->equipment_repository->findById($id);
         } else {
-            list($equipment, $search) = $this->equipment_repository->find($params);
-            $data = array_values($equipment);
+            list($data, $search) = $this->equipment_repository->find($params, $this->safeGet($params, 'items_per_page', 10));
         }
 
         return array(
