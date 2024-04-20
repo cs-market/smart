@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>equipment</id>
+    <name>Smart distribution: Оборудование</name>
+    <description></description>
+    <version>1.0.1</version>
+    <position>0</position>
+    <status>active</status>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <default_language>ru</default_language>
+    <priority>1000</priority>
+    <queries>
+        <item>CREATE TABLE `?:equipment` (
+            `equipment_id` mediumint(8) unsigned NOT NULL auto_increment,
+            `product_code` varchar(64) NOT NULL,
+            `inventory_number` varchar(64) NOT NULL,
+            `serial_number` varchar(64) NOT NULL,
+            `name` varchar(255) NOT NULL,
+            `user_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
+            `status` char(1) NOT NULL default 'A',
+            PRIMARY KEY (`equipment_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8
+        </item>
+        <item for="uninstall">DROP TABLE `?:equipment`;</item>
+
+        <item>CREATE TABLE `?:repair_requests` (
+            `request_id` mediumint(8) unsigned NOT NULL auto_increment,
+            `equipment_id` mediumint(8) unsigned NOT NULL,
+            `timestamp` int(11) UNSIGNED NOT NULL default 0,
+            `malfunctions` mediumtext,
+            `comment` varchar(255) NOT NULL,
+            `status` char(1) NOT NULL default 'A',
+            PRIMARY KEY (`request_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8
+        </item>
+        <item for="uninstall">DROP TABLE `?:repair_requests`;</item>
+    </queries>
+    <language_variables>
+        <item lang="ru" id="equipment.malfunctions">Неисправности оборудования</item>
+        <item lang="ru" id="equipment.my_equipment">Моё оборудование</item>
+        <item lang="ru" id="equipment.inventory_number">Инвентарный номер</item>
+        <item lang="ru" id="equipment.serial_number">Серийный номер</item>
+        <item lang="ru" id="equipment.show_repairs">Показать заявки</item>
+        <item lang="ru" id="equipment.hide_repairs">Скрыть заявки</item>
+        <item lang="ru" id="equipment.claim_repair">Заявить о неисправности</item>
+    </language_variables>
+</addon>
