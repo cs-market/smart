@@ -55,9 +55,7 @@
                         {$smarty.capture.$form_open nofilter}
                             {hook name="products:product_multicolumns_list"}
                                 <div class="ty-grid-list__image">
-                                    <a href="{"$product_detail_view_url"|fn_url}">
-                                        {include file="views/products/components/product_icon.tpl" product=$product show_gallery=true}
-                                    </a>
+                                    {include file="views/products/components/product_icon.tpl" product=$product show_gallery=true}
 
                                     {assign var="product_labels" value="product_labels_`$obj_prefix``$obj_id`"}
                                     {$smarty.capture.$product_labels nofilter}

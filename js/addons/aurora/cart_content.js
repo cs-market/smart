@@ -30,9 +30,16 @@
     }
 
     if ($this.hasClass('ty-value-changer__input') && $this.val() == 0) {
-        $controls = $this.closest('.cm-product-controls');
-        if ($controls.length) {
-            $controls.removeClass('in-cart').find('.ty-grid-list__qty').removeClass('ty-cart-content__qty');
+        dynamic_product = $this.closest('.ty-dynamic-quantity');
+        if (dynamic_product.length) {
+            dynamic_product.removeClass('ty-product-in-cart')
+            qty_control = $('.ty-grid-list__qty', dynamic_product);
+            if (!qty_control.length) {
+                qty_control = $('.ty-product-block__qty', dynamic_product);
+            }
+            if (qty_control.length) {
+                qty_control.removeClass('ty-cart-content__qty');
+            }
             $this.val($this.data('caVal'));
         }
     }

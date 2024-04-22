@@ -37,12 +37,13 @@
         {if $obj_id && !$no_ids}
             {$image_attributes.id = "det_img_{$obj_id}"}
         {/if}
-        {if $image_data.width && !$image_attributes.width}
+        {*if $image_data.width && !$image_attributes.width}
             {$image_attributes.width = $image_data.width}
         {/if}
         {if $image_data.height && !$image_attributes.height}
             {$image_attributes.height = $image_data.height}
-        {/if}
+        {/if*}
+        {*this does not work with old cs-cart owl*}
         {if $generate_image}
             {$image_attributes["data-ca-image-path"] = $image_data.image_path}
         {/if}
