@@ -5091,6 +5091,28 @@ fn_print_die($orders_wo_points);
     }
 
     fn_print_die('done. Out of status:', $out_of_status);
+} elseif ($mode == 'correct_reward_points_april3') {
+    $changes = db_get_array('SELECT * FROM ?:reward_point_changes WHERE reason LIKE ?l', '%correct_reward_points_april2%');
+    $checked_changes = $rewert = [];
+    foreach ($changes as $change) {
+        $hash = md5($change['reason']);
+        if (!array_key_exists($hash, $checked_changes)) {
+            $checked_changes[$hash] = $change;
+        } else {
+            $reason = unserialize($change['reason']);
+            $change['order_id'] = $reason['order_id'];
+            $revert[] = $change;
+        }
+    }
+    foreach ($revert as $change) {
+        fn_revert_reward_points_change($change);
+    }
+
+    $params['filename'] = "$mode.csv";
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($revert, $params, '"');
+
+    fn_print_die('done');
 } elseif ($mode == 'check_storages') {
     $storages = db_get_array('SELECT distinct(sp.storage_id), sp.product_id, p.items_in_package, sp.min_qty, sp.min_qty/p.items_in_package AS sell_from FROM ?:storages_products AS sp LEFT JOIN ?:products AS p ON p.product_id = sp.product_id WHERE p.items_in_package != 1 AND sp.min_qty < p.items_in_package AND sp.min_qty != 0 AND p.company_id = 45 GROUP BY sp.storage_id');
     $rest_storages = array_filter($storages, function($v) { return $v['sell_from'] != 0.5;});
