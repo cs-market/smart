@@ -258,6 +258,12 @@ select {
     border: 1px solid transparent;
     box-sizing: border-box;
     .border-radius(@border-radius);
+    & + & {
+        margin-left: initial;
+    }
+    &:not(.hidden) & {
+        margin-left: 10px;
+    }
     &__secondary, &__tertiary {
         border-color: @base;
         color: @base;

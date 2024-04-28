@@ -1,16 +1,4 @@
 <?php
-/***************************************************************************
- *                                                                          *
- *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
- *                                                                          *
- * This  is  commercial  software,  only  users  who have purchased a valid *
- * license  and  accept  to the terms of the  License Agreement can install *
- * and use this program.                                                    *
- *                                                                          *
- ****************************************************************************
- * PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
- * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
- ****************************************************************************/
 
 namespace Tygh\Addons\Equipment;
 
@@ -22,14 +10,14 @@ use Tygh\Database\Connection;
  *
  * @package Tygh\Addons\Equipment
  */
-class Repository
+class EquipmentRepository
 {
     /**
      * @var \Tygh\Database\Connection
      */
     protected $db;
 
-    protected $factory;
+    private $table = 'equipment';
 
     public function __construct(Connection $db)
     {
@@ -49,7 +37,7 @@ class Repository
         $params = $this->populateDefaultFindParameters($params);
 
         $fields = [
-            '' => 'equipment.*',
+            '' => $this->table . '.*',
         ];
         $join = $this->buildJoins($params);
         $conditions = $this->buildConditions($params);
@@ -59,9 +47,11 @@ class Repository
         $limit = $this->buildLimit($params, $params['items_per_page']);
 
         $equipment = $this->db->getHash(
-            'SELECT ?p FROM ?:equipment AS equipment ?p WHERE ?p ?p ?p ?p ?p',
+            'SELECT ?p FROM ?:?f AS ?f ?p WHERE ?p ?p ?p ?p ?p',
             'equipment_id',
             implode(',', $fields),
+            $this->table,
+            $this->table,
             implode(' ', $join),
             implode(' ', $conditions),
             $group_by ? 'GROUP BY ' . $group_by : '',
@@ -71,10 +61,12 @@ class Repository
         );
 
         if (!empty($equipment) && $params['get_repairs']) {
+            $repair_requests_repository = \Tygh::$app['addons.equipment.repair_requests_repository'];
             $equipment_ids = array_column($equipment, 'equipment_id');
-            if ($repair_requests = db_get_array('SELECT * FROM ?:repair_requests WHERE equipment_id IN (?a)', $equipment_ids)) {
+            list($repair_requests,) = $repair_requests_repository->find(['equipment_id' => $equipment_ids]);
+
+            if (!empty($repair_requests)) {
                 foreach($repair_requests as $request) {
-                    $request['malfunctions'] = unserialize($request['malfunctions']);
                     $equipment[$request['equipment_id']]['repairs'][] = $request;
                 }
             }
@@ -91,7 +83,7 @@ class Repository
             return null;
         }
 
-        list($data,) = $this->find(['equipment_id' => $equipment_id]);
+        list($data,) = $this->find(['equipment_id' => $equipment_id, 'get_repairs' => true]);
 
         return (!empty($data)) ? reset($data) : false;
     }
@@ -136,7 +128,7 @@ class Repository
     {
         $result = new OperationResult(true);
 
-        $this->db->query('DELETE FROM ?:equipment WHERE equipment_id = ?i', $equipment_id);
+        $this->db->query('DELETE FROM ?:?f WHERE equipment_id = ?i', $this->table, $equipment_id);
 
         return $result;
     }
@@ -182,43 +174,50 @@ class Repository
 
         if ($params['equipment_id']) {
             $conditions['equipment_id'] = $this->db->quote(
-                'AND equipment.equipment_id IN (?n)',
+                'AND ?f.equipment_id IN (?n)',
+                $this->table,
                 (array) $params['equipment_id']
             );
         }
         if ($params['user_id']) {
             $conditions['user_id'] = $this->db->quote(
-                'AND equipment.user_id = ?i',
+                'AND ?f.user_id = ?i',
+                $this->table,
                 $params['user_id']
             );
         }
         if ($params['product_code']) {
             $conditions['product_code'] = $this->db->quote(
-                'AND equipment.product_code = ?s',
+                'AND ?f.product_code = ?s',
+                $this->table,
                 $params['product_code']
             );
         }
         if ($params['inventory_number']) {
             $conditions['inventory_number'] = $this->db->quote(
-                'AND equipment.inventory_number = ?s',
+                'AND ?f.inventory_number = ?s',
+                $this->table,
                 $params['inventory_number']
             );
         }
         if ($params['serial_number']) {
             $conditions['serial_number'] = $this->db->quote(
-                'AND equipment.serial_number = ?s',
+                'AND ?f.serial_number = ?s',
+                $this->table,
                 $params['serial_number']
             );
         }
         if ($params['name']) {
             $conditions['name'] = $this->db->quote(
-                'AND equipment.name = ?s',
+                'AND ?f.name = ?s',
+                $this->table,
                 $params['name']
             );
         }
         if ($params['status']) {
             $conditions['status'] = $this->db->quote(
-                'AND equipment.name = ?s',
+                'AND ?f.status = ?s',
+                $this->table,
                 $params['status']
             );
         }
@@ -251,7 +250,7 @@ class Repository
     protected function buildOrderBy(array $params)
     {
         $sortings = [
-            'equipment_id' => 'equipment.equipment_id',
+            'equipment_id' => $this->table . '.equipment_id',
         ];
 
         $order_by = db_sort($params, $sortings, 'timestamp', 'desc');
@@ -287,7 +286,7 @@ class Repository
     protected function buildGroupBy(array $params)
     {
         $grouppings = [
-            'equipment_id' => 'equipment.equipment_id',
+            'equipment_id' => $this->table . '.equipment_id',
         ];
 
         if (isset($grouppings[$params['group_by']])) {

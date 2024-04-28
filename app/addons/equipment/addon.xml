@@ -19,7 +19,7 @@
             `serial_number` varchar(64) NOT NULL,
             `name` varchar(255) NOT NULL,
             `user_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
-            `status` char(1) NOT NULL default 'A',
+            `status` varchar(32) NOT NULL default '',
             PRIMARY KEY (`equipment_id`)
         ) ENGINE=MyISAM DEFAULT CHARSET=utf8
         </item>
@@ -31,7 +31,7 @@
             `timestamp` int(11) UNSIGNED NOT NULL default 0,
             `malfunctions` mediumtext,
             `comment` varchar(255) NOT NULL,
-            `status` char(1) NOT NULL default 'A',
+            `status` varchar(32) NOT NULL default '',
             PRIMARY KEY (`request_id`)
         ) ENGINE=MyISAM DEFAULT CHARSET=utf8
         </item>
@@ -45,5 +45,10 @@
         <item lang="ru" id="equipment.show_repairs">Показать заявки</item>
         <item lang="ru" id="equipment.hide_repairs">Скрыть заявки</item>
         <item lang="ru" id="equipment.claim_repair">Заявить о неисправности</item>
+        <item lang="ru" id="equipment.repair_request">Заявка на ремонт</item>
+        <item lang="ru" id="equipment.malfunction_type">Тип неисправности</item>
+        <item lang="ru" id="equipment.malfunction_comment">Коментарий к неисправности</item>
+        <item lang="ru" id="equipment.common_comment">Общий коментарий к заявке</item>
+        <item lang="ru" id="equipment.add_more">Добавить еще неисправность</item>
     </language_variables>
 </addon>

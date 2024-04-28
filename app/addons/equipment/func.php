@@ -15,3 +15,12 @@ function fn_equipment_get_status_params_definition(&$status_params, &$type)
 
     return true;
 }
+
+function fn_equipment_get_malfunction_types() {
+    $statuses = fn_get_statuses(STATUS_MALFUNCTION);
+    $malfunctions = [];
+    foreach($statuses as $status) {
+        $malfunctions[$status['params']['code']] = $status['description'];
+    }
+    return $malfunctions;
+}
