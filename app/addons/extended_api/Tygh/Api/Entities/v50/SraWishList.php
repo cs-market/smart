@@ -40,6 +40,7 @@ class SraWishList extends BaseSraWishList
                 foreach ($fields as $field) {
                     if (isset($product[$field])) {
                         $product[$field] = fn_format_price($product[$field], CART_PRIMARY_CURRENCY, null, false);
+                        $product[$field . '_formatted'] = fn_storefront_rest_api_format_price($product[$field], CART_PRIMARY_CURRENCY);
                     }
                 }
             }
