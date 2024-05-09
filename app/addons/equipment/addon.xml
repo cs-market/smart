@@ -30,7 +30,6 @@
             `equipment_id` mediumint(8) unsigned NOT NULL,
             `timestamp` int(11) UNSIGNED NOT NULL default 0,
             `malfunctions` mediumtext,
-            `comment` varchar(255) NOT NULL,
             `status` varchar(32) NOT NULL default '',
             PRIMARY KEY (`request_id`)
         ) ENGINE=MyISAM DEFAULT CHARSET=utf8

@@ -54,7 +54,7 @@
                                 {if $r.malfunctions}
                                     {foreach from=$r.malfunctions item="malfunction"}
                                         {$type = $malfunction.type}
-                                        {$malfunction_types.$type}: {$malfunction.comment nofilter}
+                                        {$malfunction_types.$type}{*: {$malfunction.comment nofilter}*}
                                     {/foreach}
                                 {/if}
                             </td>

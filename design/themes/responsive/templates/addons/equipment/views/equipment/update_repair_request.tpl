@@ -25,10 +25,10 @@
                 </div>
                 {/if}
 
-                <div class="ty-control-group">
+                {* <div class="ty-control-group">
                     <label for="malfunction_comment_0" class="ty-control-group__title">{__("equipment.malfunction_comment")}</label>
                     <textarea id="equipment_comment_0" name="request_data[malfunctions][0][comment]" class="ty-input-textarea cm-focus" autofocus rows="5" cols="69"></textarea>
-                </div>
+                </div> *}
             </div>
             {script src="js/tygh/node_cloning.js"}
             {include file="buttons/button.tpl" but_onclick="Tygh.$('#box_add_malfunction_0').cloneNode(2); Tygh.$.ceDialog('get_last').ceDialog('reload');" but_meta="ty-btn__secondary ty-float-right" but_text=__('equipment.add_more')}
