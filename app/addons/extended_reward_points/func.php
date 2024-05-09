@@ -205,34 +205,34 @@ function fn_get_cart_points_in_use($cart, $exclude_products = []) {
 }
 
 function fn_extended_reward_points_change_order_status(&$status_to, &$status_from, &$order_info, &$force_notification, &$order_statuses, &$place_order) {
-    if (fn_allowed_for('MULTIVENDOR')) {
-        $reward_points_ttl = db_get_field('SELECT reward_points_ttl FROM ?:companies WHERE company_id = ?i', $order_info['company_id']);
-    } else {
-        $reward_points_ttl = Registry::get('addons.extended_reward_points.reward_points_ttl');
-    }
+    $points_info = (isset($order_info['points_info'])) ? $order_info['points_info'] : array();
 
-    if (!empty($reward_points_ttl)) {
+    if (!empty($points_info)) {
+        $grant_points_to = (!empty($order_statuses[$status_to]['params']['grant_reward_points'])) ? $order_statuses[$status_to]['params']['grant_reward_points'] : 'N';
+        $grant_points_from = (!empty($order_statuses[$status_from]['params']['grant_reward_points'])) ? $order_statuses[$status_from]['params']['grant_reward_points'] : 'N';
 
-        $points_info = (isset($order_info['points_info'])) ? $order_info['points_info'] : array();
+        if ($order_statuses[$status_to]['params']['inventory'] == 'I' && $order_statuses[$status_from]['params']['inventory'] == 'D') {
+            if (!empty($points_info['in_use']['points'])) {
+                fn_extended_reward_points_release_points($order_info['order_id']);
+            }
+        }
 
-        if (!empty($points_info)) {
-            $grant_points_to = (!empty($order_statuses[$status_to]['params']['grant_reward_points'])) ? $order_statuses[$status_to]['params']['grant_reward_points'] : 'N';
-            $grant_points_from = (!empty($order_statuses[$status_from]['params']['grant_reward_points'])) ? $order_statuses[$status_from]['params']['grant_reward_points'] : 'N';
-
-            if ($order_statuses[$status_to]['params']['inventory'] == 'I' && $order_statuses[$status_from]['params']['inventory'] == 'D') {
-                if (!empty($points_info['in_use']['points'])) {
-                    fn_extended_reward_points_release_points($order_info['order_id']);
+        if ($order_statuses[$status_to]['params']['inventory'] == 'D' && $order_statuses[$status_from]['params']['inventory'] == 'I') {
+                
+            if (!empty($points_info['in_use']['points'])) {
+                // decrease points in use
+                if ($points_info['in_use']['points'] <= fn_get_user_additional_data(POINTS, $order_info['user_id']) || $place_order) {
+                    fn_extended_reward_points_use_points($points_info['in_use']['points'], $order_info['user_id'], $order_info['order_id']);
                 }
             }
-            if ($order_statuses[$status_to]['params']['inventory'] == 'D' && $order_statuses[$status_from]['params']['inventory'] == 'I') {
-                if (!empty($points_info['in_use']['points'])) {
-                    // decrease points in use
-                    if ($points_info['in_use']['points'] <= fn_get_user_additional_data(POINTS, $order_info['user_id'])) {
-                        fn_extended_reward_points_use_points($points_info['in_use']['points'], $order_info['user_id'], $order_info['order_id']);
-                    }
-                }
-            }
+        }
 
+        if (fn_allowed_for('MULTIVENDOR')) {
+            $reward_points_ttl = db_get_field('SELECT reward_points_ttl FROM ?:companies WHERE company_id = ?i', $order_info['company_id']);
+        } else {
+            $reward_points_ttl = Registry::get('addons.extended_reward_points.reward_points_ttl');
+        }
+        if (!empty($reward_points_ttl)) {
             if (
                 $grant_points_to === YesNo::YES && $points_info['is_gain'] === YesNo::NO && !empty($points_info['reward'])
             ) {
@@ -259,7 +259,8 @@ function fn_extended_reward_points_expire_points() {
                 'order_id' => $expiry['order_id'],
                 'text' => __('extended_reward_points.expired_reward_points_ttl'),
             );
-            fn_change_user_points(-$expiry['amount'], $expiry['user_id'], serialize($reason), CHANGE_DUE_SUBTRACT);
+            $current_value = (int) fn_get_user_additional_data(POINTS, $expiry['user_id']);
+            fn_change_user_points(-min($current_value, $expiry['amount']), $expiry['user_id'], serialize($reason), CHANGE_DUE_SUBTRACT);
         }
         db_query('UPDATE ?:reward_point_details SET amount = ?i WHERE ttl < ?i', 0, TIME);
     }
