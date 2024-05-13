@@ -41,17 +41,23 @@ function fn_smart_auth_auth_routines($request, $auth, &$field, &$condition, &$us
 
         $users_data = db_get_array("SELECT * FROM ?:users WHERE ?p ?p", $pre_condition, $condition);
 
-        if (!empty($users_data)) {
+        if (count($users_data) > 1 && !empty($request['password'])) {
             foreach ($users_data as $user_data) {
                 $password = (!empty($request['password'])) ? $request['password']: '';
-                $salt = isset($user_data['salt']) ? $user_data['salt'] : '';
-                if (fn_user_password_verify((int) $user_data['user_id'], $password, (string) $user_data['password'], (string) $salt)) {
-                    $field = '1';
-                    $user_login = '1';
-                    $condition .= db_quote(" AND user_id = ?i", $user_data['user_id']);
-                    break;
+                if ($password) {
+                    $salt = isset($user_data['salt']) ? $user_data['salt'] : '';
+                    if (fn_user_password_verify((int) $user_data['user_id'], $password, (string) $user_data['password'], (string) $salt)) {
+                        $field = '1';
+                        $user_login = '1';
+                        $condition .= db_quote(" AND user_id = ?i", $user_data['user_id']);
+                        break;
+                    }
                 }
             }
+        } elseif (!empty($users_data)) {
+            $field = '1';
+            $user_login = '1';
+            $condition .= db_quote(" AND user_id = ?i", reset($users_data)['user_id']);
         }
     }
 }

@@ -3,7 +3,7 @@
 {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum}
 <script type="text/javascript">
     (function(_, $) {
-        $.ceEvent('on', 'ce.commoninit', function() {
+        $.ceEvent('on', 'ce.commoninit', function(context) {
             $('.ty-btn__add-to-cart').click(function() {
                 dynamic_product = $(this).closest('.ty-dynamic-quantity')
                 if (dynamic_product.length) {
@@ -17,8 +17,8 @@
                     }
                 }
             });
-            $('.ty-btn__add-to-wish').click(function() {
-                $('.ty-icon-aurora-star-empty', $(this)).addClass('ty-icon-aurora-star-full').removeClass('ty-icon-aurora-star-empty');
+            $('.ty-btn__add-to-wish', context).click(function() {
+                $('.ty-icon', $(this)).toggleClass('ty-icon-aurora-star-full').toggleClass('ty-icon-aurora-star-empty');
             });
             $('.cm-autoclick').click();
         });

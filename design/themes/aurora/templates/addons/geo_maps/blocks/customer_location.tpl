@@ -15,7 +15,7 @@
             </span>
             {/strip}
         {/capture}
-        {if !$location_detected}{$extra_meta = 'cm-autoclick'}{/if}
+        {*if !$location_detected}{$extra_meta = 'cm-autoclick'}{/if*}
         {$c_url = $config.current_url|escape:'url'}
         {include file="common/popupbox.tpl"
                  href="geo_maps.customer_geolocation?return_url=`$c_url`"

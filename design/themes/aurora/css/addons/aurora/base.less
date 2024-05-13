@@ -185,7 +185,6 @@ select {
         border: 1px solid #ccc;
         border-radius: 50%;
         margin: 0;
-        position: initial;
         &:before {
             vertical-align: text-bottom;
             color: inherit !important;
@@ -874,4 +873,15 @@ select {
 
 .ty-icon-aurora-telegram {
     color: #0084c6;
+}
+
+.cm-phone-number-with-country-selection-btn-group {
+    a {
+        .border-left-radius(@border-radius);
+        padding: 7px 13px 6px;
+    }
+    + .ty-input-phone {
+        .border-left-radius(0);
+        border-left: 0;
+    }
 }

@@ -6,7 +6,7 @@ use Tygh\Enum\SiteArea;
 
 defined('BOOTSTRAP') or die('Access denied');
 
-fn_register_hooks('user_init', 'update_user_pre');
+fn_register_hooks('user_init', 'update_user_pre', 'update_product_post');
 
 // fn_init_extended_api делает $this->authenticate(); поэтому надо после вызова $application['session']->init(), но до fn_init_user потому что там корзина и все дела
 if (defined('API')) {

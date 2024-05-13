@@ -15,6 +15,11 @@
         <sections>
             <section id="general">
                 <items>
+                    <item id="add_login_field">
+                        <type>checkbox</type>
+                        <name>Добавить поле Логин</name>
+                        <default_value>N</default_value>
+                    </item>
                     <item id="auth_fields">
                         <type>multiple select</type>
                         <name>Поля для авторизации</name>

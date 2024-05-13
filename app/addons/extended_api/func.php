@@ -13,6 +13,7 @@
 
 use Tygh\ExtendedAPI;
 use Tygh\Enum\SiteArea;
+use Tygh\Enum\YesNo;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -36,6 +37,13 @@ function fn_init_extended_api() {
     return array(INIT_STATUS_OK);
 }
 
+function fn_extended_api_update_product_post($product_data, $product_id, $lang_code, $create) {
+    if (fn_allowed_for('ULTIMATE') && fn_ult_is_shared_product($product_id) === YesNo::YES && !empty($product_data['storefronts_data'])) {
+        foreach ($product_data['storefronts_data'] as $company_id => $_product_data) {
+            $_product_id = fn_ult_update_shared_product($_product_data, $product_id, $company_id, $lang_code);
+        }
+    }
+}
 
 function fn_get_fresh_user_auth_token($user_id, $ttl = 604800)
 {
