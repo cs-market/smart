@@ -62,7 +62,7 @@ class RepairRequestsRepository
         if (!empty($requests)) {
             array_walk($requests, function(&$r) {
                 $r['malfunctions'] = !empty($r['malfunctions']) ? unserialize($r['malfunctions']) : [];
-                $r['is_editable'] = $r['status'] == __('equipment.default_repair_status');
+                $r['is_editable'] = $r['status'] == __('equipment.repair_status_default');
             });
 
             if (!empty($params['get_equipment'])) {
