@@ -62,16 +62,17 @@ class RepairRequestsRepository
         if (!empty($requests)) {
             array_walk($requests, function(&$r) {
                 $r['malfunctions'] = !empty($r['malfunctions']) ? unserialize($r['malfunctions']) : [];
+                $r['is_editable'] = $r['status'] == __('equipment.default_repair_status');
             });
-        }
 
+            if (!empty($params['get_equipment'])) {
+                $equipment_repository = \Tygh::$app['addons.equipment.equipment_repository'];
+                $equipment_ids = array_column($requests, 'equipment_id');
+                list($equipment,) = $equipment_repository->find(['equipment_id' => $equipment_ids]);
 
-        if (!empty($requests) && !empty($params['get_equipment'])) {
-            $equipment_repository = \Tygh::$app['addons.equipment.equipment_repository'];
-            $equipment_ids = array_column($requests, 'equipment_id');
-            list($equipment,) = $equipment_repository->find(['equipment_id' => $equipment_ids]);
-            foreach ($requests as &$request) {
-                $request['equipment'] = $equipment[$request['equipment_id']];
+                foreach ($requests as &$request) {
+                    $request['equipment'] = $equipment[$request['equipment_id']] ?? false;
+                }
             }
         }
 
@@ -99,24 +100,38 @@ class RepairRequestsRepository
     public function save($request_data, $request_id = 0)
     {
         $result = new OperationResult(true);
-
         if ($request_id) {
+            $old_data = $this->findById($request_id);
+            if (!empty($old_data['equipment']['status']) && $old_data['status'] != __('equipment.repair_status_default')) {
+                $result->setSuccess(false);
+                $result->addError('1', __('access_denied'));
+            }
             $request_data['request_id'] = $request_id;
         } else {
             unset($request_data['request_id']);
             $request_data['timestamp'] = time();
-            if (empty($request_data['status'])) $request_data['status'] = __('new');
+            if (empty($request_data['status'])) $request_data['status'] = __('equipment.repair_status_default');
         }
 
-        if (!empty($request_data['malfunctions']) && is_array($request_data['malfunctions'])) $request_data['malfunctions'] = serialize($request_data['malfunctions']);
-
-        $this->db->replaceInto('repair_requests', $request_data);
-
-        if (!$request_id) {
-            $request_id = $this->db->getInsertId();
+        if (!empty($request_data['malfunctions'])) {
+            if (is_array($request_data['malfunctions'])) {
+                $request_data['malfunctions'] = serialize($request_data['malfunctions']); 
+            }
+        } else {
+            $result->setSuccess(false);
+            $result->addError('1', __('equipment.malfunctions_required'));
         }
 
-        $result->setData($request_id);
+        if ($result->isSuccess()) {
+            $this->db->replaceInto('repair_requests', $request_data);
+
+            if (!$request_id) {
+                $request_id = $this->db->getInsertId();
+            }
+
+            $result->setData($request_id);
+        }
+
 
         return $result;
     }
@@ -150,8 +165,6 @@ class RepairRequestsRepository
             'request_id'     => null,
             'equipment_id'     => null,
             'status'           => null,
-            'page'             => 1,
-            'items_per_page'   => 10,
             'sort_by'          => 'request_id',
             'group_by'         => 'request_id',
         ], $params);

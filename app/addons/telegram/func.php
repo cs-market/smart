@@ -96,6 +96,8 @@ function fn_telegram_place_order_post($cart, $auth, $action, $issuer_id, $parent
             }
         }
     }
+
+    fn_set_hook('telegram_place_order_notification', $order_id, $order, $auth);
 }
 
 function fn_telegram_get_users($params, &$fields, $sortings, &$condition, $join, $auth) {

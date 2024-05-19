@@ -29,7 +29,7 @@
             `request_id` mediumint(8) unsigned NOT NULL auto_increment,
             `equipment_id` mediumint(8) unsigned NOT NULL,
             `timestamp` int(11) UNSIGNED NOT NULL default 0,
-            `malfunctions` mediumtext,
+            `malfunctions` mediumtext NOT NULL,
             `status` varchar(32) NOT NULL default '',
             PRIMARY KEY (`request_id`)
         ) ENGINE=MyISAM DEFAULT CHARSET=utf8
@@ -41,13 +41,21 @@
         <item lang="ru" id="equipment.my_equipment">Моё оборудование</item>
         <item lang="ru" id="equipment.inventory_number">Инвентарный номер</item>
         <item lang="ru" id="equipment.serial_number">Серийный номер</item>
-        <item lang="ru" id="equipment.show_repairs">Показать заявки</item>
-        <item lang="ru" id="equipment.hide_repairs">Скрыть заявки</item>
-        <item lang="ru" id="equipment.claim_repair">Заявить о неисправности</item>
+        <item lang="ru" id="equipment.claim_repair">Создать заявку на ремонт</item>
+        <item lang="ru" id="equipment.repair_requests">Заявки на ремонт</item>
         <item lang="ru" id="equipment.repair_request">Заявка на ремонт</item>
+        <item lang="ru" id="equipment.repair_tooltip">Памятка к неисправности</item>
         <item lang="ru" id="equipment.malfunction_type">Тип неисправности</item>
         <item lang="ru" id="equipment.malfunction_comment">Коментарий к неисправности</item>
         <item lang="ru" id="equipment.common_comment">Общий коментарий к заявке</item>
         <item lang="ru" id="equipment.add_more">Добавить еще неисправность</item>
+        <item lang="ru" id="equipment.repair_status_default">Создана</item>
+        <item lang="ru" id="equipment.repair_status_deleted">Удалена</item>
+        <item lang="ru" id="equipment.repair_status_fixed">Исправлена</item>
+        <item lang="ru" id="equipment.equipment_status_in_repair">В ремонте</item>
+        <item lang="ru" id="equipment.equipment_status_write_off">На списании</item>
+        <item lang="ru" id="equipment.fi">Набор неисправностей обязателен к заполнению</item>
+        <item lang="ru" id="equipment.edit_repair">Редактировать заявку</item>
+        <item lang="ru" id="equipment.malfunctions_required">Набор неисправностей обязателен к заполнению</item>
     </language_variables>
 </addon>

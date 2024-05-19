@@ -1,45 +1,70 @@
 <?php
 
-$equipment_repository = Tygh::$app['addons.equipment.equipment_repository'];
-
+use Tygh\Enum\NotificationSeverity;
 
 defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $suffix = '';
+    $repair_requests_repository = Tygh::$app['addons.equipment.repair_requests_repository'];
+
     if ($mode == 'add_repair_request') {
-        $repair_requests_repository = Tygh::$app['addons.equipment.repair_requests_repository'];
-        $request_data = $_REQUEST['request_data'];
-        $result = $repair_requests_repository->save($request_data);
-        if ($result->isSuccess()) {
-            $suffix = '&equipment_id=' . $request_data['equipment_id'];
+        $repair_data = $_REQUEST['request_data'];
+        $result = $repair_requests_repository->save($repair_data, $_REQUEST['request_id'] ?? 0);
+        if ($result->isFailure()) {
+            fn_set_notification(NotificationSeverity::WARNING, __('warning'), $result->getFirstError());
         }
-        return [CONTROLLER_STATUS_OK, 'equipment.manage' . $suffix];
     }
 
-    return;
+    if ($mode == 'cancel_repair_request' && $_REQUEST['request_id']) {
+        $repair_data = $repair_requests_repository->findById($_REQUEST['request_id']);
+        if (!empty($repair_data['equipment'])) {
+            $repair_data['status'] = __('equipment.repair_status_deleted');
+            $result = $repair_requests_repository->save($repair_data, $_REQUEST['request_id'] ?? 0);
+            if ($result->isFailure()) {
+                fn_set_notification(NotificationSeverity::WARNING, __('warning'), $result->getFirstError());
+            }
+        }    
+    }
+
+    return [CONTROLLER_STATUS_OK, 'equipment.manage'];
 }
+
+$equipment_repository = Tygh::$app['addons.equipment.equipment_repository'];
+$repairs_repository = Tygh::$app['addons.equipment.repair_requests_repository'];
 
 if ($mode == 'manage') {
     if (!$auth['user_id']) return [CONTROLLER_STATUS_DENIED];
 
     $params = $_REQUEST;
-    $params['get_repairs'] = true;
+    $repairs = [];
     list($equipment, $search) = $equipment_repository->find($params);
+    if ($equipment) {
+        $params['equipment_id'] = array_keys($equipment);
+        list($repairs, ) = $repairs_repository->find($params, 0);
+    }
 
-    Tygh::$app['view']->assign('equipment', $equipment);
-    Tygh::$app['view']->assign('search', $search);
-
-    Tygh::$app['view']->assign('malfunction_types', fn_equipment_get_malfunction_types());
-}
-
-if ($mode == 'add_repair_request') {
+    Tygh::$app['view']->assign([
+        'equipment' => $equipment,
+        'repairs' => $repairs,
+        'search' => $search,
+        'malfunction_types' => fn_equipment_get_malfunction_types(),
+    ]);
+} elseif (in_array($mode, ['add_repair_request', 'update_repair_request'])) {
+    if (!$auth['user_id']) return [CONTROLLER_STATUS_DENIED];
     $params = $_REQUEST;
 
-    if (!empty($params['equipment_id'])) {
+    $repair = ['malfunctions' => ['type' => false]];
+
+    if (!empty($params['request_id'])) {
+        $repair = $repairs_repository->findById($params['request_id']);
+        $equipment = $repair['equipment'];
+    } elseif (!empty($params['equipment_id'])) {
         $equipment = $equipment_repository->findById($params);
-        Tygh::$app['view']->assign('equipment', $equipment);
     }
+
+    if (empty($equipment)) return [CONTROLLER_STATUS_DENIED];
+
+    Tygh::$app['view']->assign(['repair' => $repair, 'equipment' => $equipment ]);
 
     Tygh::$app['view']->assign('malfunction_types', fn_equipment_get_malfunction_types());
 }

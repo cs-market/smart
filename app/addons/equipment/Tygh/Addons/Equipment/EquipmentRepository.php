@@ -4,6 +4,7 @@ namespace Tygh\Addons\Equipment;
 
 use Tygh\Common\OperationResult;
 use Tygh\Database\Connection;
+use Tygh\Enum\SiteArea;
 
 /**
  * Class Repository fetches, saves and removes Equipment. The Repository saves equipment in the store database.
@@ -34,6 +35,9 @@ class EquipmentRepository
      */
     public function find(array $params = [], $items_per_page = 0)
     {
+        if (SiteArea::isStorefront(AREA)) {
+            $params['user_id'] = \Tygh::$app['session']['auth']['user_id'];
+        }
         $params = $this->populateDefaultFindParameters($params);
 
         $fields = [
@@ -60,7 +64,7 @@ class EquipmentRepository
             $limit
         );
 
-        if (!empty($equipment) && $params['get_repairs']) {
+        if (!empty($equipment) && ($params['get_repairs']) || SiteArea::isStorefront(AREA)) {
             $repair_requests_repository = \Tygh::$app['addons.equipment.repair_requests_repository'];
             $equipment_ids = array_column($equipment, 'equipment_id');
             list($repair_requests,) = $repair_requests_repository->find(['equipment_id' => $equipment_ids]);
@@ -68,6 +72,14 @@ class EquipmentRepository
             if (!empty($repair_requests)) {
                 foreach($repair_requests as $request) {
                     $equipment[$request['equipment_id']]['repairs'][] = $request;
+                }
+            }
+            if (SiteArea::isStorefront(AREA)) {
+                foreach($equipment as &$e) {
+                    $active_repairs = array_filter($e['repairs'], function($r) {
+                        return !in_array($r['status'], [__('equipment.repair_status_deleted'), __('equipment.repair_status_fixed')]);
+                    });
+                    $e['is_new_repair_allowed'] = empty($active_repairs) && !in_array($e['status'], [__('equipment.equipment_status_in_repair'), __('equipment.equipment_status_write_off')]);
                 }
             }
         }
