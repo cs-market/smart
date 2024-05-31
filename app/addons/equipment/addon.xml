@@ -54,7 +54,6 @@
         <item lang="ru" id="equipment.repair_status_fixed">Исправлена</item>
         <item lang="ru" id="equipment.equipment_status_in_repair">В ремонте</item>
         <item lang="ru" id="equipment.equipment_status_write_off">На списании</item>
-        <item lang="ru" id="equipment.fi">Набор неисправностей обязателен к заполнению</item>
         <item lang="ru" id="equipment.edit_repair">Редактировать заявку</item>
         <item lang="ru" id="equipment.malfunctions_required">Набор неисправностей обязателен к заполнению</item>
     </language_variables>

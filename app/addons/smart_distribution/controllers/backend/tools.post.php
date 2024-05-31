@@ -2279,13 +2279,24 @@ fn_print_die($orders_wo_points);
         fn_print_die($res, 'stop');
     }
     if ($action == 'promotions') {
-        if (!empty($dispatch_extra)) {
-            $prev_month = date_create('last day of previous month 23:59:59');
-            $promotion_ids = db_get_fields('SELECT promotion_id FROM ?:promotions WHERE ((to_date != 0 AND to_date <= ?i) OR status != ?s) AND company_id = ?i', $prev_month->getTimestamp(), 'A', $dispatch_extra);
-            fn_delete_promotions($promotion_ids);
-            fn_print_die('promotions', $promotion_ids);
+        $conditions = [];
+        if (isset($_REQUEST['company_id'])) {
+            $conditions[] = db_quote(' AND company_id = ?i', $_REQUEST['company_id']);
+        }
+        if (isset($_REQUEST['time_to'])) {
+            $conditions[] = db_quote(' AND (to_date != 0 AND to_date <= ?i) ', $_REQUEST['time_to']);
+        } elseif(isset($_REQUEST['date_to'])) {
+            $conditions[] = db_quote(' AND (to_date != 0 AND to_date <= ?i) ', date_create_from_format('d.m.Y H:i:s', $_REQUEST['date_to'] . ' 00:00:00')->getTimestamp());
+        }
+        if (isset($_REQUEST['status'])) {
+            $conditions[] = db_quote(' AND status = ?s', $_REQUEST['status']);
+        }
+        if (!isset($_REQUEST['confirm'])) {
+            fn_print_die($conditions);
         } else {
-            fn_print_die('empty company_id in $dispatch_extra');
+            $promotion_ids = db_get_fields('SELECT promotion_id FROM ?:promotions WHERE 1  ?p', implode(' ', $conditions));
+            fn_delete_promotions($promotion_ids);
+            fn_print_r($promotion_ids);
         }
     }
     fn_print_die('done');
@@ -5126,6 +5137,16 @@ fn_print_die($orders_wo_points);
     $params['force_header'] = true;
     $export = fn_exim_put_csv($ordered_products, $params, '"');
     fn_print_die(count($orders), $export);
+} elseif ($mode == 'bug_cart_not_clear') {
+    $last_orders = db_get_array('SELECT * FROM ?:orders WHERE company_id = ?i ORDER BY order_id DESC LIMIT 0, 100', 45);
+    foreach ($last_orders as $order) {
+        $cart = db_get_array('SELECT * FROM ?:user_session_products WHERE user_id = ?i AND type = ?s', $order['user_id'], 'C');
+        if (!empty($cart)) {
+            $order = fn_get_order_info($order['order_id']);
+            fn_print_die($order['order_id'], $cart, $order);
+        }
+    }
+    fn_print_die('here');
 }
 
 function fn_revert_reward_points_change($change, $from_order = false) {
