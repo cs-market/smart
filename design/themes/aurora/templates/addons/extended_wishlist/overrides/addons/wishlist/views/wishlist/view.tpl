@@ -11,7 +11,7 @@
     {include file="common/subheader.tpl" title=$category.category}
     {include file="blocks/list_templates/grid_list.tpl" 
         columns=$columns
-        show_empty=true
+        show_empty=false
         show_name=true 
         show_old_price=true 
         show_price=true 

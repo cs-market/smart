@@ -250,6 +250,9 @@ select {
 
 .buttons-container {
     background-color: initial;
+    .ty-mainbox-body & {
+        padding: 0;
+    }
 }
 .ty-btn {
     line-height: 1;
@@ -267,9 +270,6 @@ select {
         border-color: @base;
         color: @base;
         background-color: transparent;
-        &:hover [class^="ty-icon"] {
-            color: #fff;
-        }
     }
     &__add-to-cart {
         text-transform: unset;
@@ -450,7 +450,11 @@ select {
 }
 
 .owl-theme {
+    padding-bottom: 0;
     .owl-controls {
+        &-outside {
+            margin-top: -38px;
+        }
         .owl-buttons {
             .clearfix();
             border: 1px solid @grey;
@@ -881,10 +885,25 @@ select {
 .cm-phone-number-with-country-selection-btn-group {
     a {
         .border-left-radius(@border-radius);
+        .border-right-radius(0);
         padding: 7px 13px 6px;
+        .litecheckout__group & {
+            border-color: @checkout_input_border;
+        }
     }
     + .ty-input-phone {
         .border-left-radius(0);
+        .border-right-radius(@border-radius);
         border-left: 0;
+    }
+    ~ .cm-mask-phone-label {
+        left: 65px;
+    }
+}
+.ty-control-group {
+    @media @mobile {
+        .ty-btn {
+            margin-top: 10px;
+        }
     }
 }
