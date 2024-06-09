@@ -1,5 +1,6 @@
 {script src="js/addons/aurora/bootstrap-toggle.js"}
 {script src="js/addons/aurora/malma.js"}
+{script src="js/addons/aurora/scroll_top.js"}
 {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum}
 <script type="text/javascript">
     (function(_, $) {
