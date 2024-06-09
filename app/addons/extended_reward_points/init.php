@@ -11,6 +11,8 @@ fn_register_hooks(
     'calculate_cart_items',
     'calculate_cart_taxes_pre',
     'add_product_to_cart_get_price',
+    'pre_add_to_cart',
+    'generate_cart_id',
     'pre_place_order',
     'get_order_info',
     'user_init',

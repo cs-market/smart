@@ -37,12 +37,14 @@ function fn_extended_reward_points_storefront_rest_api_gather_additional_product
 
 function fn_extended_reward_points_pre_get_cart_product_data($hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, &$fields, &$join, $params) {
     $fields[] = '?:products.is_pbp';
+    $fields[] = '?:products.is_pbf';
     $fields[] = '?:products.is_oper';
     $fields[] = '?:products.is_op';
 }
 
 function fn_extended_reward_points_get_cart_product_data($product_id, &$_pdata, &$product, $auth, $cart, $hash) {
     $product['is_pbp'] = $_pdata['is_pbp'];
+    $product['is_pbf'] = $_pdata['is_pbf'];
     $product['is_oper'] = $_pdata['is_oper'];
 }
 
@@ -52,8 +54,9 @@ function fn_extended_reward_points_calculate_cart_items(&$cart, &$cart_products,
         foreach ($cart['products'] as $key => &$data) {
             // temporary fix for mobile app
             $data['extra']['pay_by_points']['point_price'] = $data['extra']['point_price'] ?? 0;
-
             if (!YesNo::toBool($data['is_pbp'])) continue;
+            if (empty($data['extra']['points_pay'])) continue;
+
             $data['extra']['point_price'] = fn_extended_reward_points_get_price_in_points($data, $auth);
             $cart_products[$key]['price'] = $cart_products[$key]['subtotal'] = 0;
 
@@ -140,6 +143,28 @@ function fn_extended_reward_points_fill_auth(&$auth, $user_data, $area, $origina
     }
 }
 
+function fn_extended_reward_points_pre_add_to_cart(&$product_data, $cart, $auth, $update) {
+    if (isset($auth['extended_reward_points']) && RewardPointsMechanics::isFullPayment($auth['extended_reward_points']['reward_points_mechanics'])) {
+        foreach ($product_data as $key => &$data) {
+            if ($update) {
+                $data['extra']['points_pay'] = $cart['products'][$key]['extra']['points_pay'] ?? false;
+            } elseif (empty($data['extra']['points_pay'])) {
+                $product_id = (!empty($data['product_id'])) ? intval($data['product_id']) : intval($key);
+                $_data = db_get_row('SELECT * FROM ?:products WHERE product_id = ?i', $product_id);
+                // if product can be sold only by points and not by funds
+                $data['extra']['points_pay'] = (YesNo::toBool($_data['is_pbp']) && !YesNo::toBool($_data['is_pbf']));
+            }
+        }
+        unset($data);
+    }
+}
+
+function fn_extended_reward_points_generate_cart_id(&$_cid, $extra, $only_selectable) {
+    if (!empty($extra['points_pay'])) {
+        $_cid[] = 'points_pay';
+    }
+}
+
 // vega
 function fn_extended_reward_points_add_product_to_cart_get_price($product_data, $cart, $auth, $update, $_id, &$data, $product_id, $amount, $price, $zero_price_action, &$allow_add) {
 
@@ -196,8 +221,7 @@ function fn_get_cart_points_in_use($cart, $exclude_products = []) {
     $total_use_points = 0;
     if (!empty($cart['products']))
     foreach ($cart['products'] as &$product) {
-        if (in_array($product['product_id'], $exclude_products) || !isset($product['extra']['is_pbp']) || !YesNo::toBool($product['extra']['is_pbp'])) continue;
-
+        if (in_array($product['product_id'], $exclude_products) || !isset($product['extra']['is_pbp']) || !YesNo::toBool($product['extra']['is_pbp']) || empty($product['extra']['points_pay'])) continue;
         $total_use_points += $product['extra']['point_price'] * $product['amount'];
     }
 

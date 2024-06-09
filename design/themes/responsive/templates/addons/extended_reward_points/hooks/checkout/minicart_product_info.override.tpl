@@ -1,4 +1,4 @@
-{if $auth.extended_reward_points.reward_points_mechanics == "RewardPointsMechanics::FULL_PAYMENT"|enum && $product.is_pbp == "YesNo::YES"|enum}
+{if $auth.extended_reward_points.reward_points_mechanics == "RewardPointsMechanics::FULL_PAYMENT"|enum && $product.extra.points_pay}
 {hook name="checkout:minicart_product_info"}
 {if $block.properties.products_links_type == "thumb"}
     <div class="ty-cart-items__list-item-image">

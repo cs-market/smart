@@ -75,6 +75,9 @@
         <item lang="ru" id="reward_points_report">Отчет о бонусных баллах</item>
         <item lang="ru" id="extended_reward_points.expired_reward_points_ttl">Истек срок действия бонусных баллов</item>
         <item lang="ru" id="extended_reward_points.user_points">Баллы пользователя</item>
+        <item lang="ru" id="extended_reward_points.pay_by_funds">Разрешить оплату и в валюте</item>
+        <item lang="ru" id="extended_reward_points.pay_by_points">Купить за баллы</item>
+        
         <item lang="ru" id="userlog_expiration_date">Дата сгорания</item>
     </language_variables>
     <queries>
@@ -103,5 +106,8 @@
           KEY `repaid_order_ids` (`repaid_order_ids`)
         )</item>
         <item for="uninstall">DROP TABLE `?:reward_point_details`;</item>
+
+        <item>ALTER TABLE `?:products` ADD `is_pbf` CHAR(1) NOT NULL DEFAULT 'N' AFTER `is_pbp`</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `is_pbf`</item>
     </queries>
 </addon>
