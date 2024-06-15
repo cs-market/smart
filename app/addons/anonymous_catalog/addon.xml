@@ -7,6 +7,9 @@
     <status>active</status>
     <name>Каталог товаров для гостей</name>
     <description>Позволяет вывести страницу со списком всех товаров без цены и зависимостей от юзергрупп</description>
+    <language_variables>
+        <item lang="ru" id="anonymous_catalog.auth_required">Для заказа продукции требуется авторизация</item>
+    </language_variables>
     <settings>
         <sections>
             <section id="general">

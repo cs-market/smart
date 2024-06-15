@@ -422,7 +422,7 @@ function fn_monolith_get_products($params, $fields, &$sortings, &$condition, $jo
 
 function fn_monolith_get_product_data($product_id, &$field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup){
     // если у товара балтики нет прайсов, то не достаем его
-    if (SiteArea::isStorefront(AREA)) {
+    if (SiteArea::isStorefront(AREA) && !empty($auth['user_id'])) {
         $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
 
         $price_usergroup .= db_quote(' AND IF (?:products.company_id = ?i, ?:product_prices.usergroup_id IN (?a), 1) ', 45, array_filter($usergroup_ids));

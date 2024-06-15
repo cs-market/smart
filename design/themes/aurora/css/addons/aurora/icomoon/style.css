@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ty-icon-aurora-attachment:before {
+  content: "\e91f";
+}
 .ty-icon-aurora-shipping:before {
   content: "\e91d";
 }

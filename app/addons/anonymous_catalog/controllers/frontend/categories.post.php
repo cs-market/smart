@@ -1,6 +1,7 @@
 <?php
 
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 defined('AREA') or die('Access denied');
 
@@ -23,6 +24,11 @@ if ($mode == 'product_catalog') {
         'get_discounts' => false,
         'get_features' => false
     ));
+    array_walk($products, function(&$p) {
+        $p['package_switcher'] = YesNo::NO;
+        $p['zero_price_action'] = 'P';
+    });
+
     if (isset($search['page']) && ($search['page'] > 1) && empty($products)) {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }

@@ -1,1 +1,1 @@
-{if $runtime.controller == 'auth' && $runtime.mode == $addons.baltika_auth_page.auth_mode}class=" baltika-auth "{/if}
+{if ($runtime.controller == 'auth' && $runtime.mode == $addons.baltika_auth_page.auth_mode) || ($runtime.controller == 'pages' && $smarty.request.page_id|in_array:[169,128])}class=" baltika-auth "{/if}
