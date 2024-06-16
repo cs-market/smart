@@ -44,7 +44,7 @@
                     {include file="common/product_data.tpl" product=$product show_amount_label=false }
                     
                     <div class="ty-grid-list__item 
-                        {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum} ty-dynamic-quantity {/if}
+                        {if $product.dynamic_quantity == "YesNo::YES"|enum} ty-dynamic-quantity {/if}
                         {if $product.in_cart} ty-product-in-cart {/if}
                         {if $product.is_weighted == "YesNo::YES"|enum} ty-weighted-product {/if}
                         {if $addons.aurora.inline_controls == "YesNo::YES"|enum} ty-grid-list__inline-controls {/if}

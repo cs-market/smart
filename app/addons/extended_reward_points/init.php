@@ -18,5 +18,7 @@ fn_register_hooks(
     'user_init',
     'fill_auth',
     'change_order_status',
-    'get_autostickers_pre'
+    'get_autostickers_pre',
+    'get_products_post',
+    ['get_product_data_post', 26732200]
 );

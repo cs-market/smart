@@ -1,11 +1,11 @@
 {script src="js/tygh/exceptions.js"}
-{if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum}{script src="js/addons/aurora/cart_content.js"}{/if}
+{if $product.dynamic_quantity == "YesNo::YES"|enum}{script src="js/addons/aurora/cart_content.js"}{/if}
 
 <div class="ty-product-block ty-product-detail">
     <div class="ty-product-block__wrapper 
     {if $product.in_cart} ty-product-in-cart {/if}
     {if $product.is_weighted == "YesNo::YES"|enum} ty-weighted-product {/if}
-    {if $addons.aurora.dynamic_quantity == "YesNo::YES"|enum} ty-dynamic-quantity {/if}
+    {if $product.dynamic_quantity == "YesNo::YES"|enum} ty-dynamic-quantity {/if}
     ">
     {hook name="products:view_main_info"}
         {if $product}

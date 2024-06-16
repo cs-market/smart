@@ -344,3 +344,18 @@ function fn_extended_reward_points_get_autostickers_pre(&$stickers, &$product, $
     if (!empty($product['points_info']['reward']['amount'])) $stickers['grant_rp'] = Registry::get('addons.extended_reward_points.grant_rp_sticker_id');
     if (!empty($product['points_info']['price'])) $stickers['reduce_rp'] = Registry::get('addons.extended_reward_points.reduce_rp_sticker_id');
 }
+
+function fn_extended_reward_points_get_products_post(&$products, $params, $lang_code) {
+    if (Registry::get('addons.aurora.status') == 'A') {
+        foreach ($products as $product_id => $product) {
+            $products[$product_id]['dynamic_quantity'] = (YesNo::toBool($product['dynamic_quantity']) && YesNo::toBool($product['is_pbf'])) ? YesNo::NO : $product['dynamic_quantity'];
+        }
+    }
+}
+
+function fn_extended_reward_points_get_product_data_post(&$product, $auth, $preview, $lang_code) {
+    if (Registry::get('addons.aurora.status') == 'A') {
+        $product['dynamic_quantity'] = (YesNo::toBool($product['dynamic_quantity']) && YesNo::toBool($product['is_pbf'])) ? YesNo::NO : $product['dynamic_quantity'];
+        if (!YesNo::toBool($product['dynamic_quantity'])) unset($product['in_cart'], $product['selected_amount']);
+    }
+}

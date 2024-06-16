@@ -27,16 +27,24 @@ function fn_blocks_aurora_get_vendor_info() {
 
 function fn_aurora_get_product_data_post(&$product_data, $auth, $preview, $lang_code) {
     $cart_products = array_column(Tygh::$app['session']['cart']['products'], 'amount', 'product_id');
-    if ($product_data['in_cart'] = !empty($cart_products[$product_data['product_id']])) {
-        if (YesNo::toBool(Registry::get('addons.aurora.dynamic_quantity'))) $product_data['selected_amount'] = $cart_products[$product_data['product_id']];
+    $product_data['dynamic_quantity'] = Registry::get('addons.aurora.dynamic_quantity');
+
+    if (YesNo::toBool($product_data['dynamic_quantity']) && $product_data['in_cart'] = !empty($cart_products[$product_data['product_id']])) {
+        $product_data['selected_amount'] = $cart_products[$product_data['product_id']];
+    }
+}
+
+function fn_aurora_load_products_extra_data_post(&$products, $product_ids, $params, $lang_code) {
+    foreach ($products as $product_id => $product) {
+        $products[$product_id]['dynamic_quantity'] = Registry::get('addons.aurora.dynamic_quantity');
     }
 }
 
 function fn_aurora_get_products_post(&$products, $params, $lang_code) {
     $cart_products = array_column(Tygh::$app['session']['cart']['products'], 'amount', 'product_id');
     foreach ($products as &$product_data) {
-        if ($product_data['in_cart'] = !empty($cart_products[$product_data['product_id']])) {
-            if (YesNo::toBool(Registry::get('addons.aurora.dynamic_quantity'))) {
+        if (YesNo::toBool($product_data['dynamic_quantity'])) {
+            if ($product_data['in_cart'] = !empty($cart_products[$product_data['product_id']])) {
                 $product_data['selected_amount'] = $cart_products[$product_data['product_id']];
             }
         }
