@@ -152,4 +152,10 @@ if (fn_allowed_for('MULTIVENDOR')) {
     $schema['export_fields']['Company']['alt_key'] = true;
 }
 
+if (Registry::get('addons.product_stickers.status') == 'A') {
+    $schema['export_fields']['Stickers'] = array (
+        'db_field' => 'sticker_ids',
+    );
+}
+
 return $schema;
